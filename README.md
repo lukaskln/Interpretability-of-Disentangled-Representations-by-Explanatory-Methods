@@ -1,7 +1,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/lukaskln/Semi-supervised-methods">
-    <img src="https://ethz.ch/services/de/service/kommunikation/corporate-design/logo/_jcr_content/par/fullwidthimage/image.imageformat.fullwidth.973245899.png" alt="Logo" width="250"> 
+    <img src="https://images.bhaskarassets.com/web2images/521/2020/03/12/corona_1584026916.gif" alt="Logo" width="250"> 
   </a>
 
   <h3 align="center">Semi-supervised Methods</h3>
