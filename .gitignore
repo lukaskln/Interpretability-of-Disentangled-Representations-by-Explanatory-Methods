@@ -1,3 +1,5 @@
 __pycache__/
 tb_logs/
 checkpoints/
+wandb/
+lightning_logs/

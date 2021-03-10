@@ -1,3 +1,4 @@
+import argparse
 from argparse import ArgumentParser
 
 """
@@ -17,4 +18,6 @@ def str2bool(v):
 
 def get_parser():
     parser = ArgumentParser(description='master thesis')
+    # General Model Parameters
+    parser.add_argument("--seed", default=42, type=int)
     return parser
