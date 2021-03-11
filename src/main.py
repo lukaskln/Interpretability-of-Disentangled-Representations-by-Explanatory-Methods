@@ -49,7 +49,7 @@ trainer.fit(model_enc, datamodule_mnist.train_dataloader())
 
 #wandb_logger = WandbLogger(project='VAE-LinReg', job_type='train')
 
-model_reg = LogisticRegression(freeze = False, input_dim= 16 , num_classes=10, learning_rate=0.0001)
+model_reg = LogisticRegression(freeze = True, input_dim= 20 , num_classes=10, learning_rate=0.0001)
 
 trainer = pl.Trainer(
     #logger=wandb_logger, 
@@ -61,5 +61,5 @@ trainer.fit(model_reg, datamodule_mnist.train_dataloader(), datamodule_mnist.val
 
 trainer.test(model_reg, datamodule_mnist.test_dataloader())
 
-wandb.finish()
+#wandb.finish()
 

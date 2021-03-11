@@ -6,11 +6,28 @@ from torch import optim, Tensor
 import pytorch_lightning as pl
 
 class betaVAE(pl.LightningModule):
-    def __init__(self,enc_out_dim=256, latent_dim=16, input_height=784, beta = 1):
+    def __init__(self,enc_out_dim=256, latent_dim=20, input_height=784, beta = 1):
         super(betaVAE, self).__init__()
         self.save_hyperparameters()
-        self.encoder = nn.Sequential(nn.Linear(input_height, enc_out_dim), nn.ReLU())
-        self.decoder = nn.Sequential(nn.Linear(latent_dim, enc_out_dim), nn.ReLU(), nn.Linear(enc_out_dim, input_height))
+        self.encoder = nn.Sequential(
+            nn.Linear(input_height, 500), nn.ReLU(),
+            nn.BatchNorm1d(num_features=500),
+            nn.Linear(500, 250), nn.ReLU(),
+            nn.BatchNorm1d(num_features=250),
+            nn.Linear(250, 50), nn.ReLU(),
+            nn.BatchNorm1d(num_features=50),
+            nn.Linear(50, enc_out_dim), nn.ReLU(),
+            )
+
+        self.decoder = nn.Sequential(
+            nn.Linear(latent_dim, 50), nn.ReLU(),
+            nn.BatchNorm1d(num_features=50),
+            nn.Linear(50, 250), nn.ReLU(),
+            nn.BatchNorm1d(num_features=250),
+            nn.Linear(250, 500), nn.ReLU(),
+            nn.BatchNorm1d(num_features=500),
+            nn.Linear(500, input_height)
+            )
         self.fc_mu=nn.Linear(enc_out_dim, latent_dim)
         self.fc_log_var=nn.Linear(enc_out_dim, latent_dim)
        
