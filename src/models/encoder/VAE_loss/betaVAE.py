@@ -6,7 +6,7 @@ from torch import optim, Tensor
 import pytorch_lightning as pl
 
 class betaVAE(pl.LightningModule):
-    def __init__(self,enc_out_dim=256, latent_dim=16, input_height=784):
+    def __init__(self,enc_out_dim=256, latent_dim=16, input_height=784, beta = 1):
         super(betaVAE, self).__init__()
         self.save_hyperparameters()
         self.encoder = nn.Sequential(nn.Linear(input_height, enc_out_dim), nn.ReLU())
@@ -21,18 +21,14 @@ class betaVAE(pl.LightningModule):
         return mu,log_var
     
     def sampling(self,mu, log_var):
-        std = torch.exp(log_var / 2)
-        q = torch.distributions.Normal(mu, std)
+        std = torch.exp(log_var * 0.5) + 0.00001
+        q = torch.distributions.Normal(mu + 0.00001, std)
         z = q.rsample()
         return z
 
     def forward(self,x):
-        z = self.encoder(x)
-        mu = self.fc_mu(z)
-        log_var = self.fc_log_var(z)
-        std = torch.exp(log_var / 2)
-        q = torch.distributions.Normal(mu, std)
-        z = q.rsample()
+        mu, log_var = self.encode(x)
+        z = self.sampling(mu, log_var)
         return z
 
     def decode(self,z):
@@ -42,7 +38,7 @@ class betaVAE(pl.LightningModule):
     def loss(self,recons,x, mu, logvar):
         bce = F.binary_cross_entropy(recons, x)
         kld = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
-        return bce + kld
+        return bce + self.hparams.beta * kld
 
     def training_step(self, batch, batch_idx):
         x, _ = batch
@@ -58,3 +54,9 @@ class betaVAE(pl.LightningModule):
 
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=1e-4)
+    
+    def get_progress_bar_dict(self):
+        tqdm_dict = super().get_progress_bar_dict()
+        if 'v_num' in tqdm_dict:
+            del tqdm_dict['v_num']
+        return tqdm_dict
