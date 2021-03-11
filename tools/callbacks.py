@@ -10,7 +10,7 @@ early_stop_callback_VAE = EarlyStopping(
     min_delta=0.001,
     patience=10,
     verbose=False,
-    mode='max'
+    mode='min'
 )
 
 checkpoint_callback_VAE = ModelCheckpoint(
@@ -31,5 +31,5 @@ early_stop_callback_cla = EarlyStopping(
     min_delta=0.001,
     patience=10,
     verbose=False,
-    mode='max'
+    mode='min'
 )
