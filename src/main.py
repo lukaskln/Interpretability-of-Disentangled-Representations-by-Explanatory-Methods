@@ -11,7 +11,7 @@ os.chdir(main_dir)
 
 import pytorch_lightning as pl
 
-#warnings.filterwarnings('ignore')
+warnings.filterwarnings('ignore')
 
 from src.__init__ import *
 
@@ -49,10 +49,9 @@ trainer.fit(model_enc, datamodule_mnist.train_dataloader())
 
 #wandb_logger = WandbLogger(project='VAE-LinReg', job_type='train')
 
-model_reg = LogisticRegression(freeze = True, input_dim= 16 , num_classes=10, learning_rate=0.0001)
+model_reg = LogisticRegression(freeze = False, input_dim= 16 , num_classes=10, learning_rate=0.0001)
 
 trainer = pl.Trainer(
-    max_epochs = 2,
     #logger=wandb_logger, 
     callbacks=[early_stop_callback_cla], 
     gpus=torch.cuda.device_count()
