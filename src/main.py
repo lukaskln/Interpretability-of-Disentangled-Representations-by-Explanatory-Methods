@@ -40,8 +40,8 @@ for f in files:
 
 model_enc = betaVAE(beta = 1)
 
-trainer = pl.Trainer(callbacks=[early_stop_callback_VAE,checkpoint_callback_VAE], gpus=torch.cuda.device_count())
-trainer.fit(model_enc, datamodule_mnist.train_dataloader())
+trainer = pl.Trainer(min_epochs = 30, callbacks=[early_stop_callback_VAE,checkpoint_callback_VAE], gpus=torch.cuda.device_count())
+trainer.fit(model_enc, datamodule_mnist)
 
 
 #### Train Classifier ####

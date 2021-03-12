@@ -26,7 +26,7 @@ opener.addheaders = [('User-agent', 'Mozilla/5.0')]
 urllib.request.install_opener(opener)
 
 datamodule_mnist = MNISTDataModule(data_dir= data_path / "mnist/",
-    batch_size=32)
+    batch_size=100)
 
 datamodule_mnist.prepare_data()
 datamodule_mnist.setup()

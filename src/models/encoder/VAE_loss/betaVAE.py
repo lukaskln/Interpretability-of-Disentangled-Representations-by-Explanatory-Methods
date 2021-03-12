@@ -14,13 +14,11 @@ class betaVAE(pl.LightningModule):
             nn.BatchNorm1d(num_features=500),
             nn.Linear(500, 250), nn.ReLU(),
             nn.BatchNorm1d(num_features=250),
-            nn.Linear(250, 50), nn.ReLU(),
-            nn.Linear(50, enc_out_dim), nn.ReLU(),
+            nn.Linear(250, enc_out_dim), nn.ReLU(),
             )
 
         self.decoder = nn.Sequential(
-            nn.Linear(latent_dim, 50), nn.ReLU(),
-            nn.Linear(50, 250), nn.ReLU(),
+            nn.Linear(latent_dim, 250), nn.ReLU(),
             nn.BatchNorm1d(num_features=250),
             nn.Linear(250, 500), nn.ReLU(),
             nn.Linear(500, input_height)
@@ -70,11 +68,34 @@ class betaVAE(pl.LightningModule):
         kl = kl.mean()
 
         vae_loss = recon_loss + self.hparams.beta*kl
-        self.log_dict({'vae_loss': vae_loss.mean()})
+
+        self.log('loss', vae_loss, on_epoch=False, prog_bar=True, on_step = True)
+        return vae_loss
+
+    def validation_step(self, batch, batch_idx):
+        x, y = batch
+        x = x.view(-1, self.hparams.input_height)
+
+        mu, log_var = self.encode(x)
+        p, q, z = self.sampling(mu, log_var)
+
+        reconst = self.decode(z)
+
+        recon_loss = F.mse_loss(reconst, x, reduction='mean')
+
+        log_qz = q.log_prob(z)
+        log_pz = p.log_prob(z)
+
+        kl = log_qz - log_pz
+        kl = kl.mean()
+
+        vae_loss = recon_loss + self.hparams.beta*kl
+
+        self.log('val_loss', vae_loss, on_epoch=True, prog_bar=True)
         return vae_loss
 
     def configure_optimizers(self):
-        return torch.optim.Adam(self.parameters(), lr=1e-4)
+        return torch.optim.Adam(self.parameters(), lr=0.001)
     
     def get_progress_bar_dict(self):
         tqdm_dict = super().get_progress_bar_dict()
