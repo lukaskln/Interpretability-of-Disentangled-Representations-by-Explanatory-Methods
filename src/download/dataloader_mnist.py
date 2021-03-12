@@ -15,8 +15,7 @@ class MNISTDataModule(pl.LightningDataModule):
         self.batch_size = batch_size
 
         self.transform = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize((0.5, 0.5), (0.5, 0.5))
+            transforms.ToTensor()
         ])
 
         self.dims = (1, 28, 28)

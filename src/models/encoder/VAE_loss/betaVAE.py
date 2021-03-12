@@ -6,7 +6,7 @@ from torch import optim, Tensor
 import pytorch_lightning as pl
 
 class betaVAE(pl.LightningModule):
-    def __init__(self,enc_out_dim=256, latent_dim=20, input_height=784, beta = 1):
+    def __init__(self,enc_out_dim=256, latent_dim=10, input_height=784, beta = 1):
         super(betaVAE, self).__init__()
         self.save_hyperparameters()
         self.encoder = nn.Sequential(
@@ -15,19 +15,17 @@ class betaVAE(pl.LightningModule):
             nn.Linear(500, 250), nn.ReLU(),
             nn.BatchNorm1d(num_features=250),
             nn.Linear(250, 50), nn.ReLU(),
-            nn.BatchNorm1d(num_features=50),
             nn.Linear(50, enc_out_dim), nn.ReLU(),
             )
 
         self.decoder = nn.Sequential(
             nn.Linear(latent_dim, 50), nn.ReLU(),
-            nn.BatchNorm1d(num_features=50),
             nn.Linear(50, 250), nn.ReLU(),
             nn.BatchNorm1d(num_features=250),
             nn.Linear(250, 500), nn.ReLU(),
-            nn.BatchNorm1d(num_features=500),
             nn.Linear(500, input_height)
             )
+        
         self.fc_mu=nn.Linear(enc_out_dim, latent_dim)
         self.fc_log_var=nn.Linear(enc_out_dim, latent_dim)
        
@@ -38,34 +36,40 @@ class betaVAE(pl.LightningModule):
         return mu,log_var
     
     def sampling(self,mu, log_var):
-        std = torch.exp(log_var * 0.5) + 0.00001
-        q = torch.distributions.Normal(mu + 0.00001, std)
+        std = torch.exp(log_var / 2)
+        p = torch.distributions.Normal(torch.zeros_like(mu), torch.ones_like(std))
+        q = torch.distributions.Normal(mu, std)
         z = q.rsample()
-        return z
+        return p, q, z
+
+    def decode(self, z):
+        reconst = self.decoder(z)
+        return torch.sigmoid(reconst)
 
     def forward(self,x):
         mu, log_var = self.encode(x)
-        z = self.sampling(mu, log_var)
+        p, q, z = self.sampling(mu, log_var)
         return z
-
-    def decode(self,z):
-        reconst=self.decoder(z)
-        return torch.sigmoid(reconst)       
-
-    def loss(self,recons,x, mu, logvar):
-        bce = F.binary_cross_entropy(recons, x)
-        kld = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
-        return bce + self.hparams.beta * kld
+    
 
     def training_step(self, batch, batch_idx):
-        x, _ = batch
-        x= x.view(-1,self.hparams.input_height)
-        mu,log_var = self.encode(x)
-        z = self.sampling(mu, log_var)
- 
-        recons = self.decode(z)
+        x, y = batch
+        x = x.view(-1, self.hparams.input_height)
 
-        vae_loss=self.loss(recons,x,mu,log_var)
+        mu, log_var = self.encode(x)
+        p, q, z = self.sampling(mu, log_var)
+
+        reconst = self.decode(z)
+
+        recon_loss = F.mse_loss(reconst, x, reduction='mean')
+
+        log_qz = q.log_prob(z)
+        log_pz = p.log_prob(z)
+
+        kl = log_qz - log_pz
+        kl = kl.mean()
+
+        vae_loss = recon_loss + self.hparams.beta*kl
         self.log_dict({'vae_loss': vae_loss.mean()})
         return vae_loss
 

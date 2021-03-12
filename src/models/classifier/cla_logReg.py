@@ -23,7 +23,6 @@ class LogisticRegression(pl.LightningModule):
         optimizer: Optimizer = Adam,
         l1_strength: float = 0.0,
         l2_strength: float = 0.0,
-        freeze: bool = False,
         **kwargs
     ):
         super().__init__()
@@ -31,12 +30,10 @@ class LogisticRegression(pl.LightningModule):
         self.optimizer = optimizer
 
         self.encoder = betaVAE.load_from_checkpoint(path_ckpt)
-        
-        if self.hparams.freeze == True:
-            self.encoder.freeze()
+        self.encoder.freeze()
             
         self.linear = nn.Linear(in_features=self.hparams.input_dim, out_features=self.hparams.num_classes, bias=bias)
-
+        
     def forward(self, x):
         x = self.encoder(x)
         x = self.linear(x)
