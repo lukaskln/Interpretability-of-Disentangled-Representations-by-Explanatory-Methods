@@ -7,7 +7,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 
 early_stop_callback_VAE = EarlyStopping(
     monitor='vae_loss',
-    min_delta=0.001,
+    min_delta=0.00001,
     patience=10,
     verbose=False,
     mode='min'
