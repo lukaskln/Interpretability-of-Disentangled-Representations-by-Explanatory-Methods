@@ -11,8 +11,7 @@ from torch.optim.optimizer import Optimizer
 
 from src.models.encoder.VAE_loss.betaVAE import *
 
-path_ckpt = Path(__file__).resolve(
-).parents[3] / "models/encoder/VAE_loss/Best_VAE.ckpt"
+path_ckpt = Path(__file__).resolve().parents[3] / "models/encoder/VAE_loss/Best_VAE.ckpt"
 
 
 class MLP(pl.LightningModule):
@@ -53,7 +52,10 @@ class MLP(pl.LightningModule):
 
         loss /= x.size(0)
 
+        acc = accuracy(y_hat, y)
+
         self.log('loss', loss, on_epoch=True)
+        self.log('acc', acc, on_epoch=False,  prog_bar=True)
         return loss
 
     def validation_step(self, batch, batch_idx):

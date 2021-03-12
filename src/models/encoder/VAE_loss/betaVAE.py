@@ -87,7 +87,7 @@ class betaVAE(pl.LightningModule):
         log_pz = p.log_prob(z)
 
         kl = log_qz - log_pz
-        kl = kl.mean()
+        kl = 0.1*kl.mean()
 
         vae_loss = recon_loss + self.hparams.beta*kl
 
