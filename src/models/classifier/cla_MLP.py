@@ -33,14 +33,12 @@ class MLP(pl.LightningModule):
         self.encoder.freeze()
 
         self.fc1 = nn.Linear(self.hparams.input_dim, 256, bias=bias)
-        self.fc2 = nn.Linear(256, 128, bias=bias)
-        self.fc3 = nn.Linear(128, self.hparams.num_classes, bias=bias)
+        self.fc2 = nn.Linear(256, self.hparams.num_classes, bias=bias)
 
     def forward(self, x):
         x = self.encoder(x)
         x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = self.fc3(x)
+        x = self.fc2(x)
         y_hat = F.softmax(x, dim=1)
         return y_hat
 
