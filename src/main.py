@@ -30,8 +30,7 @@ pl.seed_everything(hparams.seed)
 
 ## Remove all saved models ##
 
-files = glob.glob(
-        os.path.join(main_dir, "models\\encoder\\VAE_loss","*")
+files = glob.glob(os.path.dirname(Path(os.getcwd(), "models/encoder/VAE_loss/*/test/"))
         )
 
 for f in files:
@@ -39,7 +38,7 @@ for f in files:
 
 #### Train Encoder ####
 
-model_enc = betaVAE(beta = 4)
+model_enc = betaVAE(beta = 1)
 
 trainer = pl.Trainer(callbacks=[early_stop_callback_VAE,checkpoint_callback_VAE], gpus=torch.cuda.device_count())
 trainer.fit(model_enc, datamodule_mnist.train_dataloader())

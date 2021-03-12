@@ -66,7 +66,9 @@ class LogisticRegression(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         x, y = batch
+
         x = x.view(x.size(0), -1)
+
         y_hat = self(x)
 
         acc = accuracy(y_hat, y)

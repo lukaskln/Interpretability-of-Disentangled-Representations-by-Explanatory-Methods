@@ -49,7 +49,7 @@ class betaVAE(pl.LightningModule):
     def forward(self,x):
         mu, log_var = self.encode(x)
         p, q, z = self.sampling(mu, log_var)
-        return z
+        return mu
     
 
     def training_step(self, batch, batch_idx):
