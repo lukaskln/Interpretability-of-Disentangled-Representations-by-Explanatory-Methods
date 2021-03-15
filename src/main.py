@@ -4,23 +4,20 @@ import warnings
 import datetime
 import os
 import glob
-import platform
-import subprocess
 from pathlib import Path
 
 main_dir = os.path.dirname(Path(__file__).resolve().parents[0])
 os.chdir(main_dir)
 
-plt = platform.system()
+# TODO shell commands from script:
+#import platform
+#from subprocess import call
+# plt = platform.system()
 
-if plt == "Linux": # Change to your ethz account
-    command = 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/cluster/home/luklein/miniconda3/lib'
-    process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
-    output, error = process.communicate()
-
-    command = 'export PYTHONPATH="${PYTHONPATH}:/cluster/home/luklein/Semi-supervised-methods"'
-    process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
-    output, error = process.communicate()
+# if plt == "Linux": 
+#     command = 'export PYTHONPATH="${PYTHONPATH}:/cluster/home/luklein/Semi-supervised-methods"'
+#     process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+#     output, error = process.communicate()
 
 import pytorch_lightning as pl
 
