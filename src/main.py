@@ -28,7 +28,7 @@ from src.__init__ import *
 ## WandB Logging ##
 
 import wandb
-#wandb.init(project="VAE-LinReg")
+#wandb.init(project="VAE-mnist")
 from pytorch_lightning.loggers import WandbLogger
 
 ## Parser and Seeding ##
@@ -56,13 +56,13 @@ trainer.fit(model_enc, datamodule_mnist)
 
 #### Train Classifier ####
 
-#wandb_logger = WandbLogger(project='VAE-LinReg', job_type='train')
+wandb_logger = WandbLogger(project='VAE-mnist')
 
 model_reg = MLP(
     freeze=True, input_dim=10, num_classes=10, learning_rate=0.001)
 
 trainer = pl.Trainer(
-    #logger=wandb_logger, 
+    logger=wandb_logger, 
     callbacks=[early_stop_callback_cla], 
     gpus=torch.cuda.device_count()
 )
