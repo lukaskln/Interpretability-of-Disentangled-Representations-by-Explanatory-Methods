@@ -52,7 +52,6 @@ model_reg = MLP(
     freeze=True, input_dim=10, num_classes=10, learning_rate=0.001)
 
 trainer = pl.Trainer(
-    max_epochs = 2,
     #logger=wandb_logger, 
     callbacks=[early_stop_callback_cla], 
     gpus=torch.cuda.device_count()

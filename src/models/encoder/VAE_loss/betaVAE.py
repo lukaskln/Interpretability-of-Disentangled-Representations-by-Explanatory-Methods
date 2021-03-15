@@ -6,7 +6,7 @@ from torch import optim, Tensor
 import pytorch_lightning as pl
 
 class betaVAE(pl.LightningModule):
-    def __init__(self,enc_out_dim=256, latent_dim=10, input_height=784, beta = 1):
+    def __init__(self, enc_out_dim=256, latent_dim=10, input_height=784, beta=1, lr = 1e-4):
         super(betaVAE, self).__init__()
         self.save_hyperparameters()
         self.encoder = nn.Sequential(
@@ -31,71 +31,60 @@ class betaVAE(pl.LightningModule):
         z = self.encoder(x)
         mu = self.fc_mu(z)
         log_var = self.fc_log_var(z)
-        return mu,log_var
+        return mu, log_var
     
     def sampling(self,mu, log_var):
-        std = torch.exp(log_var / 2)
-        p = torch.distributions.Normal(torch.zeros_like(mu), torch.ones_like(std))
+        std = torch.exp(log_var * 0.5)
         q = torch.distributions.Normal(mu, std)
         z = q.rsample()
-        return p, q, z
+        return z
 
     def decode(self, z):
         reconst = self.decoder(z)
         return torch.sigmoid(reconst)
 
     def forward(self,x):
+        # During inference, we simply spit out the mean of the
+        # learned distribution for the current input.  We could
+        # use a random sample from the distribution, but mu of
+        # course has the highest probability.
         mu, log_var = self.encode(x)
-        p, q, z = self.sampling(mu, log_var)
         return mu
+
+    def loss(self, recons, x, mu, logvar):
+        bce = F.binary_cross_entropy(recons, x)
+        kld = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+        return bce + self.hparams.beta*kld
     
 
     def training_step(self, batch, batch_idx):
-        x, y = batch
+        x, _ = batch
         x = x.view(-1, self.hparams.input_height)
-
         mu, log_var = self.encode(x)
-        p, q, z = self.sampling(mu, log_var)
+        z = self.sampling(mu, log_var)
 
-        reconst = self.decode(z)
+        recons = self.decode(z)
 
-        recon_loss = F.mse_loss(reconst, x, reduction='mean')
-
-        log_qz = q.log_prob(z)
-        log_pz = p.log_prob(z)
-
-        kl = log_qz - log_pz
-        kl = kl.mean()
-
-        vae_loss = recon_loss + self.hparams.beta*kl
+        vae_loss = self.loss(recons, x, mu, log_var)
 
         self.log('loss', vae_loss, on_epoch=False, prog_bar=True, on_step = True)
         return vae_loss
 
     def validation_step(self, batch, batch_idx):
-        x, y = batch
+        x, _ = batch
         x = x.view(-1, self.hparams.input_height)
-
         mu, log_var = self.encode(x)
-        p, q, z = self.sampling(mu, log_var)
+        z = self.sampling(mu, log_var)
 
-        reconst = self.decode(z)
+        recons = self.decode(z)
 
-        recon_loss = F.mse_loss(reconst, x, reduction='mean')
-
-        log_qz = q.log_prob(z)
-        log_pz = p.log_prob(z)
-
-        kl = log_qz - log_pz
-        kl = 0.1*kl.mean()
-
-        vae_loss = recon_loss + self.hparams.beta*kl
+        vae_loss = self.loss(recons, x, mu, log_var)
 
         self.log('val_loss', vae_loss, on_epoch=True, prog_bar=True)
         return vae_loss
 
     def configure_optimizers(self):
-        return torch.optim.Adam(self.parameters(), lr=0.001)
+        return torch.optim.Adam(self.parameters(), lr=1e-4)
     
     def get_progress_bar_dict(self):
         tqdm_dict = super().get_progress_bar_dict()
