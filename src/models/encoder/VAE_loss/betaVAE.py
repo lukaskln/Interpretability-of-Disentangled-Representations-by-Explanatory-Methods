@@ -54,7 +54,11 @@ class betaVAE(pl.LightningModule):
         return mu
 
     def loss(self, recons, x, mu, logvar):
-        bce = F.binary_cross_entropy(recons, x)
+        bce = F.binary_cross_entropy(
+            recons.view(-1, self.hparams.input_height), 
+            x.view(-1, self.hparams.input_height),
+            reduction='sum')
+
         kld = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
         return bce + self.hparams.beta*kld
     

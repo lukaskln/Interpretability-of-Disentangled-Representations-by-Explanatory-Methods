@@ -25,7 +25,7 @@ def get_parser():
     # VAE
     parser.add_argument("--VAE_beta", default=1, type=int)
     parser.add_argument("--VAE_lr", default=0.001, type=float)
-    parser.add_argument("--VAE_min_epochs", default=30, type=int)
+    parser.add_argument("--VAE_max_epochs", default=70, type=int)
     parser.add_argument("--VAE_min_delta", default=0.001, type=float)
     parser.add_argument("--VAE_latent_dim", default=10, type=int)
     # Classifier

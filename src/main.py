@@ -60,9 +60,9 @@ model_enc = betaVAE(
 ## Training Encoder ##
 
 trainer = pl.Trainer(
-    min_epochs=hparams.VAE_min_epochs,
+    max_epochs=hparams.VAE_max_epochs,
     progress_bar_refresh_rate=25,
-    callbacks=[early_stop_callback_VAE, checkpoint_callback_VAE],
+    callbacks=[checkpoint_callback_VAE],
     gpus=torch.cuda.device_count()
 )
 
