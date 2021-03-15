@@ -1,5 +1,5 @@
 #### Setup ####
-
+from pytorch_lightning.loggers import WandbLogger
 import warnings
 import datetime
 import os
@@ -25,12 +25,6 @@ warnings.filterwarnings('ignore')
 
 from src.__init__ import *
 
-## WandB Logging ##
-
-import wandb
-#wandb.init(project="VAE-mnist")
-from pytorch_lightning.loggers import WandbLogger
-
 ## Parser and Seeding ##
 
 parser = get_parser()
@@ -46,23 +40,53 @@ files = glob.glob(os.path.dirname(Path(os.getcwd(), "models/encoder/VAE_loss/*/t
 for f in files:
     os.remove(f) # As administrator
 
-#### Train Encoder ####
+#### Logging ####
 
-model_enc = betaVAE(beta = 1)
+if hparams.logger == True:
+    import wandb
+    #wandb.init(project="VAE-mnist")
+    wandb_logger = WandbLogger(project='VAE-mnist')
+else:
+    wandb_logger = False
 
-trainer = pl.Trainer(min_epochs = 30, callbacks=[early_stop_callback_VAE,checkpoint_callback_VAE], gpus=torch.cuda.device_count())
-trainer.fit(model_enc, datamodule_mnist)
+#### Select Encoder ####
 
+model_enc = betaVAE(
+    beta=hparams.VAE_beta,
+    lr=hparams.VAE_lr,
+    latent_dim=hparams.VAE_latent_dim
+)
 
-#### Train Classifier ####
-
-wandb_logger = WandbLogger(project='VAE-mnist')
-
-model_reg = MLP(
-    freeze=True, input_dim=10, num_classes=10, learning_rate=0.01)
+## Training Encoder ##
 
 trainer = pl.Trainer(
-    logger=wandb_logger, 
+    min_epochs=hparams.VAE_min_epochs,
+    progress_bar_refresh_rate=25,
+    callbacks=[early_stop_callback_VAE, checkpoint_callback_VAE],
+    gpus=torch.cuda.device_count()
+)
+
+trainer.fit(model_enc, datamodule_mnist)
+
+#### Select Classifier ####    
+
+if hparams.cla_type == "MLP":
+    model_reg = MLP(input_dim=hparams.VAE_latent_dim,
+                    num_classes=10, 
+                    learning_rate=hparams.cla_lr)
+elif hparams.cla_type == "reg":
+    model_reg = LogisticRegression(
+        input_dim=hparams.VAE_latent_dim,
+        num_classes=10, 
+        learning_rate=hparams.cla_lr)
+else:
+    raise Exception('Unknown Classifer type: ' + hparams.cla_type)
+
+
+## Training Classifier ##
+trainer = pl.Trainer(
+    logger=wandb_logger,
+    progress_bar_refresh_rate=25,
     callbacks=[early_stop_callback_cla], 
     gpus=torch.cuda.device_count()
 )
@@ -71,5 +95,6 @@ trainer.fit(model_reg, datamodule_mnist.train_dataloader(), datamodule_mnist.val
 
 trainer.test(model_reg, datamodule_mnist.test_dataloader())
 
-#wandb.finish()
+if hparams.logger == True:
+    wandb.finish()
 

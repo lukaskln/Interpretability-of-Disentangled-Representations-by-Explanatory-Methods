@@ -8,7 +8,9 @@ import pytorch_lightning as pl
 class betaVAE(pl.LightningModule):
     def __init__(self, enc_out_dim=256, latent_dim=10, input_height=784, beta=1, lr=0.001):
         super(betaVAE, self).__init__()
+
         self.save_hyperparameters()
+        
         self.encoder = nn.Sequential(
             nn.Linear(input_height, 500), nn.ReLU(),
             nn.BatchNorm1d(num_features=500),
@@ -84,7 +86,7 @@ class betaVAE(pl.LightningModule):
         return vae_loss
 
     def configure_optimizers(self):
-        return torch.optim.Adam(self.parameters(), lr=1e-4)
+        return torch.optim.Adam(self.parameters(), lr= self.hparams.lr)
     
     def get_progress_bar_dict(self):
         tqdm_dict = super().get_progress_bar_dict()

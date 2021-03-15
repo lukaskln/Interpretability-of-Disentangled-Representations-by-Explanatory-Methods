@@ -3,11 +3,15 @@ from pathlib import Path
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from pytorch_lightning.callbacks import ModelCheckpoint
 
+from tools.argparser import *
+parser = get_parser()
+hparams = parser.parse_args()
+
 #### VAE Callbacks ####
 
 early_stop_callback_VAE = EarlyStopping(
     monitor='val_loss',
-    min_delta=0.0001,
+    min_delta=hparams.VAE_min_delta,
     patience=10,
     verbose=False,
     mode='min'
