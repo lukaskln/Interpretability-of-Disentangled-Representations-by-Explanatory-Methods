@@ -47,7 +47,7 @@ class betaVAE(pl.LightningModule):
         # During inference, we simply spit out the mean of the
         # learned distribution for the current input.  We could
         # use a random sample from the distribution, but mu of
-        # course has the highest probability.
+        # course has the highest probability (MAP Estimator).
         mu, log_var = self.encode(x)
         return mu
 
