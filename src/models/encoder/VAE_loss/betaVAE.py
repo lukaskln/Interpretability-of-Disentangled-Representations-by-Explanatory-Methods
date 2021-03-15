@@ -6,7 +6,7 @@ from torch import optim, Tensor
 import pytorch_lightning as pl
 
 class betaVAE(pl.LightningModule):
-    def __init__(self, enc_out_dim=256, latent_dim=10, input_height=784, beta=1, lr = 1e-4):
+    def __init__(self, enc_out_dim=256, latent_dim=10, input_height=784, beta=1, lr=0.001):
         super(betaVAE, self).__init__()
         self.save_hyperparameters()
         self.encoder = nn.Sequential(
