@@ -29,6 +29,7 @@ def get_parser():
     parser.add_argument("--VAE_min_delta", default=0.001, type=float)
     parser.add_argument("--VAE_latent_dim", default=10, type=int)
     parser.add_argument("--VAE_CNN", default=False, type=str2bool)
+    parser.add_argument("--CNN_capacity", default=64, type=int)
     # Classifier
     parser.add_argument("--cla_type", choices=["MLP", "reg"], default="MLP", type=str)
     parser.add_argument("--cla_lr", default=0.001, type=float)

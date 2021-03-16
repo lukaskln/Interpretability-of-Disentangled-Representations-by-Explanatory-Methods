@@ -61,7 +61,8 @@ else:
     model_enc = betaVAE_CNN(
         beta=hparams.VAE_beta,
         lr=hparams.VAE_lr,
-        latent_dim=hparams.VAE_latent_dim
+        latent_dim=hparams.VAE_latent_dim,
+        c = hparams.CNN_capacity
     )
 
 ## Training Encoder ##

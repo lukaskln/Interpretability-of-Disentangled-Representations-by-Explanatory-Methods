@@ -37,13 +37,13 @@ class betaVAE(pl.LightningModule):
     
     def sampling(self,mu, log_var):
         std = torch.exp(log_var * 0.5)
-        q = torch.distributions.Normal(mu, std)
+        q = torch.distributions.Normal(mu + 1e-05, std + 1e-05)
         z = q.rsample()
         return z
 
     def decode(self, z):
-        reconst = self.decoder(z)
-        return torch.sigmoid(reconst)
+        reconst = F.sigmoid(self.decoder(z))
+        return reconst
 
     def forward(self,x):
         # During inference, we simply spit out the mean of the
