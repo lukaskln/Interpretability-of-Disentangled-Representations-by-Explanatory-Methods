@@ -51,11 +51,18 @@ else:
 
 #### Select Encoder ####
 
-model_enc = betaVAE(
-    beta=hparams.VAE_beta,
-    lr=hparams.VAE_lr,
-    latent_dim=hparams.VAE_latent_dim
-)
+if hparams.VAE_CNN == False:
+    model_enc = betaVAE(
+        beta=hparams.VAE_beta,
+        lr=hparams.VAE_lr,
+        latent_dim=hparams.VAE_latent_dim
+    )
+else: 
+    model_enc = betaVAE_CNN(
+        beta=hparams.VAE_beta,
+        lr=hparams.VAE_lr,
+        latent_dim=hparams.VAE_latent_dim
+    )
 
 ## Training Encoder ##
 
@@ -72,12 +79,14 @@ trainer.fit(model_enc, datamodule_mnist)
 
 if hparams.cla_type == "MLP":
     model_reg = MLP(input_dim=hparams.VAE_latent_dim,
-                    num_classes=10, 
+                    num_classes=10,
+                    VAE_CNN=hparams.VAE_CNN,
                     learning_rate=hparams.cla_lr)
 elif hparams.cla_type == "reg":
     model_reg = LogisticRegression(
         input_dim=hparams.VAE_latent_dim,
         num_classes=10, 
+        VAE_CNN=hparams.VAE_CNN,
         learning_rate=hparams.cla_lr)
 else:
     raise Exception('Unknown Classifer type: ' + hparams.cla_type)

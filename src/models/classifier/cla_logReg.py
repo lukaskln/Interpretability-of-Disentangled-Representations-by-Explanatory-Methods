@@ -10,6 +10,7 @@ from torch.optim import Adam
 from torch.optim.optimizer import Optimizer
 
 from src.models.encoder.VAE_loss.betaVAE import *
+from src.models.encoder.VAE_loss.betaVAE_CNN import *
 
 path_ckpt = Path(__file__).resolve().parents[3] / "models/encoder/VAE_loss/Best_VAE.ckpt"
 
@@ -23,13 +24,19 @@ class LogisticRegression(pl.LightningModule):
         optimizer: Optimizer = Adam,
         l1_strength: float = 0.0,
         l2_strength: float = 0.0,
+        VAE_CNN: bool = False,
         **kwargs
     ):
         super().__init__()
         self.save_hyperparameters()
         self.optimizer = optimizer
+        self.VAE_CNN = VAE_CNN
 
-        self.encoder = betaVAE.load_from_checkpoint(path_ckpt)
+        if VAE_CNN == False:
+            self.encoder = betaVAE.load_from_checkpoint(path_ckpt)
+        else:
+            self.encoder = betaVAE_CNN.load_from_checkpoint(path_ckpt)
+
         self.encoder.freeze()
             
         self.linear = nn.Linear(in_features=self.hparams.input_dim, out_features=self.hparams.num_classes, bias=bias)
@@ -43,8 +50,9 @@ class LogisticRegression(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         x, y = batch
 
-        # flatten any input
-        x = x.view(x.size(0), -1)
+        if self.VAE_CNN == False:
+            x = x.view(x.size(0), -1)
+
         y_hat = self(x)
 
         loss = F.cross_entropy(y_hat, y, reduction='sum')
@@ -67,7 +75,8 @@ class LogisticRegression(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         x, y = batch
 
-        x = x.view(x.size(0), -1)
+        if self.VAE_CNN == False:
+            x = x.view(x.size(0), -1)
 
         y_hat = self(x)
 
@@ -85,7 +94,10 @@ class LogisticRegression(pl.LightningModule):
 
     def test_step(self, batch, batch_idx):
         x, y = batch
-        x = x.view(x.size(0), -1)
+
+        if self.VAE_CNN == False:
+            x = x.view(x.size(0), -1)
+
         y_hat = self(x)
 
         acc = accuracy(y_hat, y)

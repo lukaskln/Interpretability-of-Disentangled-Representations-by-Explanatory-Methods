@@ -10,6 +10,7 @@ from torch.optim import Adam
 from torch.optim.optimizer import Optimizer
 
 from src.models.encoder.VAE_loss.betaVAE import *
+from src.models.encoder.VAE_loss.betaVAE_CNN import *
 
 path_ckpt = Path(__file__).resolve().parents[3] / "models/encoder/VAE_loss/Best_VAE.ckpt"
 
@@ -22,13 +23,19 @@ class MLP(pl.LightningModule):
         bias: bool = True,
         learning_rate: float = 1e-4,
         optimizer: Optimizer = Adam,
+        VAE_CNN = False,
         **kwargs
     ):
         super().__init__()
         self.save_hyperparameters()
         self.optimizer = optimizer
+        self.VAE_CNN = VAE_CNN
 
-        self.encoder = betaVAE.load_from_checkpoint(path_ckpt)
+        if VAE_CNN==False:
+            self.encoder = betaVAE.load_from_checkpoint(path_ckpt)
+        else:
+            self.encoder = betaVAE_CNN.load_from_checkpoint(path_ckpt)
+
         self.encoder.freeze()
 
         self.fc1 = nn.Linear(self.hparams.input_dim, 256, bias=bias)
@@ -44,8 +51,10 @@ class MLP(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         x, y = batch
 
-        # flatten any input
-        x = x.view(x.size(0), -1)
+        if self.VAE_CNN == False:
+            # flatten any input
+            x = x.view(x.size(0), -1)
+        
         y_hat = self(x)
 
         loss = F.cross_entropy(y_hat, y, reduction='sum')
@@ -60,7 +69,10 @@ class MLP(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         x, y = batch
-        x = x.view(x.size(0), -1)
+
+        if self.VAE_CNN == False:
+            x = x.view(x.size(0), -1)
+
         y_hat = self(x)
 
         acc = accuracy(y_hat, y)
@@ -77,7 +89,10 @@ class MLP(pl.LightningModule):
 
     def test_step(self, batch, batch_idx):
         x, y = batch
-        x = x.view(x.size(0), -1)
+
+        if self.VAE_CNN == False:
+            x = x.view(x.size(0), -1)
+        
         y_hat = self(x)
 
         acc = accuracy(y_hat, y)
