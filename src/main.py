@@ -51,19 +51,38 @@ else:
 
 #### Select Encoder ####
 
-if hparams.VAE_CNN == False:
-    model_enc = betaVAE(
-        beta=hparams.VAE_beta,
-        lr=hparams.VAE_lr,
-        latent_dim=hparams.VAE_latent_dim
-    )
-else: 
-    model_enc = betaVAE_CNN(
-        beta=hparams.VAE_beta,
-        lr=hparams.VAE_lr,
-        latent_dim=hparams.VAE_latent_dim,
-        c = hparams.CNN_capacity
-    )
+if hparams.TCVAE==True:
+    if hparams.VAE_CNN == False:
+        model_enc = betaTCVAE(
+            beta=hparams.VAE_beta,
+            alpha=hparams.TCVAE_alpha,
+            gamma=hparams.TCVAE_gamma,
+            lr=hparams.VAE_lr,
+            latent_dim=hparams.VAE_latent_dim
+        )
+    else: 
+        model_enc = betaTCVAE_CNN(
+            beta=hparams.VAE_beta,
+            alpha=hparams.TCVAE_alpha,
+            gamma=hparams.TCVAE_gamma,
+            lr=hparams.VAE_lr,
+            latent_dim=hparams.VAE_latent_dim,
+            c=hparams.CNN_capacity
+        )
+else:
+    if hparams.VAE_CNN == False:
+        model_enc = betaVAE(
+            beta=hparams.VAE_beta,
+            lr=hparams.VAE_lr,
+            latent_dim=hparams.VAE_latent_dim
+        )
+    else: 
+        model_enc = betaVAE_CNN(
+            beta=hparams.VAE_beta,
+            lr=hparams.VAE_lr,
+            latent_dim=hparams.VAE_latent_dim,
+            c = hparams.CNN_capacity
+        )
 
 ## Training Encoder ##
 
@@ -82,12 +101,14 @@ if hparams.cla_type == "MLP":
     model_reg = MLP(input_dim=hparams.VAE_latent_dim,
                     num_classes=10,
                     VAE_CNN=hparams.VAE_CNN,
+                    TCVAE=hparams.TCVAE,
                     learning_rate=hparams.cla_lr)
 elif hparams.cla_type == "reg":
     model_reg = LogisticRegression(
         input_dim=hparams.VAE_latent_dim,
         num_classes=10, 
         VAE_CNN=hparams.VAE_CNN,
+        TCVAE=hparams.TCVAE,
         learning_rate=hparams.cla_lr)
 else:
     raise Exception('Unknown Classifer type: ' + hparams.cla_type)

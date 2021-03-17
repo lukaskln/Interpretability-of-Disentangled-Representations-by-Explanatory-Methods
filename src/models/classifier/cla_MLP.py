@@ -10,7 +10,9 @@ from torch.optim import Adam
 from torch.optim.optimizer import Optimizer
 
 from src.models.encoder.VAE_loss.betaVAE import *
+from src.models.encoder.VAE_loss.betaTCVAE import *
 from src.models.encoder.VAE_loss.betaVAE_CNN import *
+from src.models.encoder.VAE_loss.betaTCVAE_CNN import *
 
 path_ckpt = Path(__file__).resolve().parents[3] / "models/encoder/VAE_loss/Best_VAE.ckpt"
 
@@ -24,6 +26,7 @@ class MLP(pl.LightningModule):
         learning_rate: float = 1e-4,
         optimizer: Optimizer = Adam,
         VAE_CNN = False,
+        TCVAE=False,
         **kwargs
     ):
         super().__init__()
@@ -31,10 +34,16 @@ class MLP(pl.LightningModule):
         self.optimizer = optimizer
         self.VAE_CNN = VAE_CNN
 
-        if VAE_CNN==False:
-            self.encoder = betaVAE.load_from_checkpoint(path_ckpt)
-        else:
-            self.encoder = betaVAE_CNN.load_from_checkpoint(path_ckpt)
+        if TCVAE==True:
+            if VAE_CNN == False:
+                self.encoder = betaTCVAE.load_from_checkpoint(path_ckpt)
+            else:
+                self.encoder = betaTCVAE_CNN.load_from_checkpoint(path_ckpt)
+        else:    
+            if VAE_CNN==False:
+                self.encoder = betaVAE.load_from_checkpoint(path_ckpt)
+            else:
+                self.encoder = betaVAE_CNN.load_from_checkpoint(path_ckpt)
 
         self.encoder.freeze()
 

@@ -55,8 +55,10 @@ class betaVAE_CNN(pl.LightningModule):
             x.view(-1, self.hparams.input_height),
             reduction='sum')
 
+        batch_size = x.shape[0]
+
         kld = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
-        return bce + self.hparams.beta*kld
+        return (bce + self.hparams.beta*kld)/batch_size
 
     def training_step(self, batch, batch_idx):
         x, _ = batch

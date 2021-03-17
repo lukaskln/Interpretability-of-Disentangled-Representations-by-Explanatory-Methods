@@ -11,6 +11,8 @@ from torch.optim.optimizer import Optimizer
 
 from src.models.encoder.VAE_loss.betaVAE import *
 from src.models.encoder.VAE_loss.betaVAE_CNN import *
+from src.models.encoder.VAE_loss.betaTCVAE import *
+from src.models.encoder.VAE_loss.betaTCVAE_CNN import *
 
 path_ckpt = Path(__file__).resolve().parents[3] / "models/encoder/VAE_loss/Best_VAE.ckpt"
 
@@ -25,6 +27,7 @@ class LogisticRegression(pl.LightningModule):
         l1_strength: float = 0.0,
         l2_strength: float = 0.0,
         VAE_CNN: bool = False,
+        TCVAE: bool = False,
         **kwargs
     ):
         super().__init__()
@@ -32,10 +35,16 @@ class LogisticRegression(pl.LightningModule):
         self.optimizer = optimizer
         self.VAE_CNN = VAE_CNN
 
-        if VAE_CNN == False:
-            self.encoder = betaVAE.load_from_checkpoint(path_ckpt)
+        if TCVAE == True:
+            if VAE_CNN == False:
+                self.encoder = betaTCVAE.load_from_checkpoint(path_ckpt)
+            else:
+                self.encoder = betaTCVAE_CNN.load_from_checkpoint(path_ckpt)
         else:
-            self.encoder = betaVAE_CNN.load_from_checkpoint(path_ckpt)
+            if VAE_CNN == False:
+                self.encoder = betaVAE.load_from_checkpoint(path_ckpt)
+            else:
+                self.encoder = betaVAE_CNN.load_from_checkpoint(path_ckpt)
 
         self.encoder.freeze()
             
