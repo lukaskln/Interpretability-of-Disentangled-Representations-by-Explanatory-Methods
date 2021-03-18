@@ -3,6 +3,7 @@ import torch
 from src.download.dataloader_cifar10 import *
 from src.download.dataloader_mnist import *
 from src.download.dataloader_mnist_small import *
+from src.download.dataloader_mnist_small_enc import *
 from pathlib import Path
 from tools.argparser import *
 
@@ -37,7 +38,15 @@ datamodule_mnist.prepare_data()
 datamodule_mnist.setup()
 
 datamodule_mnist_small = MNIST_smallDataModule(data_dir=data_path / "mnist/",
-                                               batch_size= 32)
+                                               batch_size=32,
+                                               seed=hparams.seed)
 
 datamodule_mnist_small.prepare_data()
 datamodule_mnist_small.setup()
+
+datamodule_mnist_small_enc = MNIST_small_encDataModule(data_dir=data_path / "mnist/",
+                                   batch_size=hparams.batch_size,
+                                   seed=hparams.seed)
+
+datamodule_mnist_small_enc.prepare_data()
+datamodule_mnist_small_enc.setup()

@@ -8,7 +8,7 @@ from torchvision.datasets import MNIST
 from torchvision import transforms
 
 
-class MNIST_smallDataModule(pl.LightningDataModule):
+class MNIST_small_encDataModule(pl.LightningDataModule):
     def __init__(self, batch_size, data_dir, seed):
         super().__init__()
         self.data_dir = data_dir
@@ -32,9 +32,9 @@ class MNIST_smallDataModule(pl.LightningDataModule):
         if stage == 'fit' or stage is None:
             mnist_full = MNIST(self.data_dir, train=True,
                                transform=self.transform)
-            data, _ = random_split(mnist_full, [1000, 59000], 
+            _, data = random_split(mnist_full, [1000, 59000], 
                                    generator=torch.Generator().manual_seed(self.seed))
-            self.mnist_train, self.mnist_val = random_split(data, [800, 200], 
+            self.mnist_train, self.mnist_val = random_split(data, [50000, 9000], 
                                                             generator=torch.Generator().manual_seed(self.seed))
         # Assign test dataset for use in dataloader(s)
         if stage == 'test' or stage is None:

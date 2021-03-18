@@ -93,7 +93,10 @@ trainer = pl.Trainer(
     gpus=torch.cuda.device_count()
 )
 
-trainer.fit(model_enc, datamodule_mnist)
+if hparams.small_label_data == True:
+    trainer.fit(model_enc, datamodule_mnist_small_enc)
+else:
+    trainer.fit(model_enc, datamodule_mnist)
 
 #### Select Classifier ####    
 
