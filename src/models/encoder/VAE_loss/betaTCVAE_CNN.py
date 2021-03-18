@@ -97,7 +97,7 @@ class betaTCVAE_CNN(pl.LightningModule):
             (dataset_size * (batch_size - 1))
 
         importance_weights = torch.Tensor(batch_size, batch_size).fill_(
-            1 / (batch_size - 1))
+            1 / (batch_size - 1)).to(x.device)
 
         importance_weights.view(-1)[::batch_size] = 1 / dataset_size
         importance_weights.view(-1)[1::batch_size] = strat_weight
