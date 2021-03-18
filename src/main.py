@@ -37,8 +37,8 @@ pl.seed_everything(hparams.seed)
 files = glob.glob(os.path.dirname(Path(os.getcwd(), "models/encoder/VAE_loss/*/test/"))
         )
 
-# for f in files:
-#     os.remove(f) # As administrator
+for f in files:
+    os.remove(f) # As administrator
 
 #### Logging ####
 
@@ -93,7 +93,7 @@ trainer = pl.Trainer(
     gpus=torch.cuda.device_count()
 )
 
-#trainer.fit(model_enc, datamodule_mnist)
+trainer.fit(model_enc, datamodule_mnist)
 
 #### Select Classifier ####    
 
