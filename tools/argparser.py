@@ -22,6 +22,7 @@ def get_parser():
     parser.add_argument("--seed", default=42, type=int)
     parser.add_argument("--logger", default=False, type=str2bool)
     parser.add_argument("--batch_size", default=100, type=int)
+    parser.add_argument("--small_label_data", default=False, type=str2bool)
     # VAE
     parser.add_argument("--VAE_beta", default=1, type=int)
     parser.add_argument("--VAE_lr", default=0.001, type=float)

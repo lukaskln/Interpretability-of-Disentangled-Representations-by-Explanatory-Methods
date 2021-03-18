@@ -20,9 +20,9 @@ class betaTCVAE_CNN(pl.LightningModule):
                  c = 64
                  ):
         super(betaTCVAE_CNN, self).__init__()
+        self.save_hyperparameters()
         self.c = c
         self.num_iter = 0
-        self.save_hyperparameters()
 
         # Encoder
 

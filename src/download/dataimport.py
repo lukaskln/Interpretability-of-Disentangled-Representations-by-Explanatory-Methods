@@ -2,6 +2,7 @@ from six.moves import urllib
 import torch
 from src.download.dataloader_cifar10 import *
 from src.download.dataloader_mnist import *
+from src.download.dataloader_mnist_small import *
 from pathlib import Path
 from tools.argparser import *
 
@@ -34,3 +35,9 @@ datamodule_mnist = MNISTDataModule(data_dir= data_path / "mnist/",
 
 datamodule_mnist.prepare_data()
 datamodule_mnist.setup()
+
+datamodule_mnist_small = MNIST_smallDataModule(data_dir=data_path / "mnist/",
+                                               batch_size= 32)
+
+datamodule_mnist_small.prepare_data()
+datamodule_mnist_small.setup()
