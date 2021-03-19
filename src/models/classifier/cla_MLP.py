@@ -13,6 +13,8 @@ from src.models.encoder.VAE_loss.betaVAE import *
 from src.models.encoder.VAE_loss.betaTCVAE import *
 from src.models.encoder.VAE_loss.betaVAE_CNN import *
 from src.models.encoder.VAE_loss.betaTCVAE_CNN import *
+from src.models.encoder.VAE_loss.betaVAE_ResNet import *
+from src.models.encoder.VAE_loss.betaTCVAE_ResNet import *
 
 path_ckpt = Path(__file__).resolve().parents[3] / "models/encoder/VAE_loss/Best_VAE.ckpt"
 
@@ -25,25 +27,27 @@ class MLP(pl.LightningModule):
         bias: bool = True,
         learning_rate: float = 1e-4,
         optimizer: Optimizer = Adam,
-        VAE_CNN = False,
-        TCVAE=False,
+        VAE_type = "betaVAE",
         **kwargs
     ):
         super().__init__()
         self.save_hyperparameters()
         self.optimizer = optimizer
-        self.VAE_CNN = VAE_CNN
+        self.VAE_type = VAE_type
 
-        if TCVAE==True:
-            if VAE_CNN == False:
-                self.encoder = betaTCVAE.load_from_checkpoint(path_ckpt)
-            else:
-                self.encoder = betaTCVAE_CNN.load_from_checkpoint(path_ckpt)
-        else:    
-            if VAE_CNN==False:
-                self.encoder = betaVAE.load_from_checkpoint(path_ckpt)
-            else:
-                self.encoder = betaVAE_CNN.load_from_checkpoint(path_ckpt)
+
+        if VAE_type == "betaVAE":
+            self.encoder = betaVAE.load_from_checkpoint(path_ckpt)
+        elif VAE_type == "betaVAE_CNN":
+            self.encoder = betaVAE_CNN.load_from_checkpoint(path_ckpt)
+        elif VAE_type == "betaVAE_ResNet":
+            self.encoder = betaVAE_ResNet.load_from_checkpoint(path_ckpt)
+        elif VAE_type == "betaTCVAE":
+            self.encoder = betaTCVAE.load_from_checkpoint(path_ckpt)
+        elif VAE_type == "betaTCVAE_CNN":
+            self.encoder = betaTCVAE_CNN.load_from_checkpoint(path_ckpt)
+        elif VAE_type == "betaTCVAE_ResNet":
+            self.encoder = betaTCVAE_ResNet.load_from_checkpoint(path_ckpt)
 
         self.encoder.freeze()
 
@@ -60,7 +64,7 @@ class MLP(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         x, y = batch
 
-        if self.VAE_CNN == False:
+        if self.VAE_type == "betaVAE" or "betaTCVAE":
             # flatten any input
             x = x.view(x.size(0), -1)
         
@@ -79,7 +83,7 @@ class MLP(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         x, y = batch
 
-        if self.VAE_CNN == False:
+        if self.VAE_type == "betaVAE" or "betaTCVAE":
             x = x.view(x.size(0), -1)
 
         y_hat = self(x)
@@ -99,7 +103,7 @@ class MLP(pl.LightningModule):
     def test_step(self, batch, batch_idx):
         x, y = batch
 
-        if self.VAE_CNN == False:
+        if self.VAE_type == "betaVAE" or "betaTCVAE":
             x = x.view(x.size(0), -1)
         
         y_hat = self(x)

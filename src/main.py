@@ -119,15 +119,13 @@ else:
 if hparams.cla_type == "MLP":
     model_reg = MLP(input_dim=hparams.VAE_latent_dim,
                     num_classes=10,
-                    VAE_CNN=hparams.VAE_CNN,
-                    TCVAE=hparams.TCVAE,
+                    VAE_type= hparams.VAE_type,
                     learning_rate=hparams.cla_lr)
 elif hparams.cla_type == "reg":
     model_reg = LogisticRegression(
         input_dim=hparams.VAE_latent_dim,
-        num_classes=10, 
-        VAE_CNN=hparams.VAE_CNN,
-        TCVAE=hparams.TCVAE,
+        num_classes=10,
+        VAE_type=hparams.VAE_type,
         learning_rate=hparams.cla_lr)
 else:
     raise Exception('Unknown Classifer type: ' + hparams.cla_type)
