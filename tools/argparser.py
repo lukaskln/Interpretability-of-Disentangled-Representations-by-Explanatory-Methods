@@ -32,7 +32,7 @@ def get_parser():
     parser.add_argument("--VAE_max_epochs", default=70, type=int)
     parser.add_argument("--VAE_min_delta", default=0.001, type=float)
     parser.add_argument("--VAE_latent_dim", default=10, type=int)
-    parser.add_argument("--CNN_capacity", default=32, type=int)
+    parser.add_argument("--CNN_capacity", default=64, type=int)
     # beta TCVAE
     parser.add_argument("--TCVAE_gamma", default=1, type=int)
     parser.add_argument("--TCVAE_alpha", default=1, type=int)
