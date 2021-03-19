@@ -37,8 +37,8 @@ pl.seed_everything(hparams.seed)
 files = glob.glob(os.path.dirname(Path(os.getcwd(), "models/encoder/VAE_loss/*/test/"))
         )
 
-# for f in files:
-#     os.remove(f) # As administrator
+for f in files:
+    os.remove(f) # As administrator
 
 #### Logging ####
 
