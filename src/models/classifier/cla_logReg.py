@@ -62,7 +62,7 @@ class LogisticRegression(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         x, y = batch
 
-        if self.VAE_type == "betaVAE" or "betaTCVAE":
+        if self.VAE_type == "betaVAE" or self.VAE_type == "betaTCVAE":
             x = x.view(x.size(0), -1)
 
         y_hat = self(x)
@@ -87,7 +87,7 @@ class LogisticRegression(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         x, y = batch
 
-        if self.VAE_type == "betaVAE" or "betaTCVAE":
+        if self.VAE_type == "betaVAE" or self.VAE_type == "betaTCVAE":
             x = x.view(x.size(0), -1)
 
         y_hat = self(x)
@@ -107,7 +107,7 @@ class LogisticRegression(pl.LightningModule):
     def test_step(self, batch, batch_idx):
         x, y = batch
 
-        if self.VAE_type == "betaVAE" or "betaTCVAE":
+        if self.VAE_type == "betaVAE" or self.VAE_type == "betaTCVAE":
             x = x.view(x.size(0), -1)
 
         y_hat = self(x)
