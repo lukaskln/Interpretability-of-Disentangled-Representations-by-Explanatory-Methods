@@ -51,38 +51,54 @@ else:
 
 #### Select Encoder ####
 
-if hparams.TCVAE==True:
-    if hparams.VAE_CNN == False:
-        model_enc = betaTCVAE(
-            beta=hparams.VAE_beta,
-            alpha=hparams.TCVAE_alpha,
-            gamma=hparams.TCVAE_gamma,
-            lr=hparams.VAE_lr,
-            latent_dim=hparams.VAE_latent_dim
-        )
-    else: 
-        model_enc = betaTCVAE_CNN(
-            beta=hparams.VAE_beta,
-            alpha=hparams.TCVAE_alpha,
-            gamma=hparams.TCVAE_gamma,
-            lr=hparams.VAE_lr,
-            latent_dim=hparams.VAE_latent_dim,
-            c=hparams.CNN_capacity
-        )
-else:
-    if hparams.VAE_CNN == False:
+if hparams.VAE_type=="betaVAE":
         model_enc = betaVAE(
-            beta=hparams.VAE_beta,
-            lr=hparams.VAE_lr,
-            latent_dim=hparams.VAE_latent_dim
-        )
-    else: 
-        model_enc = betaVAE_CNN(
-            beta=hparams.VAE_beta,
-            lr=hparams.VAE_lr,
-            latent_dim=hparams.VAE_latent_dim,
-            c = hparams.CNN_capacity
-        )
+        beta=hparams.VAE_beta,
+        lr=hparams.VAE_lr,
+        latent_dim=hparams.VAE_latent_dim
+    )
+elif hparams.VAE_type == "betaVAE_CNN":
+    model_enc = betaVAE_CNN(
+        beta=hparams.VAE_beta,
+        lr=hparams.VAE_lr,
+        latent_dim=hparams.VAE_latent_dim,
+        c = hparams.CNN_capacity
+    )
+elif hparams.VAE_type == "betaVAE_ResNet":
+    model_enc = betaVAE_ResNet(
+        beta=hparams.VAE_beta,
+        lr=hparams.VAE_lr,
+        latent_dim=hparams.VAE_latent_dim,
+        c=hparams.CNN_capacity
+    )
+elif hparams.VAE_type == "betaTCVAE":
+    model_enc = betaTCVAE(
+        beta=hparams.VAE_beta,
+        alpha=hparams.TCVAE_alpha,
+        gamma=hparams.TCVAE_gamma,
+        lr=hparams.VAE_lr,
+        latent_dim=hparams.VAE_latent_dim
+    )
+elif hparams.VAE_type == "betaTCVAE_CNN":
+    model_enc = betaTCVAE_CNN(
+        beta=hparams.VAE_beta,
+        alpha=hparams.TCVAE_alpha,
+        gamma=hparams.TCVAE_gamma,
+        lr=hparams.VAE_lr,
+        latent_dim=hparams.VAE_latent_dim,
+        c=hparams.CNN_capacity
+    )
+elif hparams.VAE_type == "betaTCVAE_ResNet":
+    model_enc = betaTCVAE_ResNet(
+        beta=hparams.VAE_beta,
+        alpha=hparams.TCVAE_alpha,
+        gamma=hparams.TCVAE_gamma,
+        lr=hparams.VAE_lr,
+        latent_dim=hparams.VAE_latent_dim,
+        c=hparams.CNN_capacity
+    )
+else:
+    raise Exception('Unknown Encoder type: ' + hparams.VAE_type)
 
 ## Training Encoder ##
 
