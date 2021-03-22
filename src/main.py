@@ -51,7 +51,7 @@ else:
 
 #### Select Encoder ####
 
-if hparams.VAE_type=="betaVAE":
+if hparams.VAE_type=="betaVAE_MLP":
         model_enc = betaVAE(
         beta=hparams.VAE_beta,
         lr=hparams.VAE_lr,
@@ -71,7 +71,7 @@ elif hparams.VAE_type == "betaVAE_ResNet":
         latent_dim=hparams.VAE_latent_dim,
         c=hparams.CNN_capacity
     )
-elif hparams.VAE_type == "betaTCVAE":
+elif hparams.VAE_type == "betaTCVAE_MLP":
     model_enc = betaTCVAE(
         beta=hparams.VAE_beta,
         alpha=hparams.TCVAE_alpha,

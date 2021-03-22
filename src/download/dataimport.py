@@ -1,6 +1,5 @@
 from six.moves import urllib
 import torch
-from src.download.dataloader_cifar10 import *
 from src.download.dataloader_mnist import *
 from src.download.dataloader_mnist_small import *
 from src.download.dataloader_mnist_small_enc import *
@@ -18,13 +17,6 @@ hparams = parser.parse_args()
 ### Define data path ###
 base_path = Path(__file__).resolve().parents[2]
 data_path = base_path / "data"
-
-# Cifar 10
-datamodule_cifar10 = CIFAR10DataModule(data_dir = data_path / "cifar-10/", 
-                                       batch_size=hparams.batch_size)
-
-datamodule_cifar10.prepare_data()
-datamodule_cifar10.setup()
 
 # MNIST
 opener = urllib.request.build_opener()

@@ -24,9 +24,9 @@ def get_parser():
     parser.add_argument("--batch_size", default=100, type=int)
     parser.add_argument("--small_label_data", default=False, type=str2bool)
     # VAE
-    parser.add_argument("--VAE_type", choices=["betaVAE", "betaVAE_CNN", "betaVAE_ResNet",
-                                               "betaTCVAE", "betaTCVAE_CNN", "betaTCVAE_ResNet"], 
-                                               default="betaVAE", type=str)
+    parser.add_argument("--VAE_type", choices=["betaVAE_MLP", "betaVAE_CNN", "betaVAE_ResNet",
+                                               "betaTCVAE_MLP", "betaTCVAE_CNN", "betaTCVAE_ResNet"], 
+                                               default="betaVAE_MLP", type=str)
     parser.add_argument("--VAE_beta", default=1, type=int)
     parser.add_argument("--VAE_lr", default=0.001, type=float)
     parser.add_argument("--VAE_max_epochs", default=70, type=int)

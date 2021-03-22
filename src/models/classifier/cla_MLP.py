@@ -27,7 +27,7 @@ class MLP(pl.LightningModule):
         bias: bool = True,
         learning_rate: float = 1e-4,
         optimizer: Optimizer = Adam,
-        VAE_type = "betaVAE",
+        VAE_type = "betaVAE_MLP",
         **kwargs
     ):
         super().__init__()
@@ -36,13 +36,13 @@ class MLP(pl.LightningModule):
         self.VAE_type = VAE_type
 
 
-        if VAE_type == "betaVAE":
+        if VAE_type == "betaVAE_MLP":
             self.encoder = betaVAE.load_from_checkpoint(path_ckpt)
         elif VAE_type == "betaVAE_CNN":
             self.encoder = betaVAE_CNN.load_from_checkpoint(path_ckpt)
         elif VAE_type == "betaVAE_ResNet":
             self.encoder = betaVAE_ResNet.load_from_checkpoint(path_ckpt)
-        elif VAE_type == "betaTCVAE":
+        elif VAE_type == "betaTCVAE_MLP":
             self.encoder = betaTCVAE.load_from_checkpoint(path_ckpt)
         elif VAE_type == "betaTCVAE_CNN":
             self.encoder = betaTCVAE_CNN.load_from_checkpoint(path_ckpt)
@@ -64,7 +64,7 @@ class MLP(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         x, y = batch
 
-        if self.VAE_type == "betaVAE" or self.VAE_type == "betaTCVAE":
+        if self.VAE_type == "betaVAE_MLP" or self.VAE_type == "betaTCVAE_MLP":
             # flatten any input
             x = x.view(x.size(0), -1)
 
@@ -83,7 +83,7 @@ class MLP(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         x, y = batch
 
-        if self.VAE_type == "betaVAE" or self.VAE_type == "betaTCVAE":
+        if self.VAE_type == "betaVAE_MLP" or self.VAE_type == "betaTCVAE_MLP":
             x = x.view(x.size(0), -1)
 
         y_hat = self(x)
@@ -103,7 +103,7 @@ class MLP(pl.LightningModule):
     def test_step(self, batch, batch_idx):
         x, y = batch
 
-        if self.VAE_type == "betaVAE" or self.VAE_type == "betaTCVAE":
+        if self.VAE_type == "betaVAE_MLP" or self.VAE_type == "betaTCVAE_MLP":
             x = x.view(x.size(0), -1)
         
         y_hat = self(x)
