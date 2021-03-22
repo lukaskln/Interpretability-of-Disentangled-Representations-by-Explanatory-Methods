@@ -3,6 +3,8 @@ import torch
 from src.download.dataloader_mnist import *
 from src.download.dataloader_mnist_small import *
 from src.download.dataloader_mnist_small_enc import *
+from src.download.dataloader_dSprites_small import *
+from src.download.dataloader_dSprites_small_enc import *
 from pathlib import Path
 from tools.argparser import *
 
@@ -42,3 +44,19 @@ datamodule_mnist_small_enc = MNIST_small_encDataModule(data_dir=data_path / "mni
 
 datamodule_mnist_small_enc.prepare_data()
 datamodule_mnist_small_enc.setup()
+
+# dSprites
+
+datamodule_dSprites_small_enc = dSprites_small_encDataModule(data_dir=data_path / "dSprites/",
+                                                       batch_size=hparams.batch_size,
+                                                       seed=hparams.seed)
+
+datamodule_dSprites_small_enc.prepare_data()
+datamodule_dSprites_small_enc.setup()
+
+datamodule_dSprites_small = dSprites_smallDataModule(data_dir=data_path / "dSprites/",
+                                                             batch_size=hparams.batch_size,
+                                                             seed=hparams.seed)
+
+datamodule_dSprites_small.prepare_data()
+datamodule_dSprites_small.setup()

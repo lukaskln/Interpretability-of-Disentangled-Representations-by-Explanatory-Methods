@@ -80,6 +80,7 @@ class betaVAE(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         x, _ = batch
+
         x = x.view(-1, self.hparams.input_height)
         mu, log_var = self.encode(x)
         z = self.sampling(mu, log_var)

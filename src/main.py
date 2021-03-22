@@ -32,13 +32,11 @@ hparams = parser.parse_args()
 
 pl.seed_everything(hparams.seed)
 
-## Remove all saved models ##
+## Remove interim model models ##
 
-files = glob.glob(os.path.dirname(Path(os.getcwd(), "models/encoder/VAE_loss/*/test/"))
-        )
-
-for f in files:
-    os.remove(f) # As administrator
+path_ckpt = Path(os.getcwd(), "models/encoder/VAE_loss/Best_VAE.ckpt")
+if os.path.exists(path_ckpt) == True:
+    os.remove(str(path_ckpt))
 
 #### Logging ####
 
@@ -49,27 +47,55 @@ if hparams.logger == True:
 else:
     wandb_logger = False
 
+#### Dataset selection ####
+print("Loading Datasets...")
+
+if hparams.dataset=="mnist":
+    datamodule_enc = datamodule_mnist
+    dataloader_train = datamodule_mnist.train_dataloader()
+    dataloader_val = datamodule_mnist.val_dataloader()
+    dataloader_test = datamodule_mnist.test_dataloader()
+    input_height = 784
+    num_classes = 10
+elif hparams.dataset == "mnist_small":
+    datamodule_enc = datamodule_mnist_small_enc
+    dataloader_train = datamodule_mnist_small.train_dataloader()
+    dataloader_val = datamodule_mnist_small.val_dataloader()
+    dataloader_test = datamodule_mnist_small.test_dataloader()
+    input_height = 784
+    num_classes = 10
+elif hparams.dataset == "dSprites_small":
+    datamodule_enc = datamodule_dSprites_small_enc
+    dataloader_train = datamodule_dSprites_small.train_dataloader()
+    dataloader_val = datamodule_dSprites_small.val_dataloader()
+    dataloader_test = datamodule_dSprites_small.test_dataloader()
+    input_height = 4096
+    num_classes = 10
+
 #### Select Encoder ####
 
 if hparams.VAE_type=="betaVAE_MLP":
         model_enc = betaVAE(
         beta=hparams.VAE_beta,
         lr=hparams.VAE_lr,
-        latent_dim=hparams.VAE_latent_dim
+        latent_dim=hparams.VAE_latent_dim,
+        input_height=input_height
     )
 elif hparams.VAE_type == "betaVAE_CNN":
     model_enc = betaVAE_CNN(
         beta=hparams.VAE_beta,
         lr=hparams.VAE_lr,
         latent_dim=hparams.VAE_latent_dim,
-        c = hparams.CNN_capacity
+        c=hparams.CNN_capacity,
+        input_height=input_height
     )
 elif hparams.VAE_type == "betaVAE_ResNet":
     model_enc = betaVAE_ResNet(
         beta=hparams.VAE_beta,
         lr=hparams.VAE_lr,
         latent_dim=hparams.VAE_latent_dim,
-        c=hparams.CNN_capacity
+        c=hparams.CNN_capacity,
+        input_height=input_height
     )
 elif hparams.VAE_type == "betaTCVAE_MLP":
     model_enc = betaTCVAE(
@@ -77,7 +103,8 @@ elif hparams.VAE_type == "betaTCVAE_MLP":
         alpha=hparams.TCVAE_alpha,
         gamma=hparams.TCVAE_gamma,
         lr=hparams.VAE_lr,
-        latent_dim=hparams.VAE_latent_dim
+        latent_dim=hparams.VAE_latent_dim,
+        input_height=input_height
     )
 elif hparams.VAE_type == "betaTCVAE_CNN":
     model_enc = betaTCVAE_CNN(
@@ -86,7 +113,8 @@ elif hparams.VAE_type == "betaTCVAE_CNN":
         gamma=hparams.TCVAE_gamma,
         lr=hparams.VAE_lr,
         latent_dim=hparams.VAE_latent_dim,
-        c=hparams.CNN_capacity
+        c=hparams.CNN_capacity,
+        input_height=input_height
     )
 elif hparams.VAE_type == "betaTCVAE_ResNet":
     model_enc = betaTCVAE_ResNet(
@@ -95,7 +123,8 @@ elif hparams.VAE_type == "betaTCVAE_ResNet":
         gamma=hparams.TCVAE_gamma,
         lr=hparams.VAE_lr,
         latent_dim=hparams.VAE_latent_dim,
-        c=hparams.CNN_capacity
+        c=hparams.CNN_capacity,
+        input_height=input_height
     )
 else:
     raise Exception('Unknown Encoder type: ' + hparams.VAE_type)
@@ -109,22 +138,21 @@ trainer = pl.Trainer(
     gpus=torch.cuda.device_count()
 )
 
-if hparams.small_label_data == True:
-    trainer.fit(model_enc, datamodule_mnist_small_enc)
-else:
-    trainer.fit(model_enc, datamodule_mnist)
+
+trainer.fit(model_enc, datamodule_enc)
+
 
 #### Select Classifier ####    
 
 if hparams.cla_type == "MLP":
     model_reg = MLP(input_dim=hparams.VAE_latent_dim,
-                    num_classes=10,
+                    num_classes=num_classes,
                     VAE_type= hparams.VAE_type,
                     learning_rate=hparams.cla_lr)
 elif hparams.cla_type == "reg":
     model_reg = LogisticRegression(
         input_dim=hparams.VAE_latent_dim,
-        num_classes=10,
+        num_classes=num_classes,
         VAE_type=hparams.VAE_type,
         learning_rate=hparams.cla_lr)
 else:
@@ -139,14 +167,10 @@ trainer = pl.Trainer(
     gpus=torch.cuda.device_count()
 )
 
-if hparams.small_label_data == True:
-    trainer.fit(model_reg, datamodule_mnist_small.train_dataloader(),
-                datamodule_mnist_small.val_dataloader())
-    trainer.test(model_reg, datamodule_mnist_small.test_dataloader())
-else:
-    trainer.fit(model_reg, datamodule_mnist.train_dataloader(), 
-                datamodule_mnist.val_dataloader())
-    trainer.test(model_reg, datamodule_mnist.test_dataloader())
+trainer.fit(model_reg, dataloader_train, dataloader_val)
+            
+trainer.test(model_reg, dataloader_test)
+
 
 if hparams.logger == True:
     wandb.finish()

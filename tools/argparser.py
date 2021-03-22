@@ -22,7 +22,7 @@ def get_parser():
     parser.add_argument("--seed", default=42, type=int)
     parser.add_argument("--logger", default=False, type=str2bool)
     parser.add_argument("--batch_size", default=100, type=int)
-    parser.add_argument("--small_label_data", default=False, type=str2bool)
+    parser.add_argument("--dataset", choices=["mnist", "mnist_small","dSprites_small"], default="mnist", type=str)
     # VAE
     parser.add_argument("--VAE_type", choices=["betaVAE_MLP", "betaVAE_CNN", "betaVAE_ResNet",
                                                "betaTCVAE_MLP", "betaTCVAE_CNN", "betaTCVAE_ResNet"], 
