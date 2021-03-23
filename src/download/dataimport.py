@@ -20,43 +20,46 @@ hparams = parser.parse_args()
 base_path = Path(__file__).resolve().parents[2]
 data_path = base_path / "data"
 
-# MNIST
 opener = urllib.request.build_opener()
 opener.addheaders = [('User-agent', 'Mozilla/5.0')]
 urllib.request.install_opener(opener)
 
-datamodule_mnist = MNISTDataModule(data_dir= data_path / "mnist/",
-                                   batch_size=hparams.batch_size)
+# MNIST
+if hparams.dataset=="mnist":
+    datamodule_mnist = MNISTDataModule(data_dir= data_path / "mnist/",
+                                    batch_size=hparams.batch_size)
 
-datamodule_mnist.prepare_data()
-datamodule_mnist.setup()
+    datamodule_mnist.prepare_data()
+    datamodule_mnist.setup()
 
-datamodule_mnist_small = MNIST_smallDataModule(data_dir=data_path / "mnist/",
-                                               batch_size=32,
-                                               seed=hparams.seed)
+if hparams.dataset == "mnist_small":
+    datamodule_mnist_small = MNIST_smallDataModule(data_dir=data_path / "mnist/",
+                                                batch_size=32,
+                                                seed=hparams.seed)
 
-datamodule_mnist_small.prepare_data()
-datamodule_mnist_small.setup()
+    datamodule_mnist_small.prepare_data()
+    datamodule_mnist_small.setup()
 
-datamodule_mnist_small_enc = MNIST_small_encDataModule(data_dir=data_path / "mnist/",
-                                   batch_size=hparams.batch_size,
-                                   seed=hparams.seed)
+    datamodule_mnist_small_enc = MNIST_small_encDataModule(data_dir=data_path / "mnist/",
+                                    batch_size=hparams.batch_size,
+                                    seed=hparams.seed)
 
-datamodule_mnist_small_enc.prepare_data()
-datamodule_mnist_small_enc.setup()
+    datamodule_mnist_small_enc.prepare_data()
+    datamodule_mnist_small_enc.setup()
 
 # dSprites
 
-datamodule_dSprites_small_enc = dSprites_small_encDataModule(data_dir=data_path / "dSprites/",
-                                                       batch_size=hparams.batch_size,
-                                                       seed=hparams.seed)
+if hparams.dataset == "dSprites_small":
+    datamodule_dSprites_small_enc = dSprites_small_encDataModule(data_dir=data_path / "dSprites/",
+                                                        batch_size=hparams.batch_size,
+                                                        seed=hparams.seed)
 
-datamodule_dSprites_small_enc.prepare_data()
-datamodule_dSprites_small_enc.setup()
+    datamodule_dSprites_small_enc.prepare_data()
+    datamodule_dSprites_small_enc.setup()
 
-datamodule_dSprites_small = dSprites_smallDataModule(data_dir=data_path / "dSprites/",
-                                                             batch_size=32,
-                                                             seed=hparams.seed)
+    datamodule_dSprites_small = dSprites_smallDataModule(data_dir=data_path / "dSprites/",
+                                                                batch_size=32,
+                                                                seed=hparams.seed)
 
-datamodule_dSprites_small.prepare_data()
-datamodule_dSprites_small.setup()
+    datamodule_dSprites_small.prepare_data()
+    datamodule_dSprites_small.setup()
