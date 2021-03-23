@@ -1,11 +1,15 @@
 import os
 from pathlib import Path
+from random import randint
+
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from pytorch_lightning.callbacks import ModelCheckpoint
 
 from tools.argparser import *
 parser = get_parser()
 hparams = parser.parse_args()
+
+run_ID = "VAE_in_use_" + str(randint(0,9999))
 
 #### VAE Callbacks ####
 
@@ -25,7 +29,7 @@ checkpoint_callback_VAE = ModelCheckpoint(
     monitor='val_loss',
     mode='min',
     prefix='',
-    filename="Best_VAE"
+    filename=run_ID
 )
 
 #### Classifier Callbacks ####

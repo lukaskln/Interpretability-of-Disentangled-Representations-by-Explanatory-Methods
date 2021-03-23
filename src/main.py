@@ -34,12 +34,6 @@ hparams = parser.parse_args()
 
 pl.seed_everything(hparams.seed)
 
-## Remove interim model models ##
-
-path_ckpt = Path(os.getcwd(), "models/encoder/VAE_loss/Best_VAE.ckpt")
-if os.path.exists(path_ckpt) == True:
-    os.remove(str(path_ckpt))
-
 #### Logging ####
 
 if hparams.logger == True:
@@ -181,3 +175,9 @@ trainer.test(model_reg, dataloader_test)
 if hparams.logger == True:
     wandb.finish()
 
+
+## Remove interim model models ##
+
+path_ckpt = Path(os.getcwd(), "models/encoder/VAE_loss/",(run_ID + ".ckpt"))
+if hparams.save_model == False:
+    os.remove(str(path_ckpt))

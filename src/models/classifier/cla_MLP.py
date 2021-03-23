@@ -16,7 +16,9 @@ from src.models.encoder.VAE_loss.betaTCVAE_CNN import *
 from src.models.encoder.VAE_loss.betaVAE_ResNet import *
 from src.models.encoder.VAE_loss.betaTCVAE_ResNet import *
 
-path_ckpt = Path(__file__).resolve().parents[3] / "models/encoder/VAE_loss/Best_VAE.ckpt"
+from tools.callbacks import *
+
+path_ckpt = Path(__file__).resolve().parents[3] / "models/encoder/VAE_loss/" / (run_ID+".ckpt")
 
 
 class MLP(pl.LightningModule):
