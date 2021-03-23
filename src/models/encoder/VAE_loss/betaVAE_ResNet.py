@@ -8,10 +8,16 @@ import pytorch_lightning as pl
 
 
 class betaVAE_ResNet(pl.LightningModule):
-    def __init__(self, input_height=784, c=32, latent_dim=10, beta=1, lr=0.001):
+    def __init__(self, input_height=784, c=32, latent_dim=10, beta=1, lr=0.001, dataset="mnist"):
         super(betaVAE_ResNet, self).__init__()
         self.c = c
         self.save_hyperparameters()
+
+        if dataset=="mnist" or dataset=="mnist_small":
+            self.scale = 7
+        elif dataset=="dSprites_small":
+            self.scale = 16
+        
 
         # Encoder
         self.resnet = torchvision.models.resnet18()
@@ -23,8 +29,8 @@ class betaVAE_ResNet(pl.LightningModule):
 
         # Decoder
         self.dec_bn1 = nn.BatchNorm1d(latent_dim)
-        self.fc = nn.Linear(in_features=latent_dim, out_features=c*2*7*7)
-        self.dec_bn2 = nn.BatchNorm1d(c*2*7*7)
+        self.fc = nn.Linear(in_features=latent_dim, out_features=c*2*self.scale*self.scale)
+        self.dec_bn2 = nn.BatchNorm1d(c*2*self.scale*self.scale)
         self.dec_conv2 = nn.ConvTranspose2d(
             in_channels=c*2, out_channels=c, kernel_size=4, stride=2, padding=1)
         self.dec_bn3 = nn.BatchNorm2d(c)
@@ -48,7 +54,7 @@ class betaVAE_ResNet(pl.LightningModule):
         x = self.dec_bn1(z)
         x = self.fc(x)
         x = self.dec_bn2(x)
-        x = x.view(x.size(0), self.c*2, 7, 7)
+        x = x.view(x.size(0), self.c*2, self.scale, self.scale)
         x = F.relu(self.dec_conv2(x))
         x = self.dec_bn3(x)
         x = self.dec_conv1(x)

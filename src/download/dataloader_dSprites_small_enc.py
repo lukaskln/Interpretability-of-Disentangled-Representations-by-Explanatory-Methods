@@ -50,7 +50,7 @@ class dSprites_small_encDataModule(pl.LightningDataModule):
         y = np.load(os.path.join(self.data_dir, "latents_classes.npy"))
         y = np.argmax(y, axis=1)
         
-        X = np.expand_dims(X * 255, axis=-1)
+        X = np.expand_dims(X, axis=1)
 
         dSprites_full = TensorDataset(torch.from_numpy(X), torch.from_numpy(y))
 

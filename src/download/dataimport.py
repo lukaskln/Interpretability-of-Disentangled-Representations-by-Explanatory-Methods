@@ -55,7 +55,7 @@ datamodule_dSprites_small_enc.prepare_data()
 datamodule_dSprites_small_enc.setup()
 
 datamodule_dSprites_small = dSprites_smallDataModule(data_dir=data_path / "dSprites/",
-                                                             batch_size=hparams.batch_size,
+                                                             batch_size=32,
                                                              seed=hparams.seed)
 
 datamodule_dSprites_small.prepare_data()

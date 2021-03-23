@@ -23,6 +23,8 @@ import pytorch_lightning as pl
 
 warnings.filterwarnings('ignore')
 
+print("Loading Modules...")
+
 from src.__init__ import *
 
 ## Parser and Seeding ##
@@ -70,7 +72,7 @@ elif hparams.dataset == "dSprites_small":
     dataloader_val = datamodule_dSprites_small.val_dataloader()
     dataloader_test = datamodule_dSprites_small.test_dataloader()
     input_height = 4096
-    num_classes = 10
+    num_classes = 6
 
 #### Select Encoder ####
 
@@ -87,7 +89,8 @@ elif hparams.VAE_type == "betaVAE_CNN":
         lr=hparams.VAE_lr,
         latent_dim=hparams.VAE_latent_dim,
         c=hparams.CNN_capacity,
-        input_height=input_height
+        input_height=input_height,
+        dataset=hparams.dataset
     )
 elif hparams.VAE_type == "betaVAE_ResNet":
     model_enc = betaVAE_ResNet(
@@ -95,7 +98,8 @@ elif hparams.VAE_type == "betaVAE_ResNet":
         lr=hparams.VAE_lr,
         latent_dim=hparams.VAE_latent_dim,
         c=hparams.CNN_capacity,
-        input_height=input_height
+        input_height=input_height,
+        dataset=hparams.dataset
     )
 elif hparams.VAE_type == "betaTCVAE_MLP":
     model_enc = betaTCVAE(
@@ -114,7 +118,8 @@ elif hparams.VAE_type == "betaTCVAE_CNN":
         lr=hparams.VAE_lr,
         latent_dim=hparams.VAE_latent_dim,
         c=hparams.CNN_capacity,
-        input_height=input_height
+        input_height=input_height,
+        dataset=hparams.dataset
     )
 elif hparams.VAE_type == "betaTCVAE_ResNet":
     model_enc = betaTCVAE_ResNet(
@@ -124,7 +129,8 @@ elif hparams.VAE_type == "betaTCVAE_ResNet":
         lr=hparams.VAE_lr,
         latent_dim=hparams.VAE_latent_dim,
         c=hparams.CNN_capacity,
-        input_height=input_height
+        input_height=input_height,
+        dataset=hparams.dataset
     )
 else:
     raise Exception('Unknown Encoder type: ' + hparams.VAE_type)
@@ -145,7 +151,7 @@ trainer.fit(model_enc, datamodule_enc)
 #### Select Classifier ####    
 
 if hparams.cla_type == "MLP":
-    model_reg = MLP(input_dim=hparams.VAE_latent_dim,
+    model_reg = MLP(input_dim=4096,
                     num_classes=num_classes,
                     VAE_type= hparams.VAE_type,
                     learning_rate=hparams.cla_lr)
