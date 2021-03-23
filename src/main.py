@@ -151,7 +151,7 @@ trainer.fit(model_enc, datamodule_enc)
 #### Select Classifier ####    
 
 if hparams.cla_type == "MLP":
-    model_reg = MLP(input_dim=4096,
+    model_reg = MLP(input_dim=hparams.VAE_latent_dim,
                     num_classes=num_classes,
                     VAE_type= hparams.VAE_type,
                     learning_rate=hparams.cla_lr)
