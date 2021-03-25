@@ -40,4 +40,7 @@ def get_parser():
     # Classifier
     parser.add_argument("--cla_type", choices=["MLP", "reg"], default="MLP", type=str)
     parser.add_argument("--cla_lr", default=0.001, type=float)
+    # Evaluation
+    parser.add_argument("--eval_model_ID", default=1000, type=int) 
+    parser.add_argument("--eval_latent_range", default=3.0, type=float)
     return parser

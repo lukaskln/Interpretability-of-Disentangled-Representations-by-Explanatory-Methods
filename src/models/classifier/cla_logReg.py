@@ -18,7 +18,7 @@ from src.models.encoder.VAE_loss.betaTCVAE_ResNet import *
 
 from tools.callbacks import *
 
-path_ckpt = Path(__file__).resolve().parents[3] / "models/encoder/VAE_loss/" / (run_ID+".ckpt")
+path_ckpt = Path(__file__).resolve().parents[3] / "models/encoder/VAE_loss/" / (model_ID+".ckpt")
 
 class LogisticRegression(pl.LightningModule):
     def __init__(

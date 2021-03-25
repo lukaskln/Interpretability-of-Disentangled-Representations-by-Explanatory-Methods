@@ -9,7 +9,7 @@ from tools.argparser import *
 parser = get_parser()
 hparams = parser.parse_args()
 
-run_ID = "VAE_in_use_" + str(randint(0,9999))
+model_ID = "VAE_in_use_" + str(randint(1000,9999))
 
 #### VAE Callbacks ####
 
@@ -29,7 +29,7 @@ checkpoint_callback_VAE = ModelCheckpoint(
     monitor='val_loss',
     mode='min',
     prefix='',
-    filename=run_ID
+    filename=model_ID
 )
 
 #### Classifier Callbacks ####

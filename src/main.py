@@ -27,6 +27,8 @@ print("Loading Modules...")
 
 from src.__init__ import *
 
+print("Model ID:", model_ID)
+
 ## Parser and Seeding ##
 
 parser = get_parser()
@@ -176,8 +178,8 @@ if hparams.logger == True:
     wandb.finish()
 
 
-## Remove interim model models ##
+## Remove interim models ##
 
-path_ckpt = Path(os.getcwd(), "models/encoder/VAE_loss/",(run_ID + ".ckpt"))
+path_ckpt = Path(os.getcwd(), "models/encoder/VAE_loss/",(model_ID + ".ckpt"))
 if hparams.save_model == False:
     os.remove(str(path_ckpt))
