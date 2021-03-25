@@ -36,6 +36,10 @@ class vis_LatentSpace:
         fig, ax = plt.subplots(figsize=(10, 8))
         plt.axis('off')
         self.show_image(make_grid(recon.data, 20, 8))
+
+        for i in range(0, self.latent_dim, 1):
+            plt.text(3, 15 + (i*36), str(i+1), color="red")
+
         print("Latent Space Factors:")
         plt.show()
 
