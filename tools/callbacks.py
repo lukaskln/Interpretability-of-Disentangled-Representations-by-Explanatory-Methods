@@ -9,7 +9,7 @@ from tools.argparser import *
 parser = get_parser()
 hparams = parser.parse_args()
 
-model_ID = "VAE_in_use_" + str(randint(1000,9999))
+model_ID = str(randint(1001,9999))
 
 #### VAE Callbacks ####
 
@@ -29,7 +29,7 @@ checkpoint_callback_VAE = ModelCheckpoint(
     monitor='val_loss',
     mode='min',
     prefix='',
-    filename=model_ID
+    filename="VAE_" + model_ID
 )
 
 #### Classifier Callbacks ####
@@ -40,4 +40,15 @@ early_stop_callback_cla = EarlyStopping(
     patience=10,
     verbose=False,
     mode='min'
+)
+
+checkpoint_callback_cla = ModelCheckpoint(
+    dirpath=os.path.dirname(
+        Path(os.getcwd(), "models/classifier/test/")),
+    save_top_k=1,
+    verbose=False,
+    monitor='val_acc',
+    mode='max',
+    prefix='',
+    filename= "cla_" + model_ID
 )

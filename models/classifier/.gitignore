@@ -1,3 +1,1 @@
-__pycache__/
-tb_logs/
-checkpoints/
+cla_*.ckpt

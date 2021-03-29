@@ -41,7 +41,7 @@ class vis_Reconstructions:
             images = images.cpu()
 
             if self.type == 'betaVAE' or self.type == 'betaTCVAE':
-                images = self.to_img(images.view(-1, 1, height, height))
+                images = self.to_img(images.view(-1, 1, height, width))
             else:
                 images = self.to_img(images)
             

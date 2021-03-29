@@ -17,8 +17,15 @@ from src.models.encoder.VAE_loss.betaVAE_ResNet import *
 from src.models.encoder.VAE_loss.betaTCVAE_ResNet import *
 
 from tools.callbacks import *
+from tools.argparser import *
 
-path_ckpt = Path(__file__).resolve().parents[3] / "models/encoder/VAE_loss/" / (model_ID+".ckpt")
+parser = get_parser()
+hparams = parser.parse_args()
+
+if hparams.eval_model_ID==1000:
+    path_ckpt = Path(__file__).resolve().parents[3] / "models/encoder/VAE_loss/" / ("VAE_" + model_ID + ".ckpt")
+else:
+    path_ckpt = Path(__file__).resolve().parents[3] / "models/encoder/VAE_loss/" / ("VAE_" + str(hparams.eval_model_ID) + ".ckpt")
 
 
 class MLP(pl.LightningModule):
@@ -62,6 +69,13 @@ class MLP(pl.LightningModule):
         x = self.fc2(x)
         y_hat = F.softmax(x, dim=1)
         return y_hat
+
+    def forward_no_enc(self, x):
+        x = torch.from_numpy(x).float()
+        x = F.relu(self.fc1(x))
+        x = self.fc2(x)
+        y_hat = F.softmax(x, dim=1)
+        return y_hat.numpy().astype('float32')
 
     def training_step(self, batch, batch_idx):
         x, y = batch

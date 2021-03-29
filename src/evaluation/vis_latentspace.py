@@ -38,8 +38,8 @@ class vis_LatentSpace:
         self.show_image(make_grid(recon.data, 20, 8))
 
         for i in range(0, self.latent_dim, 1):
-            plt.text(3, 15 + (i*36), str(i+1), color="red")
+            plt.text(3, 15 + (i*36), str(i), color="red")
 
-        print("Latent Space Factors:")
+        print("Latent Space Features:")
         plt.show()
 

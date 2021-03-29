@@ -19,22 +19,25 @@ from src.__init__ import *
 
 from src.evaluation.vis_latentspace import *
 from src.evaluation.vis_reconstructions import *
+from src.evaluation.scores_attribution_methods import *
+from src.evaluation.vis_attribution_methods import *
 
 parser = get_parser()
 hparams = parser.parse_args()
 
-## Model import ##
+#### Model import ####
 
-path_ckpt = Path(os.getcwd(), 
+## Encoder ##
+path_ckpt_VAE = Path(os.getcwd(), 
                 "models/encoder/VAE_loss/", 
-                ("VAE_in_use_" + str(hparams.eval_model_ID) + ".ckpt")
+                ("VAE_" + str(hparams.eval_model_ID) + ".ckpt")
             )
 
-if os.path.exists(path_ckpt)==False:
+if os.path.exists(path_ckpt_VAE)==False:
     print("[ERROR] Model does not exist. Please check the /models folder for existing models.")
     raise SystemExit(0)
 
-architectures = [
+architectures_VAE = [
     betaVAE,
     betaVAE_CNN,
     betaVAE_ResNet,
@@ -43,12 +46,35 @@ architectures = [
     betaTCVAE_ResNet
 ]
 
-info = None
-
-for architecture in architectures:
+for architecture in architectures_VAE:
     try:
-        encoder = architecture.load_from_checkpoint(path_ckpt)
+        encoder = architecture.load_from_checkpoint(path_ckpt_VAE)
         encoder_type = architecture.__name__
+        break
+    except AttributeError:
+        # repeat the loop on failure
+        continue
+
+## Classifier ##
+
+path_ckpt_cla = Path(os.getcwd(),
+                     "models/classifier/",
+                     ("cla_" + str(hparams.eval_model_ID) + ".ckpt")
+                     )
+
+if os.path.exists(path_ckpt_cla) == False:
+    print("[ERROR] Model does not exist. Please check the /models folder for existing models.")
+    raise SystemExit(0)
+
+architectures_cla = [
+    MLP,
+    LogisticRegression
+]
+
+for architecture in architectures_cla:
+    try:
+        cla = architecture.load_from_checkpoint(path_ckpt_cla)
+        cla_type = architecture.__name__
         break
     except AttributeError:
         # repeat the loop on failure
@@ -79,6 +105,7 @@ elif hparams.dataset == "dSprites_small":
     input_height = 4096
     num_classes = 6
 
+
 #### Visualizations ####
 
 try:
@@ -93,8 +120,22 @@ vis_LatentSpace(encoder,
                 latent_range=hparams.eval_latent_range
                 ).visualise()
 
-#### Disentanglement scores ####
-
 #### Attribution Methods ####
+
+scores, test_images = scores_AM_Original(cla, 
+                                        dataloader_test, 
+                                        type=encoder_type,
+                                        out_dim = cla.state_dict()['fc2.weight'].shape[0]
+                                        ).deep_shap()
+
+vis_AM_Original(scores, test_images).visualise()
+
+exp, scores, encoding_test, labels_test = scores_AM_Latent(model = cla,
+                                        encoder = encoder,
+                                        datamodule = dataloader_test,
+                                        type = encoder_type,
+                                        ).kernel_shap()
+
+#### Disentanglement scores ####
 
 

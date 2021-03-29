@@ -165,7 +165,7 @@ else:
 trainer = pl.Trainer(
     logger=wandb_logger,
     progress_bar_refresh_rate=25,
-    callbacks=[early_stop_callback_cla], 
+    callbacks=[early_stop_callback_cla, checkpoint_callback_cla],
     gpus=torch.cuda.device_count()
 )
 
@@ -180,6 +180,10 @@ if hparams.logger == True:
 
 ## Remove interim models ##
 
-path_ckpt = Path(os.getcwd(), "models/encoder/VAE_loss/",(model_ID + ".ckpt"))
+path_ckpt_VAE = Path(os.getcwd(), "models/encoder/VAE_loss/",("VAE_" + model_ID + ".ckpt"))
+path_ckpt_cla = Path(os.getcwd(), "models/classifier/",("cla_" + model_ID + ".ckpt"))
+
 if hparams.save_model == False:
-    os.remove(str(path_ckpt))
+    os.remove(str(path_ckpt_VAE))
+    os.remove(str(path_ckpt_cla))
+
