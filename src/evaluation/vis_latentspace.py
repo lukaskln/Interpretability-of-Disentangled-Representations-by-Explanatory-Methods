@@ -2,7 +2,7 @@ from torchvision.utils import make_grid
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
-plt.ion()
+plt.ioff()
 
 class vis_LatentSpace:
     def __init__(self, model, latent_dim=10, latent_range=3):
@@ -28,7 +28,7 @@ class vis_LatentSpace:
             latent = torch.zeros(self.latent_dim, 20)
             latent[i, :] = torch.linspace(-self.latent_range, self.latent_range, 20)
             latent = torch.transpose(latent, 0, 1)
-            img_recon = self.model.decoder(latent)
+            img_recon = self.model.decode(latent)
             recon.append(img_recon.view(-1, 1, 28, 28))
 
         recon = torch.cat(recon)
@@ -40,6 +40,6 @@ class vis_LatentSpace:
         for i in range(0, self.latent_dim, 1):
             plt.text(3, 15 + (i*36), str(i), color="red")
 
-        print("Latent Space Features:")
+        print("\n Latent Space Features:")
         plt.show()
 

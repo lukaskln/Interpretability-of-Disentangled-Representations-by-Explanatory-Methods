@@ -51,7 +51,7 @@ for architecture in architectures_VAE:
         encoder = architecture.load_from_checkpoint(path_ckpt_VAE)
         encoder_type = architecture.__name__
         break
-    except AttributeError:
+    except RuntimeError:
         # repeat the loop on failure
         continue
 
@@ -76,7 +76,7 @@ for architecture in architectures_cla:
         cla = architecture.load_from_checkpoint(path_ckpt_cla)
         cla_type = architecture.__name__
         break
-    except AttributeError:
+    except RuntimeError:
         # repeat the loop on failure
         continue
 
@@ -123,10 +123,10 @@ vis_LatentSpace(encoder,
 #### Attribution Methods ####
 
 scores, test_images = scores_AM_Original(cla, 
-                                        dataloader_test, 
-                                        type=encoder_type,
-                                        out_dim = cla.state_dict()['fc2.weight'].shape[0]
-                                        ).deep_shap()
+                                         dataloader_test, 
+                                         type=encoder_type,
+                                         out_dim = cla.state_dict()['fc2.weight'].shape[0]
+                                         ).expgrad_shap()
 
 vis_AM_Original(scores, test_images).visualise()
 
@@ -134,7 +134,14 @@ exp, scores, encoding_test, labels_test = scores_AM_Latent(model = cla,
                                         encoder = encoder,
                                         datamodule = dataloader_test,
                                         type = encoder_type,
-                                        ).kernel_shap()
+                                        ).expgrad_shap()
+
+
+vis_AM_Latent(shap_values=scores,
+              explainer=exp, 
+              encoding_test=encoding_test,
+              labels_test=labels_test
+              ).visualise()
 
 #### Disentanglement scores ####
 

@@ -64,18 +64,14 @@ class MLP(pl.LightningModule):
         self.fc2 = nn.Linear(256, self.hparams.num_classes, bias=bias)
 
     def forward(self, x):
-        x = self.encoder(x)
+
+        if x.shape[1] != self.hparams.input_dim:
+            x = self.encoder(x)
+
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
         y_hat = F.softmax(x, dim=1)
         return y_hat
-
-    def forward_no_enc(self, x):
-        x = torch.from_numpy(x).float()
-        x = F.relu(self.fc1(x))
-        x = self.fc2(x)
-        y_hat = F.softmax(x, dim=1)
-        return y_hat.numpy().astype('float32')
 
     def training_step(self, batch, batch_idx):
         x, y = batch

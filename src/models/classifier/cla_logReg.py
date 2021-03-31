@@ -64,17 +64,16 @@ class LogisticRegression(pl.LightningModule):
         self.encoder.freeze()
             
         self.linear = nn.Linear(in_features=self.hparams.input_dim, out_features=self.hparams.num_classes, bias=bias)
-        
+
     def forward(self, x):
-        x = self.encoder(x)
+
+        if x.shape[1] != self.hparams.input_dim:
+            x = self.encoder(x)
+            
         x = self.linear(x)
         y_hat = F.softmax(x, dim=1)
         return y_hat
 
-    def forward_no_enc(self, x):
-        x = self.linear(x)
-        y_hat = F.softmax(x, dim=1)
-        return y_hat
 
     def training_step(self, batch, batch_idx):
         x, y = batch

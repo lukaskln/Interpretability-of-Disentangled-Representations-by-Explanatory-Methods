@@ -2,9 +2,10 @@ import torch
 import numpy as np
 import shap
 import matplotlib.pyplot as plt
+from itertools import tee
 
 class scores_AM_Original:
-    def __init__(self, model, datamodule, type, out_dim = 10, n=5):
+    def __init__(self, model, datamodule, type, out_dim=10, n=5):
         self.model = model
         self.model.eval()
         self.n = n
@@ -13,40 +14,69 @@ class scores_AM_Original:
         self.datamodule = datamodule
         self.type = type
 
-    def baseline(self, images):
-        height = images[0].shape[1]
-        width = images[0].shape[2]
-        baseline = torch.zeros(height, width)
-        return baseline
-    
     def deep_shap(self):
+        print('\n Attribution of Original Images:')
+
         iter_obj = iter(self.datamodule)
-        images_1, _ = iter_obj.next()
-        images_2, _ = iter_obj.next()
+        a, _ = iter_obj.next()
+        images_test, labels_test = iter_obj.next()
+        b, _ = iter_obj.next()
+        c, _ = iter_obj.next()
+        d, _ = iter_obj.next() # messy sol
+        images_train = torch.cat([a,b,c,d], dim = 0)
 
-        height = images_1[0].shape[1]
-        width = images_1[0].shape[2]
+        height = images_test[0].shape[1]
+        width = images_test[0].shape[2]
 
-        if self.type == 'betaVAE' or self.type == 'betaTCVAE':
-            background = images_1.view(-1, height * width)
-            test_images = images_2[:self.n].view(-1, height * width)
+        if self.type == "betaVAE" or self.type == "betaTCVAE":
+            images_test = images_test[:self.n].view(-1, height * width)
+            background = images_train.view(-1, height * width)
         else:
-            background = images_1
-            test_images = images_2[:self.n]
+            images_test = images_test[:self.n]
+            background = images_train
 
         model = self.model
         # estimate expectation with one batch size
-        exp = shap.DeepExplainer(model, background) 
-
-        deep_shap_values = exp.shap_values(test_images)
+        exp = shap.DeepExplainer(model, data = background)
+        deep_shap_values = exp.shap_values(images_test, check_additivity=True)
 
         if self.type == 'betaVAE' or self.type == 'betaTCVAE':
-            deep_shap_values = np.asarray(deep_shap_values).reshape(self.out_dim, self.n, height, width)
-            test_images = test_images.view(-1, 1, height, width)
+            deep_shap_values = np.asarray(deep_shap_values).reshape(
+                self.out_dim, self.n, height, width)
+            images_test = images_test.view(-1, 1, height, width)
 
-        return deep_shap_values, test_images
+        return deep_shap_values, images_test
 
+    def expgrad_shap(self):
+        print('\n Attribution of Original Images:')
 
+        with torch.no_grad():
+            iter_obj = iter(self.datamodule)
+            iter_obj.next()
+            images_test, labels_test = iter_obj.next()
+
+            height = images_test[0].shape[1]
+            width = images_test[0].shape[2]
+
+            if self.type == "betaVAE" or self.type == "betaTCVAE":
+                images_test = images_test[:self.n].view(-1, height * width)
+                background = torch.zeros((1, height * width))
+            else:
+                images_test = images_test[:self.n]
+                background = torch.zeros((1,1,height,width))
+
+        exp = shap.GradientExplainer(self.model,
+                                    data=background
+                                    )
+
+        expgrad_shap_values = exp.shap_values(images_test)
+
+        if self.type == 'betaVAE' or self.type == 'betaTCVAE':
+            expgrad_shap_values = np.asarray(expgrad_shap_values).reshape(
+                self.out_dim, self.n, height, width)
+            images_test = images_test.view(-1, 1, height, width)
+
+        return expgrad_shap_values, images_test
 
 
 class scores_AM_Latent:
@@ -60,7 +90,7 @@ class scores_AM_Latent:
         self.datamodule = datamodule
         self.type = type
 
-    def kernel_shap(self):
+    def expgrad_shap(self):
         print("\n Attribution of Latent Space Representations: ")
 
         with torch.no_grad():
@@ -80,10 +110,38 @@ class scores_AM_Latent:
             encoding_train, _ = encoder.encode(images_train)
             encoding_test, _ = encoder.encode(images_test)
 
-            exp = shap.KernelExplainer(self.model.forward_no_enc, 
-                                       data = encoding_train.numpy().astype('float32'))
-            
-            kernel_shap_values = exp.shap_values(encoding_test.numpy().astype('float32'))
-            return exp, kernel_shap_values, encoding_test.numpy().astype('float32'), labels_test
+        exp = shap.GradientExplainer(self.model, 
+                                    data = encoding_train)
+        
+        expgrad_shap_values = exp.shap_values(encoding_test)
+        return exp, expgrad_shap_values, encoding_test.numpy().astype('float32'), labels_test
 
+    def deep_shap(self):
+        print("\n Attribution of Latent Space Representations: ")
+
+        with torch.no_grad():
+            iter_obj = iter(self.datamodule)
+            a, _ = iter_obj.next()
+            images_test, labels_test = iter_obj.next()
+            b, _ = iter_obj.next()
+            c, _ = iter_obj.next()
+            d, _ = iter_obj.next()  # messy sol
+            images_train = torch.cat([a, b, c, d], dim=0)
+
+            height = images_test[0].shape[1]
+            width = images_test[0].shape[2]
+
+            if self.type == "betaVAE" or self.type == "betaTCVAE":
+                images_train = images_train.view(-1, height * width)
+                images_test = images_test.view(-1, height * width)
+        
+            encoder = self.encoder
+
+            encoding_train, _ = encoder.encode(images_train)
+            encoding_test, _ = encoder.encode(images_test)
+
+        exp = shap.DeepExplainer(self.model, encoding_train)
+        deep_shap_values = exp.shap_values(encoding_test, check_additivity=True)
+
+        return exp, deep_shap_values, encoding_test.numpy().astype('float32'), labels_test
 
