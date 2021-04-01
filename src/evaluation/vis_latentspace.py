@@ -5,12 +5,13 @@ import matplotlib.pyplot as plt
 plt.ioff()
 
 class vis_LatentSpace:
-    def __init__(self, model, latent_dim=10, latent_range=3):
+    def __init__(self, model, latent_dim=10, latent_range=3, input_dim=28):
         self.model = model
         self.model.eval()
 
         self.latent_dim = latent_dim
         self.latent_range = latent_range
+        self.input_dim = input_dim
 
     def to_img(self, x):
         x = x.clamp(0, 1)
@@ -29,7 +30,7 @@ class vis_LatentSpace:
             latent[i, :] = torch.linspace(-self.latent_range, self.latent_range, 20)
             latent = torch.transpose(latent, 0, 1)
             img_recon = self.model.decode(latent)
-            recon.append(img_recon.view(-1, 1, 28, 28))
+            recon.append(img_recon.view(-1, 1, self.input_dim, self.input_dim))
 
         recon = torch.cat(recon)
 
@@ -37,8 +38,13 @@ class vis_LatentSpace:
         plt.axis('off')
         self.show_image(make_grid(recon.data, 20, 8))
 
+        if self.input_dim==28:
+            step_size = 36
+        else:
+            step_size = 70
+
         for i in range(0, self.latent_dim, 1):
-            plt.text(3, 15 + (i*36), str(i), color="red")
+            plt.text(3, (self.input_dim/2.1) + (i*step_size), str(i), color="red")
 
         print("\n Latent Space Features:")
         plt.show()

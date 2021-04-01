@@ -48,7 +48,7 @@ class dSprites_small_encDataModule(pl.LightningDataModule):
 
         X = np.load(os.path.join(self.data_dir, "imgs.npy"))
         y = np.load(os.path.join(self.data_dir, "latents_classes.npy"))
-        y = np.argmax(y, axis=1)
+        y = y[:, 1]
         
         X = np.expand_dims(X, axis=1)
 

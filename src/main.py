@@ -68,7 +68,7 @@ elif hparams.dataset == "dSprites_small":
     dataloader_val = datamodule_dSprites_small.val_dataloader()
     dataloader_test = datamodule_dSprites_small.test_dataloader()
     input_height = 4096
-    num_classes = 6
+    num_classes = 3
 
 #### Select Encoder ####
 

@@ -103,7 +103,7 @@ elif hparams.dataset == "dSprites_small":
     dataloader_val = datamodule_dSprites_small.val_dataloader()
     dataloader_test = datamodule_dSprites_small.test_dataloader()
     input_height = 4096
-    num_classes = 6
+    num_classes = 3
 
 
 #### Visualizations ####
@@ -117,7 +117,8 @@ except RuntimeError:
 
 vis_LatentSpace(encoder,
                 latent_dim=encoder.state_dict()['fc_mu.weight'].shape[0],
-                latent_range=hparams.eval_latent_range
+                latent_range=hparams.eval_latent_range,
+                input_dim=np.sqrt(input_height).astype(int),
                 ).visualise()
 
 #### Attribution Methods ####

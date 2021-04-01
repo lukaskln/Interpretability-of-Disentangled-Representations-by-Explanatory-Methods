@@ -28,8 +28,12 @@ class vis_AM_Latent:
         self.encoding_test = encoding_test
         self.labels_test = labels_test
         self.exp = explainer
+        self.n = len(np.unique(labels_test.numpy()))
 
-        #shap.initjs()
+        if self.n > 3:
+            self.labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        else:
+            self.labels = ["square", "ellipse", "heart"]
 
     def visualise(self):
         print("\n Total Latent Feature Attribution:")
@@ -37,7 +41,8 @@ class vis_AM_Latent:
         shap.summary_plot(self.shap_values, 
                           self.encoding_test, 
                           plot_type="bar",
-                          color= plt.cm.tab10
+                          color= plt.cm.tab10,
+                          class_names=self.labels
                         )
 
         print("\n Attribution of Latent Features:")
@@ -48,10 +53,10 @@ class vis_AM_Latent:
         for i in range(0, 4, 1):
             plt.subplot(2, 2, i+1)
             shap.multioutput_decision_plot(
-                np.zeros((1,10)).tolist()[0], #[i for i in softmax(self.exp.expected_value)]
+                np.zeros((1,self.n)).tolist()[0], #[i for i in softmax(self.exp.expected_value)]
                 self.shap_values,
                 highlight=self.labels_test[i],
-                legend_labels=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                legend_labels=self.labels,
                 legend_location='lower right',
                 show=False,
                 auto_size_plot=False,

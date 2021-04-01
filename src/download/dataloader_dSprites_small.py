@@ -48,7 +48,7 @@ class dSprites_smallDataModule(pl.LightningDataModule):
 
         X = np.load(os.path.join(self.data_dir, "imgs.npy"))
         y = np.load(os.path.join(self.data_dir, "latents_classes.npy"))
-        y = np.argmax(y, axis=1)
+        y = y[:, 1]
 
         X = np.expand_dims(X, axis=1)
 
@@ -70,5 +70,5 @@ class dSprites_smallDataModule(pl.LightningDataModule):
             collate_fn=collate_fn)
 
     def test_dataloader(self):
-        return DataLoader(self.dSprites_test, batch_size=self.batch_size,  
+        return DataLoader(self.dSprites_test, batch_size=100, 
             collate_fn=collate_fn)
