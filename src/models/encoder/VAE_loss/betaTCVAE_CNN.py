@@ -32,13 +32,19 @@ class betaTCVAE_CNN(pl.LightningModule):
             self.trainset_size = 500000
 
         # Encoder
-        self.enc_conv1 = nn.Conv2d(in_channels=1, out_channels=c,kernel_size=5, stride=1, padding=1)  # out: c x 14 x 14
-        self.enc_pool1 = nn.MaxPool2d(2, stride=2, padding=0)
-        self.enc_conv2 = nn.Conv2d(in_channels=c, out_channels=c*2,kernel_size=5, stride=1, padding=1)  # out: c x 7 x 7
-        self.enc_pool2 = nn.AdaptiveAvgPool2d((3,3))
-        self.enc_fc = nn.Linear(in_features=c*2*3*3, out_features=10*c)
+        model = torchvision.models.vgg16_bn()
+
+        for param in model.features.parameters():
+            param.require_grad = False
+
+        model = list(model.features.children())[1:40]
+
+        self.enc_conv1 = nn.Conv2d(1, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        self.vgg = nn.Sequential(*model)
+        self.enc_avgpool = nn.AdaptiveAvgPool2d(output_size=(1,1))
+        self.enc_fc = nn.Linear(in_features=512, out_features=10*c)
         self.fc_mu = nn.Linear(in_features=10*c, out_features=latent_dim)
-        self.fc_logvar = nn.Linear(in_features=10*c, out_features=latent_dim)
+        self.fc_logvar = nn.Linear(in_features=10*c, out_features=latent_dim) 
 
         # Decoder
         self.dec_bn1 = nn.BatchNorm1d(latent_dim)
@@ -49,11 +55,10 @@ class betaTCVAE_CNN(pl.LightningModule):
         self.dec_conv1 = nn.ConvTranspose2d(in_channels=c, out_channels=1, kernel_size=4, stride=2, padding=1)
         
     def encode(self, x):
-        x = F.relu(self.enc_conv1(x))
-        x = self.enc_pool1(x)
-        x = F.relu(self.enc_conv2(x))
-        x = self.enc_pool2(x)
-        x = x.view(x.size(0), -1)
+        x = self.enc_conv1(x)
+        x = self.vgg(x)
+        x = self.enc_avgpool(x)
+        x = torch.squeeze(x)
         x = F.relu(self.enc_fc(x))
         mu = self.fc_mu(x)
         log_var = self.fc_logvar(x)
