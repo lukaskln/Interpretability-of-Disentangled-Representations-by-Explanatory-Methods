@@ -25,8 +25,8 @@ def get_parser():
     parser.add_argument("--save_model", default=False, type=str2bool)
     parser.add_argument("--dataset", choices=["mnist", "mnist_small","dSprites_small"], default="mnist", type=str)
     # VAE
-    parser.add_argument("--VAE_type", choices=["betaVAE_MLP", "betaVAE_CNN", "betaVAE_ResNet",
-                                               "betaTCVAE_MLP", "betaTCVAE_CNN", "betaTCVAE_ResNet"], 
+    parser.add_argument("--VAE_type", choices=["betaVAE_MLP", "betaVAE_VGG", "betaVAE_ResNet",
+                                               "betaTCVAE_MLP", "betaTCVAE_VGG", "betaTCVAE_ResNet"], 
                                                default="betaVAE_MLP", type=str)
     parser.add_argument("--VAE_beta", default=1, type=int)
     parser.add_argument("--VAE_lr", default=0.001, type=float)

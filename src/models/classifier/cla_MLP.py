@@ -11,8 +11,8 @@ from torch.optim.optimizer import Optimizer
 
 from src.models.encoder.VAE_loss.betaVAE import *
 from src.models.encoder.VAE_loss.betaTCVAE import *
-from src.models.encoder.VAE_loss.betaVAE_CNN import *
-from src.models.encoder.VAE_loss.betaTCVAE_CNN import *
+from src.models.encoder.VAE_loss.betaVAE_VGG import *
+from src.models.encoder.VAE_loss.betaTCVAE_VGG import *
 from src.models.encoder.VAE_loss.betaVAE_ResNet import *
 from src.models.encoder.VAE_loss.betaTCVAE_ResNet import *
 
@@ -47,14 +47,14 @@ class MLP(pl.LightningModule):
 
         if VAE_type == "betaVAE_MLP":
             self.encoder = betaVAE.load_from_checkpoint(path_ckpt)
-        elif VAE_type == "betaVAE_CNN":
-            self.encoder = betaVAE_CNN.load_from_checkpoint(path_ckpt)
+        elif VAE_type == "betaVAE_VGG":
+            self.encoder = betaVAE_VGG.load_from_checkpoint(path_ckpt)
         elif VAE_type == "betaVAE_ResNet":
             self.encoder = betaVAE_ResNet.load_from_checkpoint(path_ckpt)
         elif VAE_type == "betaTCVAE_MLP":
             self.encoder = betaTCVAE.load_from_checkpoint(path_ckpt)
-        elif VAE_type == "betaTCVAE_CNN":
-            self.encoder = betaTCVAE_CNN.load_from_checkpoint(path_ckpt)
+        elif VAE_type == "betaTCVAE_VGG":
+            self.encoder = betaTCVAE_VGG.load_from_checkpoint(path_ckpt)
         elif VAE_type == "betaTCVAE_ResNet":
             self.encoder = betaTCVAE_ResNet.load_from_checkpoint(path_ckpt)
 

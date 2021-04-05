@@ -39,10 +39,10 @@ if os.path.exists(path_ckpt_VAE)==False:
 
 architectures_VAE = [
     betaVAE,
-    betaVAE_CNN,
+    betaVAE_VGG,
     betaVAE_ResNet,
     betaTCVAE,
-    betaTCVAE_CNN,
+    betaTCVAE_VGG,
     betaTCVAE_ResNet
 ]
 

@@ -79,8 +79,8 @@ if hparams.VAE_type=="betaVAE_MLP":
         latent_dim=hparams.VAE_latent_dim,
         input_height=input_height
     )
-elif hparams.VAE_type == "betaVAE_CNN":
-    model_enc = betaVAE_CNN(
+elif hparams.VAE_type == "betaVAE_VGG":
+    model_enc = betaVAE_VGG(
         beta=hparams.VAE_beta,
         lr=hparams.VAE_lr,
         latent_dim=hparams.VAE_latent_dim,
@@ -106,8 +106,8 @@ elif hparams.VAE_type == "betaTCVAE_MLP":
         latent_dim=hparams.VAE_latent_dim,
         input_height=input_height
     )
-elif hparams.VAE_type == "betaTCVAE_CNN":
-    model_enc = betaTCVAE_CNN(
+elif hparams.VAE_type == "betaTCVAE_VGG":
+    model_enc = betaTCVAE_VGG(
         beta=hparams.VAE_beta,
         alpha=hparams.TCVAE_alpha,
         gamma=hparams.TCVAE_gamma,
