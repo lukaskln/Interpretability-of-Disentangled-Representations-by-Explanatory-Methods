@@ -70,7 +70,9 @@ class MLP(pl.LightningModule):
 
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
+        
         y_hat = F.softmax(x, dim=1)
+
         return y_hat
 
     def training_step(self, batch, batch_idx):

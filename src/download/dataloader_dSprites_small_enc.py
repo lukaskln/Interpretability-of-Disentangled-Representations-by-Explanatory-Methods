@@ -27,7 +27,7 @@ class dSprites_small_encDataModule(pl.LightningDataModule):
         self.seed = seed
 
         self.dims = (1, 64, 64)
-        self.num_classes = 6
+        self.num_classes = 3
 
     def prepare_data(self):
         if not os.path.exists(os.path.join(self.data_dir, "imgs.npy")):
@@ -56,7 +56,7 @@ class dSprites_small_encDataModule(pl.LightningDataModule):
 
         _, data = random_split(dSprites_full, [7280, 730000],  # 737280
                                generator=torch.Generator().manual_seed(self.seed))
-        self.dSprites_train, self.dSprites_val, self.dSprites_test = random_split(data, [500000, 100000, 130000],
+        self.dSprites_train, self.dSprites_val, self.dSprites_test = random_split(data, [600000, 129000, 1000],
                                                         generator=torch.Generator().manual_seed(self.seed))
 
     def train_dataloader(self):

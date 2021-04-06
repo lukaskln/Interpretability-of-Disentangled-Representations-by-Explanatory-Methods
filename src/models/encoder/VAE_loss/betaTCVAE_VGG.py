@@ -59,7 +59,13 @@ class betaTCVAE_VGG(pl.LightningModule):
         x = self.enc_conv1(x)
         x = self.vgg(x)
         x = self.enc_avgpool(x)
-        x = torch.squeeze(x)
+
+        try:
+            x = torch.squeeze(x, dim=3)
+            x = torch.squeeze(x, dim=2)
+        except IndexError:
+            pass
+
         x = F.relu(self.enc_fc(x))
         mu = self.fc_mu(x)
         log_var = self.fc_logvar(x)
