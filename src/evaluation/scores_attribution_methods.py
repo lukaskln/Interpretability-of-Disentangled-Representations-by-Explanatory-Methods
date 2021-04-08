@@ -22,7 +22,7 @@ class scores_AM_Original:
         images_test, labels_test = iter_obj.next()
         b, _ = iter_obj.next()
         c, _ = iter_obj.next()
-        d, _ = iter_obj.next() # messy sol
+        d, _ = iter_obj.next() # messy solution, change that!
         images_train = torch.cat([a,b,c,d], dim = 0)
 
         height = images_test[0].shape[1]

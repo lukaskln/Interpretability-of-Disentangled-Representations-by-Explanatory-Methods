@@ -144,6 +144,5 @@ vis_AM_Latent(shap_values=scores,
               labels_test=labels_test
               ).visualise()
 
-#### Disentanglement scores ####
 
 
