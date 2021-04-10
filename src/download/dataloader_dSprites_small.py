@@ -56,7 +56,7 @@ class dSprites_smallDataModule(pl.LightningDataModule):
 
         train, test = random_split(dSprites_full, [7280, 730000],  # 737280
                                generator=torch.Generator().manual_seed(self.seed))
-        _, _, self.dSprites_test = random_split(test, [500000, 100000, 130000],
+        _, _, self.dSprites_test = random_split(test, [600000, 100000, 30000],
                                     generator=torch.Generator().manual_seed(self.seed))
         self.dSprites_train, self.dSprites_val = random_split(train, [6000, 1280],
                                                     generator=torch.Generator().manual_seed(self.seed))
