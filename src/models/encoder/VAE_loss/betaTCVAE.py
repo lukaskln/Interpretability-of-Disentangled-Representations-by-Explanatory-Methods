@@ -17,12 +17,17 @@ class betaTCVAE(pl.LightningModule):
         alpha: float = 1.,
         beta: float = 4.,
         gamma: float = 1.,
-        M_N = 0.005
+        dataset="mnist"
         ):
         super(betaTCVAE, self).__init__()
 
         self.save_hyperparameters()
         self.num_iter = 0
+
+        if dataset == "mnist" or dataset == "mnist_small":
+            self.trainset_size = 50000
+        elif dataset == "dSprites_small":
+            self.trainset_size = 600000
 
         self.encoder = nn.Sequential(
             nn.Linear(input_height, 500), nn.ReLU(),
@@ -84,17 +89,15 @@ class betaTCVAE(pl.LightningModule):
                                                 mu.view(1, batch_size,
                                                         latent_dim),
                                                 log_var.view(1, batch_size, latent_dim))
-
-        dataset_size = (1 / M_N) * batch_size  # dataset size
         
         # Estimate the three KL terms (log(q(z))) via importance sampling
-        strat_weight = (dataset_size - batch_size + 1) / \
-            (dataset_size * (batch_size - 1))
+        strat_weight = (self.trainset_size - batch_size + 1) / \
+            (self.trainset_size * (batch_size - 1))
         
         importance_weights = torch.Tensor(batch_size, batch_size).fill_(
             1 / (batch_size - 1)).to(x.device)
         
-        importance_weights.view(-1)[::batch_size] = 1 / dataset_size
+        importance_weights.view(-1)[::batch_size] = 1 / self.trainset_size
         importance_weights.view(-1)[1::batch_size] = strat_weight
         importance_weights[batch_size - 2, 0] = strat_weight
         log_importance_weights = importance_weights.log()

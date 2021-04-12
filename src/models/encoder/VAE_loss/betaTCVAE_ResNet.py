@@ -19,7 +19,8 @@ class betaTCVAE_ResNet(pl.LightningModule):
                  gamma: float = 1.,
                  M_N=0.005,
                  dataset = "mnist",
-                 c=64
+                 c=64,
+                 pretrained = False
                  ):
         super(betaTCVAE_ResNet, self).__init__()
         self.save_hyperparameters()
@@ -31,12 +32,25 @@ class betaTCVAE_ResNet(pl.LightningModule):
             self.trainset_size = 50000
         elif dataset=="dSprites_small":
             self.scale = 16
-            self.trainset_size = 500000
+            self.trainset_size = 600000
 
         # Encoder
-        self.resnet = torchvision.models.resnet18()
-        self.resnet.conv1 = nn.Conv2d(
-            1, 64, kernel_size=7, stride=1, padding=3, bias=False)
+        self.resnet = torchvision.models.resnet18(pretrained=True)
+
+        if pretrained == True:
+
+            with torch.no_grad():
+                weight = self.resnet.conv1.weight.clone()
+
+            self.resnet.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=1, padding=3, bias=False)
+
+            for param in self.resnet.parameters():
+                param.requires_grad = False
+
+            self.resnet.conv1.weight[:, 0] = weight[:, 0]
+        else:
+            self.resnet.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=1, padding=3, bias=False)
+            
         self.resnet.avgpool = nn.AdaptiveAvgPool2d(output_size=(1, 1))
         self.enc_fc = nn.Linear(in_features=1000, out_features=5*c)
         self.fc_mu = nn.Linear(in_features=5*c, out_features=latent_dim)

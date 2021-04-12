@@ -30,13 +30,10 @@ class betaTCVAE_VGG(pl.LightningModule):
             self.trainset_size = 50000
         elif dataset=="dSprites_small":
             self.scale = 16
-            self.trainset_size = 500000
+            self.trainset_size = 600000
 
         # Encoder
         model = torchvision.models.vgg16_bn()
-
-        for param in model.features.parameters():
-            param.require_grad = False
 
         model = list(model.features.children())[1:40]
 

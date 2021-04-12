@@ -20,9 +20,6 @@ class betaVAE_VGG(pl.LightningModule):
         # Encoder
         model = torchvision.models.vgg16_bn()
 
-        for param in model.features.parameters():
-            param.require_grad = False
-
         model = list(model.features.children())[1:40]
 
         self.enc_conv1 = nn.Conv2d(1, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))

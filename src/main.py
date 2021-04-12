@@ -104,7 +104,8 @@ elif hparams.VAE_type == "betaTCVAE_MLP":
         gamma=hparams.TCVAE_gamma,
         lr=hparams.VAE_lr,
         latent_dim=hparams.VAE_latent_dim,
-        input_height=input_height
+        input_height=input_height,
+        dataset=hparams.dataset
     )
 elif hparams.VAE_type == "betaTCVAE_VGG":
     model_enc = betaTCVAE_VGG(
@@ -126,7 +127,8 @@ elif hparams.VAE_type == "betaTCVAE_ResNet":
         latent_dim=hparams.VAE_latent_dim,
         c=hparams.CNN_capacity,
         input_height=input_height,
-        dataset=hparams.dataset
+        dataset=hparams.dataset,
+        pretrained = hparams.pretrained
     )
 else:
     raise Exception('Unknown Encoder type: ' + hparams.VAE_type)
