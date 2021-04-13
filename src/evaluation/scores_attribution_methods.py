@@ -15,8 +15,7 @@ class scores_AM_Original:
         self.type = type
 
     def deep_shap(self):
-        print('\n Attribution of Original Images:')
-
+        
         iter_obj = iter(self.datamodule)
         a, _ = iter_obj.next()
         images_test, labels_test = iter_obj.next()
@@ -48,7 +47,6 @@ class scores_AM_Original:
         return deep_shap_values, images_test
 
     def expgrad_shap(self):
-        print('\n Attribution of Original Images:')
 
         with torch.no_grad():
             iter_obj = iter(self.datamodule)
@@ -144,4 +142,3 @@ class scores_AM_Latent:
         deep_shap_values = exp.shap_values(encoding_test, check_additivity=True)
 
         return exp, deep_shap_values, encoding_test.numpy().astype('float32'), labels_test
-

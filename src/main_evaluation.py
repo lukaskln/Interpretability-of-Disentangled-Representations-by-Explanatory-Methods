@@ -123,11 +123,13 @@ vis_LatentSpace(encoder,
 
 #### Attribution Methods ####
 
+print('\n Attribution of Original Images into Predictions:')
 scores, test_images = scores_AM_Original(cla, 
                                          dataloader_test, 
                                          type=encoder_type,
                                          out_dim = cla.state_dict()['fc2.weight'].shape[0]
                                          ).expgrad_shap()
+
 
 vis_AM_Original(scores, test_images).visualise()
 
@@ -143,6 +145,21 @@ vis_AM_Latent(shap_values=scores,
               encoding_test=encoding_test,
               labels_test=labels_test
               ).visualise()
+
+print('\n Attribution of Original Images into Latent Space Representations:')
+scores, test_images = scores_AM_Original(encoder,
+                                         dataloader_test, 
+                                         type=encoder_type,
+                                         out_dim = encoder.state_dict()['fc_mu.weight'].shape[0]
+                                         ).expgrad_shap()
+
+vis_AM_Original(scores, test_images).visualise()
+
+# vis_AM_Latent_on_Rec(shap_values=scores, 
+#                     encoding_test = encoding_test, 
+#                     model = encoder,
+#                     type = encoder_type
+#                      ).visualise()
 
 
 
