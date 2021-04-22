@@ -56,17 +56,16 @@ class dSprites_smallDataModule(pl.LightningDataModule):
 
         train, test = random_split(dSprites_full, [7280, 730000],  # 737280
                                generator=torch.Generator().manual_seed(self.seed))
-        _, _, self.dSprites_test = random_split(test, [600000, 100000, 30000],
+        _, _, self.dSprites_test = random_split(test, [600000, 65000, 65000],
                                     generator=torch.Generator().manual_seed(self.seed))
-        self.dSprites_train, self.dSprites_val = random_split(train, [6000, 1280],
-                                                    generator=torch.Generator().manual_seed(self.seed))
+        self.dSprites_train = train
 
     def train_dataloader(self):
         return DataLoader(self.dSprites_train, batch_size=self.batch_size, 
             shuffle=True,  collate_fn=collate_fn)
 
     def val_dataloader(self):
-        return DataLoader(self.dSprites_val, batch_size=self.batch_size,  
+        return DataLoader(self.dSprites_test, batch_size=self.batch_size,
             collate_fn=collate_fn)
 
     def test_dataloader(self):
