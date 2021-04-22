@@ -5,8 +5,10 @@ from src.download.dataloader_mnist_small import *
 from src.download.dataloader_mnist_small_enc import *
 from src.download.dataloader_dSprites_small import *
 from src.download.dataloader_dSprites_small_enc import *
+from src.download.dataloader_OCT_small import *
 from pathlib import Path
 from tools.argparser import *
+import platform
 
 """
 Downloads training, validation and test data if not available locally and stores them into 
@@ -63,3 +65,17 @@ if hparams.dataset == "dSprites_small":
 
     datamodule_dSprites_small.prepare_data()
     datamodule_dSprites_small.setup()
+
+if hparams.dataset == "OCT_small":
+    
+    system = platform.system()
+    if system == "Windows":
+        data_path = "C:/Users/Lukas/Documents/GitHub/Semi-supervised-methods/data/OCT"
+    else:
+        data_path = "/cluster/scratch/luklein/CellData/OCT"
+
+    datamodule_OCT_small = OCT_small_DataModule(data_dir=data_path,
+                                                                 batch_size=hparams.batch_size,
+                                                                 seed=hparams.seed)
+
+    datamodule_OCT_small.setup()

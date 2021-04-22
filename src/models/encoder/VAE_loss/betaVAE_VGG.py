@@ -16,7 +16,9 @@ class betaVAE_VGG(pl.LightningModule):
             self.scale = 7
         elif dataset=="dSprites_small":
             self.scale = 16
-
+        elif dataset == "OCT_small":
+            self.scale = 75
+            
         # Encoder
         model = torchvision.models.vgg16_bn()
 

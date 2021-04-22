@@ -33,6 +33,9 @@ class betaTCVAE_ResNet(pl.LightningModule):
         elif dataset=="dSprites_small":
             self.scale = 16
             self.trainset_size = 600000
+        elif dataset == "OCT_small":
+            self.scale = 75
+            self.trainset_size = 107000
 
         # Encoder
         self.resnet = torchvision.models.resnet18(pretrained=True)

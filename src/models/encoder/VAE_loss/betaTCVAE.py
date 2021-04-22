@@ -28,6 +28,8 @@ class betaTCVAE(pl.LightningModule):
             self.trainset_size = 50000
         elif dataset == "dSprites_small":
             self.trainset_size = 600000
+        elif dataset == "OCT_small":
+            self.trainset_size = 107000
 
         self.encoder = nn.Sequential(
             nn.Linear(input_height, 500), nn.ReLU(),

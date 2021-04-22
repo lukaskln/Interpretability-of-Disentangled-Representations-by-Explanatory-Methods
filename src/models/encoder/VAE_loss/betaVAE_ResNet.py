@@ -17,8 +17,9 @@ class betaVAE_ResNet(pl.LightningModule):
             self.scale = 7
         elif dataset=="dSprites_small":
             self.scale = 16
+        elif dataset == "OCT_small":
+            self.scale = 75
         
-
         # Encoder
         self.resnet = torchvision.models.resnet18()
         self.resnet.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=1, padding=3,bias=False)
