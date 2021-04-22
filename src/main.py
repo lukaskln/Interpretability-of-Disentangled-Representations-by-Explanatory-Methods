@@ -74,7 +74,7 @@ elif hparams.dataset == "OCT_small":
     dataloader_train = datamodule_OCT_small.train_cla_dataloader()
     dataloader_val = datamodule_OCT_small.val_dataloader()
     dataloader_test = datamodule_OCT_small.test_dataloader()
-    input_height = 90000
+    input_height = 40000
     num_classes = 4
 #### Select Encoder ####
 

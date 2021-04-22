@@ -24,7 +24,7 @@ class OCT_small_DataModule(pl.LightningDataModule):
     def setup(self):
 
         transform_img = transforms.Compose([
-            torchvision.transforms.Resize((300, 300)),
+            torchvision.transforms.Resize((200, 200)),
             transforms.Grayscale(num_output_channels=1),
             #transforms.CenterCrop((496,750)),
             transforms.ToTensor(),

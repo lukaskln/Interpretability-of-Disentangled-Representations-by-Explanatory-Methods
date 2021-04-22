@@ -32,7 +32,7 @@ class betaTCVAE_VGG(pl.LightningModule):
             self.scale = 16
             self.trainset_size = 600000
         elif dataset == "OCT_small":
-            self.scale = 75
+            self.scale = 0.25 * 200
             self.trainset_size = 107000
 
         # Encoder
