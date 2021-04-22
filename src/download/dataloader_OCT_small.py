@@ -13,7 +13,6 @@ from torch import Tensor
 import torch
 import torchvision
 from torchvision import transforms
-import matplotlib.pyplot as plt
 
 class OCT_small_DataModule(pl.LightningDataModule):
     def __init__(self, batch_size, data_dir, seed):
