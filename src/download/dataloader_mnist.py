@@ -8,11 +8,12 @@ from torchvision.datasets import MNIST
 from torchvision import transforms
 
 
-class MNISTDataModule(pl.LightningDataModule):
-    def __init__(self, batch_size, data_dir):
+class MNIST_DataModule(pl.LightningDataModule):
+    def __init__(self, batch_size, data_dir, seed):
         super().__init__()
         self.data_dir = data_dir
         self.batch_size = batch_size
+        self.seed = seed
 
         self.transform = transforms.Compose([
             transforms.ToTensor()
@@ -27,23 +28,31 @@ class MNISTDataModule(pl.LightningDataModule):
         MNIST(self.data_dir, train=False, download=True)
 
     def setup(self, stage=None):
-        # Assign train/val datasets for use in dataloaders
-        if stage == 'fit' or stage is None:
-            mnist_full = MNIST(self.data_dir, train=True,
-                                 transform=self.transform)
-            self.mnist_train, self.mnist_val = random_split(
-                mnist_full, [50000, 10000])
 
-        # Assign test dataset for use in dataloader(s)
-        if stage == 'test' or stage is None:
-            self.mnist_test = MNIST(
-                self.data_dir, train=False, transform=self.transform)
+        mnist_full = MNIST(self.data_dir, train=True, transform=self.transform)
+
+        data_cla, data_enc = random_split(mnist_full, [1000, 59000],
+                                generator=torch.Generator().manual_seed(self.seed))
+
+        self.train_enc, self.val_enc = random_split(data_enc, [50000, 9000],
+                                generator=torch.Generator().manual_seed(self.seed))
+
+        self.train_cla, self.val_cla = random_split(data_cla, [800, 200],
+                                generator=torch.Generator().manual_seed(self.seed))
+
+        self.test = MNIST(self.data_dir, train=False, transform=self.transform)
 
     def train_dataloader(self):
-        return DataLoader(self.mnist_train, batch_size=self.batch_size, shuffle=True)
+        return DataLoader(self.train_enc, batch_size=self.batch_size, shuffle=True)
+
+    def train_dataloader_cla(self):
+        return DataLoader(self.train_cla, batch_size=32, shuffle=True)
 
     def val_dataloader(self):
-        return DataLoader(self.mnist_val, batch_size=self.batch_size)
+        return DataLoader(self.val_enc, batch_size=self.batch_size)
+
+    def val_dataloader_cla(self):
+        return DataLoader(self.val_cla, batch_size=32)
 
     def test_dataloader(self):
-        return DataLoader(self.mnist_test, batch_size=self.batch_size)
+        return DataLoader(self.test, batch_size=self.batch_size)

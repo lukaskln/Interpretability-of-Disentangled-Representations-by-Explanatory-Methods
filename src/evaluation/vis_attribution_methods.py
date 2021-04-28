@@ -19,7 +19,7 @@ class vis_AM_Original:
     def visualise(self):
         shap_values, test_values = self.prep(self.shap_values, self.test_images)
 
-        shap.image_plot(shap_values, -test_values)
+        shap.image_plot(shap_values, test_values)
 
 class vis_AM_Latent:
     def __init__(self, shap_values, explainer, encoding_test, labels_test):
@@ -29,8 +29,10 @@ class vis_AM_Latent:
         self.exp = explainer
         self.n = len(np.unique(labels_test.numpy()))
 
-        if self.n > 3:
+        if self.n == 10:
             self.labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        elif self.n == 4:
+            self.labels = ["CNV", "DME", "Drusen","Normal"]
         else:
             self.labels = ["square", "ellipse", "heart"]
 
@@ -116,4 +118,4 @@ class vis_AM_Latent_on_Rec:
 
         shap_values, test_values = self.prep(shap_values_rec, test_images_rec)
 
-        shap.image_plot(shap_values, -test_values)
+        shap.image_plot(shap_values, test_values)

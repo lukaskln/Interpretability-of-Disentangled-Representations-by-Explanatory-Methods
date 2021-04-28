@@ -24,11 +24,11 @@ class betaTCVAE(pl.LightningModule):
         self.save_hyperparameters()
         self.num_iter = 0
 
-        if dataset == "mnist" or dataset == "mnist_small":
+        if dataset == "mnist":
             self.trainset_size = 50000
-        elif dataset == "dSprites_small":
+        elif dataset == "dSprites":
             self.trainset_size = 600000
-        elif dataset == "OCT_small":
+        elif dataset == "OCT":
             self.trainset_size = 107000
 
         self.encoder = nn.Sequential(

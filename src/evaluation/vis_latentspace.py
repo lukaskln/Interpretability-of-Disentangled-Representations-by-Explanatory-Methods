@@ -40,8 +40,10 @@ class vis_LatentSpace:
 
         if self.input_dim==28:
             step_size = 36
-        else:
+        elif self.input_dim == 64:
             step_size = 70
+        else:
+            step_size = 210
 
         for i in range(0, self.latent_dim, 1):
             plt.text(3, (self.input_dim/2.1) + (i*step_size), str(i), color="red")

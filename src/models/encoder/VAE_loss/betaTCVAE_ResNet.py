@@ -27,13 +27,13 @@ class betaTCVAE_ResNet(pl.LightningModule):
         self.c = c
         self.num_iter = 0
 
-        if dataset == "mnist" or dataset == "mnist_small":
+        if dataset == "mnist":
             self.scale = 7
             self.trainset_size = 50000
-        elif dataset=="dSprites_small":
+        elif dataset=="dSprites":
             self.scale = 16
             self.trainset_size = 600000
-        elif dataset == "OCT_small":
+        elif dataset == "OCT":
             self.scale = 50
             self.trainset_size = 107000
 

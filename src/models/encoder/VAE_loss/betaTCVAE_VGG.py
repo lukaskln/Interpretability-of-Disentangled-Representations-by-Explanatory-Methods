@@ -24,14 +24,15 @@ class betaTCVAE_VGG(pl.LightningModule):
         self.save_hyperparameters()
         self.c = c
         self.num_iter = 0
+        self.dataset = dataset
 
-        if dataset == "mnist" or dataset == "mnist_small":
+        if dataset == "mnist":
             self.scale = 7
             self.trainset_size = 50000
-        elif dataset=="dSprites_small":
+        elif dataset=="dSprites":
             self.scale = 16
             self.trainset_size = 600000
-        elif dataset == "OCT_small":
+        elif dataset == "OCT":
             self.scale = 50
             self.trainset_size = 107000
 
@@ -48,13 +49,36 @@ class betaTCVAE_VGG(pl.LightningModule):
         self.fc_logvar = nn.Linear(in_features=10*c, out_features=latent_dim) 
 
         # Decoder
-        self.dec_bn1 = nn.BatchNorm1d(latent_dim)
-        self.fc = nn.Linear(in_features=latent_dim, out_features=c*2*self.scale*self.scale)
-        self.dec_bn2 = nn.BatchNorm1d(c*2*self.scale*self.scale)
-        self.dec_conv2 = nn.ConvTranspose2d(in_channels=c*2, out_channels=c, kernel_size=4, stride=2, padding=1)
-        self.dec_bn3 = nn.BatchNorm2d(c)
-        self.dec_conv1 = nn.ConvTranspose2d(in_channels=c, out_channels=1, kernel_size=4, stride=2, padding=1)
-        
+
+        if dataset == "OCT":
+            self.decoder = nn.Sequential(
+                nn.ConvTranspose2d(in_channels=latent_dim, out_channels=self.scale * 8, kernel_size=8, stride=1, padding=0, bias=False),
+                nn.BatchNorm2d(self.scale * 8),
+                nn.ReLU(True),
+                nn.ConvTranspose2d(in_channels=self.scale * 8, out_channels=self.scale * 4, kernel_size=8, stride=2, padding=1, bias=False),
+                nn.BatchNorm2d(self.scale * 4),
+                nn.ReLU(True),
+                nn.ConvTranspose2d(in_channels=self.scale * 4, out_channels=self.scale * 2, kernel_size=10, stride=2, padding=1, bias=False),
+                nn.BatchNorm2d(self.scale * 2),
+                nn.ReLU(True),
+                nn.ConvTranspose2d(in_channels=self.scale * 2, out_channels=self.scale, kernel_size=10, stride=2, padding=1, bias=False),
+                nn.BatchNorm2d(self.scale),
+                nn.ReLU(True),
+                nn.ConvTranspose2d(in_channels=self.scale, out_channels=1, kernel_size=10, stride=2, padding=1, bias=False),
+                nn.Sigmoid()
+            )
+        else:
+            self.decoder = nn.Sequential(
+                nn.BatchNorm1d(latent_dim),
+                nn.Linear(in_features=latent_dim, out_features=c*2*self.scale*self.scale),
+                nn.BatchNorm1d(c*2*self.scale*self.scale),
+                nn.Unflatten(1, (self.c*2, self.scale, self.scale)),
+                nn.ConvTranspose2d(in_channels=c*2, out_channels=c, kernel_size=4, stride=2, padding=1),
+                nn.ReLU(), nn.BatchNorm2d(c),
+                nn.ConvTranspose2d(in_channels=c, out_channels=1, kernel_size=4, stride=2, padding=1),
+                nn.Sigmoid()
+            )
+
     def encode(self, x):
         x = self.enc_conv1(x)
         x = self.vgg(x)
@@ -78,14 +102,12 @@ class betaTCVAE_VGG(pl.LightningModule):
         return z
 
     def decode(self, z):
-        x = self.dec_bn1(z)
-        x = self.fc(x)
-        x = self.dec_bn2(x)
-        x = x.view(x.size(0), self.c*2, self.scale, self.scale)
-        x = F.relu(self.dec_conv2(x))
-        x = self.dec_bn3(x)
-        x = self.dec_conv1(x)
-        return torch.sigmoid(x)
+        if self.dataset=="OCT":
+            z = torch.unsqueeze(z,2)
+            z = torch.unsqueeze(z,3)
+
+        x = self.decoder(z)
+        return x
 
     def forward(self, x):
         mu, log_var = self.encode(x)
@@ -97,7 +119,6 @@ class betaTCVAE_VGG(pl.LightningModule):
         return log_density
 
     def loss(self, recons, x, mu, log_var, z):
-
         recons_loss = F.binary_cross_entropy(
             recons.view(-1, self.hparams.input_height),
             x.view(-1, self.hparams.input_height),

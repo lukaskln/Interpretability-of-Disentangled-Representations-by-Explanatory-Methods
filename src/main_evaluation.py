@@ -84,32 +84,22 @@ for architecture in architectures_cla:
 print("Loading Datasets...")
 
 if hparams.dataset == "mnist":
-    datamodule_enc = datamodule_mnist
-    dataloader_train = datamodule_mnist.train_dataloader()
-    dataloader_val = datamodule_mnist.val_dataloader()
-    dataloader_test = datamodule_mnist.test_dataloader()
+    datamodule = datamodule_mnist
     input_height = 784
     num_classes = 10
-elif hparams.dataset == "mnist_small":
-    datamodule_enc = datamodule_mnist_small_enc
-    dataloader_train = datamodule_mnist_small.train_dataloader()
-    dataloader_val = datamodule_mnist_small.val_dataloader()
-    dataloader_test = datamodule_mnist_small.test_dataloader()
-    input_height = 784
-    num_classes = 10
-elif hparams.dataset == "dSprites_small":
-    datamodule_enc = datamodule_dSprites_small_enc
-    dataloader_train = datamodule_dSprites_small.train_dataloader()
-    dataloader_val = datamodule_dSprites_small.val_dataloader()
-    dataloader_test = datamodule_dSprites_small.test_dataloader()
+elif hparams.dataset == "dSprites":
+    datamodule = datamodule_dSprites
     input_height = 4096
     num_classes = 3
-
+elif hparams.dataset == "OCT":
+    datamodule = datamodule_OCT
+    input_height = 40804
+    num_classes = 4
 
 #### Visualizations ####
 
 try:
-    vis_Reconstructions(encoder, dataloader_test, type=encoder_type).visualise()
+    vis_Reconstructions(encoder, datamodule.train_dataloader(), type=encoder_type).visualise()
 except RuntimeError:
     print("[ERROR] Wrong dataset selected? Check --dataset=...")
     raise SystemExit(0)
@@ -125,7 +115,7 @@ vis_LatentSpace(encoder,
 
 print('\n Attribution of Original Images into Predictions:')
 scores, test_images = scores_AM_Original(cla, 
-                                         dataloader_test, 
+                                         datamodule.train_dataloader(),
                                          type=encoder_type,
                                          out_dim = cla.state_dict()['fc2.weight'].shape[0]
                                          ).expgrad_shap()
@@ -135,7 +125,7 @@ vis_AM_Original(scores, test_images).visualise()
 
 exp, scores, encoding_test, labels_test = scores_AM_Latent(model = cla,
                                         encoder = encoder,
-                                        datamodule = dataloader_test,
+                                                           datamodule=datamodule.train_dataloader(),
                                         type = encoder_type,
                                         ).expgrad_shap()
 
@@ -148,7 +138,7 @@ vis_AM_Latent(shap_values=scores,
 
 print('\n Attribution of Original Images into Latent Space Representations:')
 scores, test_images = scores_AM_Original(encoder,
-                                         dataloader_test, 
+                                         datamodule.train_dataloader(),
                                          type=encoder_type,
                                          out_dim = encoder.state_dict()['fc_mu.weight'].shape[0]
                                          ).expgrad_shap()

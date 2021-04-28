@@ -13,11 +13,11 @@ class betaVAE_ResNet(pl.LightningModule):
         self.c = c
         self.save_hyperparameters()
 
-        if dataset=="mnist" or dataset=="mnist_small":
+        if dataset=="mnist":
             self.scale = 7
-        elif dataset=="dSprites_small":
+        elif dataset=="dSprites":
             self.scale = 16
-        elif dataset == "OCT_small":
+        elif dataset == "OCT":
             self.scale = 50
         
         # Encoder

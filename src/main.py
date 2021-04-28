@@ -9,16 +9,6 @@ from pathlib import Path
 main_dir = os.path.dirname(Path(__file__).resolve().parents[0])
 os.chdir(main_dir)
 
-# TODO shell commands from script:
-#import platform
-#from subprocess import call
-# plt = platform.system()
-
-# if plt == "Linux": 
-#     command = 'export PYTHONPATH="${PYTHONPATH}:/cluster/home/luklein/Semi-supervised-methods"'
-#     process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
-#     output, error = process.communicate()
-
 import pytorch_lightning as pl
 
 warnings.filterwarnings('ignore')
@@ -49,32 +39,16 @@ else:
 print("Loading Datasets...")
 
 if hparams.dataset=="mnist":
-    datamodule_enc = datamodule_mnist
-    dataloader_train = datamodule_mnist.train_dataloader()
-    dataloader_val = datamodule_mnist.val_dataloader()
-    dataloader_test = datamodule_mnist.test_dataloader()
+    datamodule = datamodule_mnist
     input_height = 784
     num_classes = 10
-elif hparams.dataset == "mnist_small":
-    datamodule_enc = datamodule_mnist_small_enc
-    dataloader_train = datamodule_mnist_small.train_dataloader()
-    dataloader_val = datamodule_mnist_small.val_dataloader()
-    dataloader_test = datamodule_mnist_small.test_dataloader()
-    input_height = 784
-    num_classes = 10
-elif hparams.dataset == "dSprites_small":
-    datamodule_enc = datamodule_dSprites_small_enc
-    dataloader_train = datamodule_dSprites_small.train_dataloader()
-    dataloader_val = datamodule_dSprites_small.val_dataloader()
-    dataloader_test = datamodule_dSprites_small.test_dataloader()
+elif hparams.dataset == "dSprites":
+    datamodule = datamodule_dSprites
     input_height = 4096
     num_classes = 3
-elif hparams.dataset == "OCT_small":
-    datamodule_enc = datamodule_OCT_small
-    dataloader_train = datamodule_OCT_small.train_cla_dataloader()
-    dataloader_val = datamodule_OCT_small.val_dataloader()
-    dataloader_test = datamodule_OCT_small.test_dataloader()
-    input_height = 40000
+elif hparams.dataset == "OCT":
+    datamodule = datamodule_OCT
+    input_height = 40804
     num_classes = 4
 #### Select Encoder ####
 
@@ -149,7 +123,7 @@ trainer = pl.Trainer(
 )
 
 
-trainer.fit(model_enc, datamodule_enc)
+trainer.fit(model_enc, datamodule.train_dataloader(), datamodule.val_dataloader())
 
 
 #### Select Classifier ####    
@@ -177,9 +151,12 @@ trainer = pl.Trainer(
     gpus=torch.cuda.device_count()
 )
 
-trainer.fit(model_reg, dataloader_train, dataloader_val)
+trainer.fit(model_reg, 
+    datamodule.train_dataloader_cla(), 
+    datamodule.val_dataloader_cla()
+    )
             
-trainer.test(model_reg, dataloader_test)
+trainer.test(model_reg, datamodule.test_dataloader())
 
 
 if hparams.logger == True:

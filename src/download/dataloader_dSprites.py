@@ -19,7 +19,7 @@ def collate_fn(batch):
     targets = [item[1] for item in batch]
     return imgs, targets
 
-class dSprites_small_encDataModule(pl.LightningDataModule):
+class dSprites_DataModule(pl.LightningDataModule):
     def __init__(self, batch_size, data_dir, seed):
         super().__init__()
         self.data_dir = data_dir
@@ -54,19 +54,28 @@ class dSprites_small_encDataModule(pl.LightningDataModule):
 
         dSprites_full = TensorDataset(torch.from_numpy(X), torch.from_numpy(y))
 
-        _, data = random_split(dSprites_full, [7280, 730000],  # 737280
+        self.train_cla, data_enc = random_split(dSprites_full, [7280, 730000],  # 737280
                                generator=torch.Generator().manual_seed(self.seed))
-        self.dSprites_train, self.dSprites_val, self.dSprites_test = random_split(data, [600000, 65000, 65000],
+
+        self.train_enc, self.val_enc, self.test = random_split(data_enc, [600000, 65000, 65000],
                                                         generator=torch.Generator().manual_seed(self.seed))
 
     def train_dataloader(self):
-        return DataLoader(self.dSprites_train, batch_size=self.batch_size, shuffle=True,
+        return DataLoader(self.train_enc, batch_size=self.batch_size, shuffle=True,
+                          collate_fn=collate_fn)
+
+    def train_dataloader_cla(self):
+        return DataLoader(self.train_cla, batch_size=32, shuffle=True,
                           collate_fn=collate_fn)
 
     def val_dataloader(self):
-        return DataLoader(self.dSprites_val, batch_size=self.batch_size,
+        return DataLoader(self.val_enc, batch_size=self.batch_size,
+                          collate_fn=collate_fn)
+
+    def val_dataloader_cla(self):
+        return DataLoader(self.test, batch_size=32,
                           collate_fn=collate_fn)
 
     def test_dataloader(self):
-        return DataLoader(self.dSprites_test, batch_size=self.batch_size,  
-            collate_fn=collate_fn)
+        return DataLoader(self.test, batch_size=self.batch_size,  
+                        collate_fn=collate_fn)
