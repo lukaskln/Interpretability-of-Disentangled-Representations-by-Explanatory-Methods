@@ -8,7 +8,7 @@ import pytorch_lightning as pl
 
 
 class betaVAE_ResNet(pl.LightningModule):
-    def __init__(self, input_height=784, c=32, latent_dim=10, beta=1, lr=0.001, dataset="mnist"):
+    def __init__(self, input_height=784, c=64, latent_dim=10, beta=1, lr=0.001, dataset="mnist"):
         super(betaVAE_ResNet, self).__init__()
         self.c = c
         self.save_hyperparameters()

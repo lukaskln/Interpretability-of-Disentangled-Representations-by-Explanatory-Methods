@@ -38,12 +38,12 @@ if os.path.exists(path_ckpt_VAE)==False:
     raise SystemExit(0)
 
 architectures_VAE = [
-    # betaVAE,
-    # betaVAE_VGG,
-    # betaVAE_ResNet,
     betaTCVAE,
     betaTCVAE_VGG,
-    betaTCVAE_ResNet
+    betaTCVAE_ResNet,
+    betaVAE,
+    betaVAE_VGG,
+    betaVAE_ResNet
 ]
 
 for architecture in architectures_VAE:

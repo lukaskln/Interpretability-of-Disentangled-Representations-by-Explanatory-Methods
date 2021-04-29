@@ -28,12 +28,12 @@ pl.seed_everything(hparams.seed)
 
 #### Logging ####
 
-if hparams.logger == True:
+if hparams.logger == "wandb":
     import wandb
     #wandb.init(project="VAE-mnist")
-    wandb_logger = WandbLogger(project='VAE-mnist')
+    logger = WandbLogger(project='VAE-mnist')
 else:
-    wandb_logger = False
+    logger = False
 
 #### Dataset selection ####
 print("Loading Datasets...")
@@ -52,100 +52,98 @@ elif hparams.dataset == "OCT":
     num_classes = 4
 #### Select Encoder ####
 
-if hparams.VAE_type=="betaVAE_MLP":
+if hparams.model=="betaVAE_MLP":
         model_enc = betaVAE(
         beta=hparams.VAE_beta,
-        lr=hparams.VAE_lr,
-        latent_dim=hparams.VAE_latent_dim,
+        lr=hparams.learning_rate,
+        latent_dim=hparams.latent_dim,
         input_height=input_height
     )
-elif hparams.VAE_type == "betaVAE_VGG":
+elif hparams.model == "betaVAE_VGG":
     model_enc = betaVAE_VGG(
         beta=hparams.VAE_beta,
-        lr=hparams.VAE_lr,
-        latent_dim=hparams.VAE_latent_dim,
-        c=hparams.CNN_capacity,
+        lr=hparams.learning_rate,
+        latent_dim=hparams.latent_dim,
         input_height=input_height,
         dataset=hparams.dataset
     )
-elif hparams.VAE_type == "betaVAE_ResNet":
+elif hparams.model == "betaVAE_ResNet":
     model_enc = betaVAE_ResNet(
         beta=hparams.VAE_beta,
-        lr=hparams.VAE_lr,
-        latent_dim=hparams.VAE_latent_dim,
-        c=hparams.CNN_capacity,
+        lr=hparams.learning_rate,
+        latent_dim=hparams.latent_dim,
         input_height=input_height,
         dataset=hparams.dataset
     )
-elif hparams.VAE_type == "betaTCVAE_MLP":
+elif hparams.model == "betaTCVAE_MLP":
     model_enc = betaTCVAE(
         beta=hparams.VAE_beta,
-        alpha=hparams.TCVAE_alpha,
-        gamma=hparams.TCVAE_gamma,
-        lr=hparams.VAE_lr,
-        latent_dim=hparams.VAE_latent_dim,
+        alpha=hparams.VAE_alpha,
+        gamma=hparams.VAE_gamma,
+        lr=hparams.learning_rate,
+        latent_dim=hparams.latent_dim,
         input_height=input_height,
         dataset=hparams.dataset
     )
-elif hparams.VAE_type == "betaTCVAE_VGG":
+elif hparams.model == "betaTCVAE_VGG":
     model_enc = betaTCVAE_VGG(
         beta=hparams.VAE_beta,
-        alpha=hparams.TCVAE_alpha,
-        gamma=hparams.TCVAE_gamma,
-        lr=hparams.VAE_lr,
-        latent_dim=hparams.VAE_latent_dim,
-        c=hparams.CNN_capacity,
+        alpha=hparams.VAE_alpha,
+        gamma=hparams.VAE_gamma,
+        lr=hparams.learning_rate,
+        latent_dim=hparams.latent_dim,
         input_height=input_height,
         dataset=hparams.dataset
     )
-elif hparams.VAE_type == "betaTCVAE_ResNet":
+elif hparams.model == "betaTCVAE_ResNet":
     model_enc = betaTCVAE_ResNet(
         beta=hparams.VAE_beta,
-        alpha=hparams.TCVAE_alpha,
-        gamma=hparams.TCVAE_gamma,
-        lr=hparams.VAE_lr,
-        latent_dim=hparams.VAE_latent_dim,
-        c=hparams.CNN_capacity,
+        alpha=hparams.VAE_alpha,
+        gamma=hparams.VAE_gamma,
+        lr=hparams.learning_rate,
+        latent_dim=hparams.latent_dim,
         input_height=input_height,
         dataset=hparams.dataset,
         pretrained = hparams.pretrained
     )
 else:
-    raise Exception('Unknown Encoder type: ' + hparams.VAE_type)
+    raise Exception('Unknown Encoder type: ' + hparams.model)
 
 ## Training Encoder ##
 
 trainer = pl.Trainer(
-    max_epochs=hparams.VAE_max_epochs,
+    max_epochs=hparams.max_epochs,
     progress_bar_refresh_rate=25,
     callbacks=[checkpoint_callback_VAE],
-    gpus=torch.cuda.device_count()
+    gpus=torch.cuda.device_count(),
+    logger=logger
 )
 
 
-trainer.fit(model_enc, datamodule.train_dataloader(), datamodule.val_dataloader())
+trainer.fit(model_enc,
+    datamodule.train_dataloader(), 
+    datamodule.val_dataloader(),
+    )
 
 
 #### Select Classifier ####    
 
-if hparams.cla_type == "MLP":
-    model_reg = MLP(input_dim=hparams.VAE_latent_dim,
+if hparams.model_cla == "MLP":
+    model_reg = MLP(input_dim=hparams.latent_dim,
                     num_classes=num_classes,
-                    VAE_type= hparams.VAE_type,
-                    learning_rate=hparams.cla_lr)
-elif hparams.cla_type == "reg":
+                    VAE_type= hparams.model)
+elif hparams.model_cla == "reg":
     model_reg = LogisticRegression(
-        input_dim=hparams.VAE_latent_dim,
+        input_dim=hparams.latent_dim,
         num_classes=num_classes,
-        VAE_type=hparams.VAE_type,
-        learning_rate=hparams.cla_lr)
+        VAE_type=hparams.model)
 else:
     raise Exception('Unknown Classifer type: ' + hparams.cla_type)
 
 
 ## Training Classifier ##
 trainer = pl.Trainer(
-    logger=wandb_logger,
+    logger= logger,
     progress_bar_refresh_rate=25,
     callbacks=[early_stop_callback_cla, checkpoint_callback_cla],
     gpus=torch.cuda.device_count()
@@ -159,7 +157,7 @@ trainer.fit(model_reg,
 trainer.test(model_reg, datamodule.test_dataloader())
 
 
-if hparams.logger == True:
+if hparams.logger == "wandb":
     wandb.finish()
 
 

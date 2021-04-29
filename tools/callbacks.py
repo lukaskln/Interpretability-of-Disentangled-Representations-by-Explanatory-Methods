@@ -15,7 +15,7 @@ model_ID = str(randint(1001,9999))
 
 early_stop_callback_VAE = EarlyStopping(
     monitor='val_loss',
-    min_delta=hparams.VAE_min_delta,
+    min_delta=hparams.min_delta,
     patience=10,
     verbose=False,
     mode='min'
