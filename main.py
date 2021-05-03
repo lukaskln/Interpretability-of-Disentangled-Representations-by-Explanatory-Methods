@@ -125,6 +125,7 @@ def run():
         distributed_backend="ddp" if torch.cuda.device_count() > 1 else False,
         sync_batchnorm=True if torch.cuda.device_count() > 1 else False,
         logger=logger,
+        accelerator='ddp2'
     )
 
 
