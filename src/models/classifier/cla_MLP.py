@@ -90,8 +90,10 @@ class MLP(pl.LightningModule):
 
         acc = accuracy(y_hat, y)
 
-        self.log('loss', loss, on_epoch=True)
-        self.log('acc', acc, on_epoch=False,  prog_bar=True)
+        self.log('loss', loss, on_epoch=True,
+                 sync_dist=True if torch.cuda.device_count() > 1 else False)
+        self.log('acc', acc, on_epoch=False,  prog_bar=True,
+                 sync_dist=True if torch.cuda.device_count() > 1 else False)
         return loss
 
     def validation_step(self, batch, batch_idx):
@@ -111,8 +113,10 @@ class MLP(pl.LightningModule):
         acc = torch.stack([x['acc'] for x in outputs]).mean()
         val_loss = torch.stack([x['val_loss'] for x in outputs]).mean()
 
-        self.log('val_loss', val_loss, on_epoch=True, prog_bar=True)
-        self.log('val_acc', acc, on_epoch=True, prog_bar=True)
+        self.log('val_loss', val_loss, on_epoch=True, prog_bar=True,
+                 sync_dist=True if torch.cuda.device_count() > 1 else False)
+        self.log('val_acc', acc, on_epoch=True, prog_bar=True,
+                 sync_dist=True if torch.cuda.device_count() > 1 else False)
 
     def test_step(self, batch, batch_idx):
         x, y = batch
@@ -131,8 +135,10 @@ class MLP(pl.LightningModule):
         acc = torch.stack([x['acc'] for x in outputs]).mean()
         test_loss = torch.stack([x['test_loss'] for x in outputs]).mean()
 
-        self.log('test_loss', test_loss, on_epoch=True, prog_bar=True)
-        self.log('test_acc', acc, on_epoch=True, prog_bar=True)
+        self.log('test_loss', test_loss, on_epoch=True, prog_bar=True,
+                 sync_dist=True if torch.cuda.device_count() > 1 else False)
+        self.log('test_acc', acc, on_epoch=True, prog_bar=True,
+                 sync_dist=True if torch.cuda.device_count() > 1 else False)
 
     def configure_optimizers(self):
         return self.optimizer(self.parameters(), lr=self.hparams.learning_rate)

@@ -141,7 +141,8 @@ class betaTCVAE(pl.LightningModule):
 
         vae_loss = self.loss(recons, x, mu, log_var, z, M_N)
 
-        self.log('loss', vae_loss, on_epoch=False, prog_bar=True, on_step=True)
+        self.log('loss', vae_loss, on_epoch=False, prog_bar=True, on_step=True,
+                 sync_dist=True if torch.cuda.device_count() > 1 else False)
         return vae_loss
 
     def validation_step(self, batch, batch_idx):
@@ -156,7 +157,8 @@ class betaTCVAE(pl.LightningModule):
 
         vae_loss = self.loss(recons, x, mu, log_var, z, M_N)
 
-        self.log('val_loss', vae_loss, on_epoch=True, prog_bar=True)
+        self.log('val_loss', vae_loss, on_epoch=True, prog_bar=True,
+                 sync_dist=True if torch.cuda.device_count() > 1 else False)
         return vae_loss
 
     def configure_optimizers(self):
