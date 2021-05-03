@@ -42,16 +42,16 @@ class MNIST_DataModule(pl.LightningDataModule):
         self.test = MNIST(self.data_dir, train=False, transform=self.transform)
 
     def train_dataloader(self):
-        return DataLoader(self.train_enc, batch_size=self.batch_size, shuffle=True, num_workers=self.num_workers)
+        return DataLoader(self.train_enc, batch_size=self.batch_size, shuffle=True)
 
     def train_dataloader_cla(self):
-        return DataLoader(self.train_cla, batch_size=32, shuffle=True, num_workers=self.num_workers)
+        return DataLoader(self.train_cla, batch_size=32, shuffle=True)
 
     def val_dataloader(self):
-        return DataLoader(self.val_enc, batch_size=self.batch_size, num_workers=self.num_workers)
+        return DataLoader(self.val_enc, batch_size=self.batch_size)
 
     def val_dataloader_cla(self):
-        return DataLoader(self.val_cla, batch_size=32, num_workers=self.num_workers)
+        return DataLoader(self.val_cla, batch_size=32)
 
     def test_dataloader(self):
-        return DataLoader(self.test, batch_size=self.batch_size, num_workers=self.num_workers)
+        return DataLoader(self.test, batch_size=self.batch_size)
