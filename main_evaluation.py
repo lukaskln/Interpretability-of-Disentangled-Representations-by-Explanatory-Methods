@@ -27,7 +27,7 @@ hparams = parser.parse_args()
 ## Encoder ##
 path_ckpt_VAE = Path(os.getcwd(), 
                 "models/encoder/VAE_loss/", 
-                ("VAE_" + str(hparams.eval_model_ID) + ".ckpt")
+                ("VAE_" + str(hparams.model_ID) + ".ckpt")
             )
 
 if os.path.exists(path_ckpt_VAE)==False:
@@ -56,7 +56,7 @@ for architecture in architectures_VAE:
 
 path_ckpt_cla = Path(os.getcwd(),
                     "models/classifier/",
-                    ("cla_" + str(hparams.eval_model_ID) + ".ckpt")
+                    ("cla_" + str(hparams.model_ID) + ".ckpt")
                     )
 
 if os.path.exists(path_ckpt_cla) == False:

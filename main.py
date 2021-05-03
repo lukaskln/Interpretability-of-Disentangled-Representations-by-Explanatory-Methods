@@ -15,19 +15,20 @@ from src.__init__ import *
 
 def run():
 
-    print("Model ID:", model_ID)
-
     ## Parser and Seeding ##
 
     parser = get_parser()
     hparams = parser.parse_args()
 
+    print("Model ID:", hparams.model_ID)
+
     pl.seed_everything(hparams.seed)
 
-    if hparams.eval_model_ID == 1000:
-        path_ckpt = Path(__file__).resolve().parents[0] / "models/encoder/VAE_loss/" / ("VAE_" + model_ID + ".ckpt")
-    else:
-        path_ckpt = Path(__file__).resolve().parents[0] / "models/encoder/VAE_loss/" / ("VAE_" + str(hparams.eval_model_ID) + ".ckpt")
+    path_ckpt = Path(__file__).resolve().parents[0] / "models/encoder/VAE_loss/" / ("VAE_" + str(hparams.model_ID) + ".ckpt")
+
+    if os.path.exists(path_ckpt) == True:
+        print("[ERROR] Model ID does already exist")
+        raise SystemExit(0)
 
     #### Logging ####
 
@@ -174,8 +175,8 @@ def run():
 
     ## Remove interim models ##
 
-    path_ckpt_VAE = Path(os.getcwd(), "models/encoder/VAE_loss/",("VAE_" + model_ID + ".ckpt"))
-    path_ckpt_cla = Path(os.getcwd(), "models/classifier/",("cla_" + model_ID + ".ckpt"))
+    path_ckpt_VAE = Path(os.getcwd(), "models/encoder/VAE_loss/",("VAE_" + str(hparams.model_ID) + ".ckpt"))
+    path_ckpt_cla = Path(os.getcwd(), "models/classifier/",("cla_" + str(hparams.model_ID) + ".ckpt"))
 
     if hparams.save_model == False:
         os.remove(str(path_ckpt_VAE))
