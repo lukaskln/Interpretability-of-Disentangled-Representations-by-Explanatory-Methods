@@ -120,12 +120,11 @@ def run():
     trainer = pl.Trainer(
         max_epochs=hparams.max_epochs,
         progress_bar_refresh_rate=25,
-        callbacks=[checkpoint_callback_VAE],
+        callbacks=False,
         gpus=-1 if torch.cuda.device_count() > 1 else 0,
-        distributed_backend="ddp" if torch.cuda.device_count() > 1 else False,
+        distributed_backend="dp" if torch.cuda.device_count() > 1 else False,
         sync_batchnorm=True if torch.cuda.device_count() > 1 else False,
-        logger=logger,
-        accelerator='ddp2'
+        logger=logger
     )
 
 
@@ -134,6 +133,7 @@ def run():
         datamodule.val_dataloader(),
         )
 
+    torch.save(model_enc, path_ckpt)
     #### Select Classifier ####    
 
     if hparams.model_cla == "MLP":
@@ -157,7 +157,7 @@ def run():
         progress_bar_refresh_rate=25,
         callbacks=[early_stop_callback_cla, checkpoint_callback_cla],
         gpus=-1 if torch.cuda.device_count() > 1 else 0,
-        distributed_backend="ddp" if torch.cuda.device_count() > 1 else False,
+        distributed_backend="dp" if torch.cuda.device_count() > 1 else False,
         sync_batchnorm=True if torch.cuda.device_count() > 1 else False
     )
 
