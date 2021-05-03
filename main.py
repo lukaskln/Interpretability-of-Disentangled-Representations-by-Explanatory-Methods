@@ -108,7 +108,7 @@ else:
 
 ## Training Encoder ##
 
-print(torch.cuda.device_count())
+print("GPUs used:", torch.cuda.device_count())
 
 trainer = pl.Trainer(
     max_epochs=hparams.max_epochs,
