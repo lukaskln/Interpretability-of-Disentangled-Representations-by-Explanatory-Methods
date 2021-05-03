@@ -1,3 +1,13 @@
+import torch
+
+def run():
+    torch.multiprocessing.freeze_support()
+    print('loop')
+
+
+if __name__ == '__main__':
+    run()
+
 #### Setup ####
 from pytorch_lightning.loggers import WandbLogger
 import warnings
@@ -116,6 +126,8 @@ trainer = pl.Trainer(
     progress_bar_refresh_rate=25,
     callbacks=[checkpoint_callback_VAE],
     gpus=torch.cuda.device_count(),
+    distributed_backend="ddp" if torch.cuda.device_count() > 1 else False,
+    sync_batchnorm=True if torch.cuda.device_count() > 1 else False,
     logger=logger
 )
 
@@ -146,7 +158,9 @@ trainer = pl.Trainer(
     logger= logger,
     progress_bar_refresh_rate=25,
     callbacks=[early_stop_callback_cla, checkpoint_callback_cla],
-    gpus=torch.cuda.device_count()
+    gpus=torch.cuda.device_count(),
+    distributed_backend="ddp" if torch.cuda.device_count() > 1 else False,
+    sync_batchnorm=True if torch.cuda.device_count() > 1 else False
 )
 
 trainer.fit(model_reg, 
