@@ -148,9 +148,7 @@ def run():
         logger= logger,
         progress_bar_refresh_rate=25,
         callbacks=[early_stop_callback_cla, checkpoint_callback_cla],
-        gpus=-1 if torch.cuda.device_count() > 1 else 0,
-        distributed_backend="ddp" if torch.cuda.device_count() > 1 else False,
-        sync_batchnorm=True if torch.cuda.device_count() > 1 else False,
+        gpus= 1
     )
 
     trainer.fit(model_reg, 

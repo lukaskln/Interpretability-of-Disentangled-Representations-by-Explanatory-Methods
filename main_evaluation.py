@@ -55,9 +55,9 @@ for architecture in architectures_VAE:
 ## Classifier ##
 
 path_ckpt_cla = Path(os.getcwd(),
-                     "models/classifier/",
-                     ("cla_" + str(hparams.eval_model_ID) + ".ckpt")
-                     )
+                    "models/classifier/",
+                    ("cla_" + str(hparams.eval_model_ID) + ".ckpt")
+                    )
 
 if os.path.exists(path_ckpt_cla) == False:
     print("[ERROR] Model does not exist. Please check the /models folder for existing models.")
@@ -112,10 +112,10 @@ vis_LatentSpace(encoder,
 
 print('\n Attribution of Original Images into Predictions:')
 scores, test_images = scores_AM_Original(cla, 
-                                         datamodule.train_dataloader(),
-                                         type=encoder_type,
-                                         out_dim = cla.state_dict()['fc2.weight'].shape[0]
-                                         ).expgrad_shap()
+                                        datamodule.train_dataloader(),
+                                        type=encoder_type,
+                                        out_dim = cla.state_dict()['fc2.weight'].shape[0]
+                                        ).expgrad_shap()
 
 
 vis_AM_Original(scores, test_images).visualise()
@@ -128,17 +128,17 @@ exp, scores, encoding_test, labels_test = scores_AM_Latent(model = cla,
 
 
 vis_AM_Latent(shap_values=scores,
-              explainer=exp, 
-              encoding_test=encoding_test,
-              labels_test=labels_test
-              ).visualise()
+            explainer=exp, 
+            encoding_test=encoding_test,
+            labels_test=labels_test
+            ).visualise()
 
 print('\n Attribution of Original Images into Latent Space Representations:')
 scores, test_images = scores_AM_Original(encoder,
-                                         datamodule.train_dataloader(),
-                                         type=encoder_type,
-                                         out_dim = encoder.state_dict()['fc_mu.weight'].shape[0]
-                                         ).expgrad_shap()
+                                        datamodule.train_dataloader(),
+                                        type=encoder_type,
+                                        out_dim = encoder.state_dict()['fc_mu.weight'].shape[0]
+                                        ).expgrad_shap()
 
 vis_AM_Original(scores, test_images).visualise()
 

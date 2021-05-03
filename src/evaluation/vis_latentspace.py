@@ -27,8 +27,7 @@ class vis_LatentSpace:
 
         for i in range(0,self.latent_dim,1):
             if self.input_dim==64:
-                latent = torch.Tensor([9.3978e-03, -4.7979e-02,  1.5028e+00, -9.9019e-01,  1.6954e+00,
-                                       1.0239e+00,  2.6542e-02,  6.4998e-01,  2.1610e-02,  1.3277e-02])
+                latent = torch.Tensor([ 1.0181e-02, -1.3138e+00, -1.0526e+00, -1.1646e+00, -1.7112e+00,-4.4280e-02,  8.0676e-02,  2.3319e+00,  1.3610e-02,  5.3523e-02])
                 latent= torch.transpose(latent.repeat(20, 1), 0, 1)
             else:
                 latent = torch.zeros(self.latent_dim, 20)
