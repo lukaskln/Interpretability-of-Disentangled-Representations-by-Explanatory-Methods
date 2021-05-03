@@ -1,7 +1,7 @@
 import argparse
 from argparse import ArgumentParser
 import os
-
+from random import randint
 """
 This file contains the declaration of our argument parser
 """
@@ -23,7 +23,7 @@ def get_parser():
     parser.add_argument("--batch_size", default=100, type=int)
     parser.add_argument("--dataset", choices=["mnist","dSprites","OCT"], default="mnist", type=str)
     parser.add_argument("--num_workers", default=int(os.cpu_count() / 2), type=int)
-    parser.add_argument("--model_ID", default=1000, type=int)
+    parser.add_argument("--model_ID", default=randint(1000,9999) , type=int)
     
     # Training Parameters
     parser.add_argument("--model", choices=["betaVAE_MLP", "betaVAE_VGG", "betaVAE_ResNet",

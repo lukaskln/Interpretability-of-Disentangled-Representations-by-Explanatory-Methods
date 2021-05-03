@@ -139,13 +139,11 @@ def run():
     if hparams.model_cla == "MLP":
         model_reg = MLP(input_dim=hparams.latent_dim,
                         num_classes=num_classes,
-                        VAE_type= hparams.model,
                         path_ckpt=path_ckpt)
     elif hparams.model_cla == "reg":
         model_reg = LogisticRegression(
             input_dim=hparams.latent_dim,
             num_classes=num_classes,
-            VAE_type=hparams.model,
             path_ckpt=path_ckpt)
     else:
         raise Exception('Unknown Classifer type: ' + hparams.cla_type)

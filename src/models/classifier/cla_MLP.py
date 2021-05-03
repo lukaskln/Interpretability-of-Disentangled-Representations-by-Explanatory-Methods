@@ -9,13 +9,6 @@ from torch.nn import functional as F
 from torch.optim import Adam
 from torch.optim.optimizer import Optimizer
 
-from src.models.encoder.VAE_loss.betaVAE import *
-from src.models.encoder.VAE_loss.betaTCVAE import *
-from src.models.encoder.VAE_loss.betaVAE_VGG import *
-from src.models.encoder.VAE_loss.betaTCVAE_VGG import *
-from src.models.encoder.VAE_loss.betaVAE_ResNet import *
-from src.models.encoder.VAE_loss.betaTCVAE_ResNet import *
-
 class MLP(pl.LightningModule):
     def __init__(
         self,
@@ -25,27 +18,11 @@ class MLP(pl.LightningModule):
         bias: bool = True,
         learning_rate: float = 1e-4,
         optimizer: Optimizer = Adam,
-        VAE_type = "betaVAE_MLP",
         **kwargs
     ):
         super().__init__()
         self.save_hyperparameters()
         self.optimizer = optimizer
-        self.VAE_type = VAE_type
-
-
-        # if VAE_type == "betaVAE_MLP":
-        #     self.encoder = betaVAE.load_from_checkpoint(path_ckpt)
-        # elif VAE_type == "betaVAE_VGG":
-        #     self.encoder = betaVAE_VGG.load_from_checkpoint(path_ckpt)
-        # elif VAE_type == "betaVAE_ResNet":
-        #     self.encoder = betaVAE_ResNet.load_from_checkpoint(path_ckpt)
-        # elif VAE_type == "betaTCVAE_MLP":
-        #     self.encoder = betaTCVAE.load_from_checkpoint(path_ckpt)
-        # elif VAE_type == "betaTCVAE_VGG":
-        #     self.encoder = betaTCVAE_VGG.load_from_checkpoint(path_ckpt)
-        # elif VAE_type == "betaTCVAE_ResNet":
-        #     self.encoder = betaTCVAE_ResNet.load_from_checkpoint(path_ckpt)
 
         self.encoder = torch.load(path_ckpt)
         self.encoder.freeze()

@@ -9,13 +9,6 @@ from torch.nn import functional as F
 from torch.optim import Adam
 from torch.optim.optimizer import Optimizer
 
-from src.models.encoder.VAE_loss.betaVAE import *
-from src.models.encoder.VAE_loss.betaVAE_VGG import *
-from src.models.encoder.VAE_loss.betaTCVAE import *
-from src.models.encoder.VAE_loss.betaTCVAE_VGG import *
-from src.models.encoder.VAE_loss.betaVAE_ResNet import *
-from src.models.encoder.VAE_loss.betaTCVAE_ResNet import *
-
 class LogisticRegression(pl.LightningModule):
     def __init__(
         self,
@@ -27,27 +20,13 @@ class LogisticRegression(pl.LightningModule):
         optimizer: Optimizer = Adam,
         l1_strength: float = 0.0,
         l2_strength: float = 0.0,
-        VAE_type="betaVAE_MLP",
         **kwargs
     ):
         super().__init__()
         self.save_hyperparameters()
         self.optimizer = optimizer
-        self.VAE_type = VAE_type
 
-        if VAE_type == "betaVAE_MLP":
-            self.encoder = betaVAE.load_from_checkpoint(path_ckpt)
-        elif VAE_type == "betaVAE_VGG":
-            self.encoder = betaVAE_VGG.load_from_checkpoint(path_ckpt)
-        elif VAE_type == "betaVAE_ResNet":
-            self.encoder = betaVAE_ResNet.load_from_checkpoint(path_ckpt)
-        elif VAE_type == "betaTCVAE_MLP":
-            self.encoder = betaTCVAE.load_from_checkpoint(path_ckpt)
-        elif VAE_type == "betaTCVAE_VGG":
-            self.encoder = betaTCVAE_VGG.load_from_checkpoint(path_ckpt)
-        elif VAE_type == "betaTCVAE_ResNet":
-            self.encoder = betaTCVAE_ResNet.load_from_checkpoint(path_ckpt)
-
+        self.encoder = torch.load(path_ckpt)
         self.encoder.freeze()
             
         self.linear = nn.Linear(in_features=self.hparams.input_dim, out_features=self.hparams.num_classes, bias=bias)
