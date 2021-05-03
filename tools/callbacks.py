@@ -20,16 +20,16 @@ early_stop_callback_VAE = EarlyStopping(
     mode='min'
 )
 
-checkpoint_callback_VAE = ModelCheckpoint(
-    dirpath=os.path.dirname(
-        Path(os.getcwd(), "models/encoder/VAE_loss/test/")),
-    save_top_k=1,
-    verbose=False,
-    monitor='val_loss',
-    mode='min',
-    prefix='',
-    filename="VAE_" + str(hparams.model_ID)
-)
+# checkpoint_callback_VAE = ModelCheckpoint(
+#     dirpath=os.path.dirname(
+#         Path(os.getcwd(), "models/encoder/VAE_loss/test/")),
+#     save_top_k=1,
+#     verbose=False,
+#     monitor='val_loss',
+#     mode='min',
+#     prefix='',
+#     filename="VAE_" + str(hparams.model_ID)
+# )
 
 #### Classifier Callbacks ####
 

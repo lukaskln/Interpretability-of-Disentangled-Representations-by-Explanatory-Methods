@@ -120,7 +120,7 @@ def run():
     trainer = pl.Trainer(
         max_epochs=hparams.max_epochs,
         progress_bar_refresh_rate=25,
-        callbacks=[checkpoint_callback_VAE],
+        callbacks=False,
         gpus=-1 if torch.cuda.device_count() > 1 else 0,
         distributed_backend="ddp" if torch.cuda.device_count() > 1 else False,
         sync_batchnorm=True if torch.cuda.device_count() > 1 else False,
@@ -132,7 +132,8 @@ def run():
         datamodule.train_dataloader(), 
         datamodule.val_dataloader(),
         )
-
+    
+    trainer.save_checkpoint(path_ckpt)
 
     #### Select Classifier ####    
 
