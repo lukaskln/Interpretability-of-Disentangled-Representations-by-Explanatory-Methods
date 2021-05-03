@@ -122,7 +122,7 @@ vis_AM_Original(scores, test_images).visualise()
 
 exp, scores, encoding_test, labels_test = scores_AM_Latent(model = cla,
                                         encoder = encoder,
-                                                           datamodule=datamodule.train_dataloader(),
+                                        datamodule=datamodule.train_dataloader(),
                                         type = encoder_type,
                                         ).expgrad_shap()
 
@@ -142,11 +142,7 @@ scores, test_images = scores_AM_Original(encoder,
 
 vis_AM_Original(scores, test_images).visualise()
 
-# vis_AM_Latent_on_Rec(shap_values=scores, 
-#                     encoding_test = encoding_test, 
-#                     model = encoder,
-#                     type = encoder_type
-#                      ).visualise()
+
 
 
 

@@ -50,7 +50,6 @@ class scores_AM_Original:
 
         with torch.no_grad():
             iter_obj = iter(self.datamodule)
-            iter_obj.next()
             images_test, labels_test = iter_obj.next()
 
             height = images_test[0].shape[1]

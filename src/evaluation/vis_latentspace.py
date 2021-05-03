@@ -26,7 +26,12 @@ class vis_LatentSpace:
         recon = []
 
         for i in range(0,self.latent_dim,1):
-            latent = torch.zeros(self.latent_dim, 20)
+            if self.input_dim==64:
+                latent = torch.Tensor([9.3978e-03, -4.7979e-02,  1.5028e+00, -9.9019e-01,  1.6954e+00,
+                                       1.0239e+00,  2.6542e-02,  6.4998e-01,  2.1610e-02,  1.3277e-02])
+                latent= torch.transpose(latent.repeat(20, 1), 0, 1)
+            else:
+                latent = torch.zeros(self.latent_dim, 20)
             latent[i, :] = torch.linspace(-self.latent_range, self.latent_range, 20)
             latent = torch.transpose(latent, 0, 1)
             img_recon = self.model.decode(latent)
@@ -36,6 +41,7 @@ class vis_LatentSpace:
 
         fig, ax = plt.subplots(figsize=(10, 8))
         plt.axis('off')
+        plt.rcParams["figure.figsize"] = (20, 3)
         self.show_image(make_grid(recon.data, 20, 8))
 
         if self.input_dim==28:

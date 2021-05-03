@@ -16,7 +16,7 @@ from torchvision import transforms
 
 def collate_fn(batch):
     imgs = torch.stack([item[0].float() for item in batch])
-    targets = [item[1] for item in batch]
+    targets = torch.stack([item[1] for item in batch])
     return imgs, targets
 
 class dSprites_DataModule(pl.LightningDataModule):
@@ -61,12 +61,10 @@ class dSprites_DataModule(pl.LightningDataModule):
                                                         generator=torch.Generator().manual_seed(self.seed))
 
     def train_dataloader(self):
-        return DataLoader(self.train_enc, batch_size=self.batch_size, shuffle=True,
-                          collate_fn=collate_fn)
+        return DataLoader(self.train_enc, batch_size=self.batch_size, collate_fn=collate_fn)
 
     def train_dataloader_cla(self):
-        return DataLoader(self.train_cla, batch_size=32, shuffle=True,
-                          collate_fn=collate_fn)
+        return DataLoader(self.train_cla, batch_size=32, collate_fn=collate_fn)
 
     def val_dataloader(self):
         return DataLoader(self.val_enc, batch_size=self.batch_size,
