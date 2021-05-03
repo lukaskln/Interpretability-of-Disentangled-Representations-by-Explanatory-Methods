@@ -9,6 +9,13 @@ from torch.nn import functional as F
 from torch.optim import Adam
 from torch.optim.optimizer import Optimizer
 
+from src.models.encoder.VAE_loss.betaVAE import *
+from src.models.encoder.VAE_loss.betaVAE_VGG import *
+from src.models.encoder.VAE_loss.betaTCVAE import *
+from src.models.encoder.VAE_loss.betaTCVAE_VGG import *
+from src.models.encoder.VAE_loss.betaVAE_ResNet import *
+from src.models.encoder.VAE_loss.betaTCVAE_ResNet import *
+
 class LogisticRegression(pl.LightningModule):
     def __init__(
         self,
@@ -20,11 +27,13 @@ class LogisticRegression(pl.LightningModule):
         optimizer: Optimizer = Adam,
         l1_strength: float = 0.0,
         l2_strength: float = 0.0,
+        VAE_type="betaVAE_MLP",
         **kwargs
     ):
         super().__init__()
         self.save_hyperparameters()
         self.optimizer = optimizer
+        self.VAE_type = VAE_type
 
         self.encoder = torch.load(path_ckpt)
         self.encoder.freeze()

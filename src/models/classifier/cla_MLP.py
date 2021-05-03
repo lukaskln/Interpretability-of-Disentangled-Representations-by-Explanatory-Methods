@@ -18,11 +18,13 @@ class MLP(pl.LightningModule):
         bias: bool = True,
         learning_rate: float = 1e-4,
         optimizer: Optimizer = Adam,
+        VAE_type = "betaVAE_MLP",
         **kwargs
     ):
         super().__init__()
         self.save_hyperparameters()
         self.optimizer = optimizer
+        self.VAE_type = VAE_type
 
         self.encoder = torch.load(path_ckpt)
         self.encoder.freeze()
