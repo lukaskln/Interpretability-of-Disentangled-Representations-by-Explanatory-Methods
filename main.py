@@ -6,9 +6,6 @@ import os
 import glob
 from pathlib import Path
 
-main_dir = os.path.dirname(Path(__file__).resolve().parents[0])
-os.chdir(main_dir)
-
 import pytorch_lightning as pl
 
 warnings.filterwarnings('ignore')
@@ -119,7 +116,6 @@ trainer = pl.Trainer(
     distributed_backend="ddp" if torch.cuda.device_count() > 1 else False,
     sync_batchnorm=True if torch.cuda.device_count() > 1 else False,
     logger=logger,
-    num_sanity_val_steps=0
 )
 
 
