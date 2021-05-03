@@ -29,11 +29,12 @@ def make_weights_for_balanced_classes(images, nclasses):
 
 
 class OCT_DataModule(pl.LightningDataModule):
-    def __init__(self, batch_size, data_dir, seed):
+    def __init__(self, batch_size, data_dir, seed, num_workers):
         super().__init__()
         self.data_dir = data_dir
         self.batch_size = batch_size
         self.seed = seed
+        self.num_workers = num_workers
 
     def setup(self):
 
@@ -72,16 +73,16 @@ class OCT_DataModule(pl.LightningDataModule):
         self.test = torchvision.datasets.ImageFolder(self.data_dir + "/test", transform=transform_img)
 
     def train_dataloader(self):
-        return DataLoader(self.train_enc, batch_size=self.batch_size)
+        return DataLoader(self.train_enc, batch_size=self.batch_size, num_workers=self.num_workers)
 
     def train_dataloader_cla(self):
-        return DataLoader(self.train_cla, batch_size=32)
+        return DataLoader(self.train_cla, batch_size=32, num_workers=self.num_workers)
 
     def val_dataloader(self):
-        return DataLoader(self.val_enc, batch_size=self.batch_size)
+        return DataLoader(self.val_enc, batch_size=self.batch_size, num_workers=self.num_workers)
 
     def val_dataloader_cla(self):
-        return DataLoader(self.test, batch_size=32)
+        return DataLoader(self.test, batch_size=32, num_workers=self.num_workers)
 
     def test_dataloader(self):
-        return DataLoader(self.test, batch_size=self.batch_size)
+        return DataLoader(self.test, batch_size=self.batch_size, num_workers=self.num_workers)

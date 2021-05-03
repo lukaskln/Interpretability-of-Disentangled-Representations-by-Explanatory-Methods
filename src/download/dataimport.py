@@ -27,7 +27,8 @@ urllib.request.install_opener(opener)
 if hparams.dataset=="mnist":
     datamodule_mnist = MNIST_DataModule(data_dir=data_path / "mnist/",
                                     batch_size=hparams.batch_size,
-                                    seed=hparams.seed)
+                                    seed=hparams.seed,
+                                    num_workers = hparams.num_workers)
 
     datamodule_mnist.prepare_data()
     datamodule_mnist.setup()
@@ -37,7 +38,8 @@ if hparams.dataset=="mnist":
 if hparams.dataset == "dSprites":
     datamodule_dSprites = dSprites_DataModule(data_dir=data_path / "dSprites/",
                                                         batch_size=hparams.batch_size,
-                                                        seed=hparams.seed)
+                                                        seed=hparams.seed,
+                                                        num_workers = hparams.num_workers)
 
     datamodule_dSprites.prepare_data()
     datamodule_dSprites.setup()
@@ -52,6 +54,7 @@ if hparams.dataset == "OCT":
 
     datamodule_OCT = OCT_DataModule(data_dir=data_path,
                                     batch_size=hparams.batch_size,
-                                    seed=hparams.seed)
+                                    seed=hparams.seed,
+                                    num_workers=hparams.num_workers)
 
     datamodule_OCT.setup()

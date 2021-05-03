@@ -2,6 +2,7 @@ import torch
 from pathlib import Path
 from tools.argparser import *
 import pytorch_lightning as pl
+import os
 
 from torch.utils.data import DataLoader, random_split
 from torchvision.datasets import MNIST
@@ -9,18 +10,16 @@ from torchvision import transforms
 
 
 class MNIST_DataModule(pl.LightningDataModule):
-    def __init__(self, batch_size, data_dir, seed):
+    def __init__(self, batch_size, data_dir, seed, num_workers):
         super().__init__()
         self.data_dir = data_dir
         self.batch_size = batch_size
         self.seed = seed
+        self.num_workers = num_workers
 
         self.transform = transforms.Compose([
             transforms.ToTensor()
         ])
-
-        self.dims = (1, 28, 28)
-        self.num_classes = 10
 
     def prepare_data(self):
         # download
@@ -43,16 +42,16 @@ class MNIST_DataModule(pl.LightningDataModule):
         self.test = MNIST(self.data_dir, train=False, transform=self.transform)
 
     def train_dataloader(self):
-        return DataLoader(self.train_enc, batch_size=self.batch_size, shuffle=True)
+        return DataLoader(self.train_enc, batch_size=self.batch_size, shuffle=True, num_workers=self.num_workers)
 
     def train_dataloader_cla(self):
-        return DataLoader(self.train_cla, batch_size=32, shuffle=True)
+        return DataLoader(self.train_cla, batch_size=32, shuffle=True, num_workers=self.num_workers)
 
     def val_dataloader(self):
-        return DataLoader(self.val_enc, batch_size=self.batch_size)
+        return DataLoader(self.val_enc, batch_size=self.batch_size, num_workers=self.num_workers)
 
     def val_dataloader_cla(self):
-        return DataLoader(self.val_cla, batch_size=32)
+        return DataLoader(self.val_cla, batch_size=32, num_workers=self.num_workers)
 
     def test_dataloader(self):
-        return DataLoader(self.test, batch_size=self.batch_size)
+        return DataLoader(self.test, batch_size=self.batch_size, num_workers=self.num_workers)

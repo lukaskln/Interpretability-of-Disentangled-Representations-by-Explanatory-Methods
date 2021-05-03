@@ -20,14 +20,12 @@ def collate_fn(batch):
     return imgs, targets
 
 class dSprites_DataModule(pl.LightningDataModule):
-    def __init__(self, batch_size, data_dir, seed):
+    def __init__(self, batch_size, data_dir, seed, num_workers):
         super().__init__()
         self.data_dir = data_dir
         self.batch_size = batch_size
         self.seed = seed
-
-        self.dims = (1, 64, 64)
-        self.num_classes = 3
+        self.num_workers = num_workers
 
     def prepare_data(self):
         if not os.path.exists(os.path.join(self.data_dir, "imgs.npy")):
@@ -61,19 +59,19 @@ class dSprites_DataModule(pl.LightningDataModule):
                                                         generator=torch.Generator().manual_seed(self.seed))
 
     def train_dataloader(self):
-        return DataLoader(self.train_enc, batch_size=self.batch_size, collate_fn=collate_fn)
+        return DataLoader(self.train_enc, batch_size=self.batch_size, collate_fn=collate_fn, num_workers=self.num_workers)
 
     def train_dataloader_cla(self):
-        return DataLoader(self.train_cla, batch_size=32, collate_fn=collate_fn)
+        return DataLoader(self.train_cla, batch_size=32, collate_fn=collate_fn, num_workers=self.num_workers)
 
     def val_dataloader(self):
         return DataLoader(self.val_enc, batch_size=self.batch_size,
-                          collate_fn=collate_fn)
+                          collate_fn=collate_fn, num_workers=self.num_workers)
 
     def val_dataloader_cla(self):
         return DataLoader(self.test, batch_size=32,
-                          collate_fn=collate_fn)
+                          collate_fn=collate_fn, num_workers=self.num_workers)
 
     def test_dataloader(self):
         return DataLoader(self.test, batch_size=self.batch_size,  
-                        collate_fn=collate_fn)
+                          collate_fn=collate_fn, num_workers=self.num_workers)
