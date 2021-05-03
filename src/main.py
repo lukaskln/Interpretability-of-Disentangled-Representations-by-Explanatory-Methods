@@ -118,7 +118,8 @@ trainer = pl.Trainer(
     gpus=torch.cuda.device_count(),
     distributed_backend="ddp" if torch.cuda.device_count() > 1 else False,
     sync_batchnorm=True if torch.cuda.device_count() > 1 else False,
-    logger=logger
+    logger=logger,
+    num_sanity_val_steps=0
 )
 
 
