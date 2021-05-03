@@ -16,21 +16,10 @@ from src.models.encoder.VAE_loss.betaTCVAE_VGG import *
 from src.models.encoder.VAE_loss.betaVAE_ResNet import *
 from src.models.encoder.VAE_loss.betaTCVAE_ResNet import *
 
-from tools.callbacks import *
-from tools.argparser import *
-
-parser = get_parser()
-hparams = parser.parse_args()
-
-if hparams.eval_model_ID==1000:
-    path_ckpt = Path(__file__).resolve().parents[3] / "models/encoder/VAE_loss/" / ("VAE_" + model_ID + ".ckpt")
-else:
-    path_ckpt = Path(__file__).resolve().parents[3] / "models/encoder/VAE_loss/" / ("VAE_" + str(hparams.eval_model_ID) + ".ckpt")
-
-
 class MLP(pl.LightningModule):
     def __init__(
         self,
+        path_ckpt,
         input_dim: int,
         num_classes: int,
         bias: bool = True,

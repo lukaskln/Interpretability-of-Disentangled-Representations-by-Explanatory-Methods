@@ -24,6 +24,11 @@ def run():
 
     pl.seed_everything(hparams.seed)
 
+    if hparams.eval_model_ID == 1000:
+        path_ckpt = Path(__file__).resolve().parents[0] / "models/encoder/VAE_loss/" / ("VAE_" + model_ID + ".ckpt")
+    else:
+        path_ckpt = Path(__file__).resolve().parents[0] / "models/encoder/VAE_loss/" / ("VAE_" + str(hparams.eval_model_ID) + ".ckpt")
+
     #### Logging ####
 
     if hparams.logger == "wandb":
@@ -133,12 +138,14 @@ def run():
     if hparams.model_cla == "MLP":
         model_reg = MLP(input_dim=hparams.latent_dim,
                         num_classes=num_classes,
-                        VAE_type= hparams.model)
+                        VAE_type= hparams.model,
+                        path_ckpt=path_ckpt)
     elif hparams.model_cla == "reg":
         model_reg = LogisticRegression(
             input_dim=hparams.latent_dim,
             num_classes=num_classes,
-            VAE_type=hparams.model)
+            VAE_type=hparams.model,
+            path_ckpt=path_ckpt)
     else:
         raise Exception('Unknown Classifer type: ' + hparams.cla_type)
 
@@ -148,7 +155,9 @@ def run():
         logger= logger,
         progress_bar_refresh_rate=25,
         callbacks=[early_stop_callback_cla, checkpoint_callback_cla],
-        gpus= 1
+        gpus=-1 if torch.cuda.device_count() > 1 else 0,
+        distributed_backend="ddp" if torch.cuda.device_count() > 1 else False,
+        sync_batchnorm=True if torch.cuda.device_count() > 1 else False
     )
 
     trainer.fit(model_reg, 
