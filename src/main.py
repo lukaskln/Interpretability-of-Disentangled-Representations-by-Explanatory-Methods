@@ -4,10 +4,6 @@ def run():
     torch.multiprocessing.freeze_support()
     print('loop')
 
-
-if __name__ == '__main__':
-    run()
-
 #### Setup ####
 from pytorch_lightning.loggers import WandbLogger
 import warnings
@@ -18,6 +14,9 @@ from pathlib import Path
 
 main_dir = os.path.dirname(Path(__file__).resolve().parents[0])
 os.chdir(main_dir)
+
+if __name__ == '__main__':
+    run()
 
 import pytorch_lightning as pl
 
