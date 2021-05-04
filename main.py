@@ -119,6 +119,7 @@ def run():
 
     trainer = pl.Trainer(
         max_epochs=hparams.max_epochs,
+        gradient_clip_val=hparams.grad_clipping,
         progress_bar_refresh_rate=25,
         callbacks=False,
         gpus=-1 if torch.cuda.device_count() > 1 else 0,

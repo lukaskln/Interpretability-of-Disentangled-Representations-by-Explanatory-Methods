@@ -31,6 +31,7 @@ def get_parser():
                                             default="betaVAE_MLP", type=str)
     parser.add_argument("--model_cla", choices=["MLP", "reg"], default="MLP", type=str)
     parser.add_argument("--learning_rate", default=0.001, type=float)
+    parser.add_argument("--grad_clipping", default=0.0, type=float)
     parser.add_argument("--max_epochs", default=70, type=int)
     parser.add_argument("--min_delta", default=0.001, type=float)
     parser.add_argument("--latent_dim", default=10, type=int)
