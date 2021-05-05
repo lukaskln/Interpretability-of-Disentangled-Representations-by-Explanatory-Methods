@@ -24,7 +24,7 @@ def run():
 
     pl.seed_everything(hparams.seed)
 
-    path_ckpt = Path(__file__).resolve().parents[0] / "models/encoder/VAE_loss/" / ("VAE_" + str(hparams.model_ID) + ".ckpt")
+    path_ckpt = Path("./models/encoder/VAE_loss/VAE_" + str(hparams.model_ID) + ".ckpt")
 
     if os.path.exists(path_ckpt) == True:
         print("[ERROR] Model ID does already exist")

@@ -4,6 +4,7 @@ import datetime
 import os
 import glob
 from pathlib import Path
+import pathlib
 
 import pytorch_lightning as pl
 import torch
@@ -25,10 +26,7 @@ hparams = parser.parse_args()
 #### Model import ####
 
 ## Encoder ##
-path_ckpt_VAE = Path(os.getcwd(), 
-                "models/encoder/VAE_loss/", 
-                ("VAE_" + str(hparams.model_ID) + ".ckpt")
-            )
+path_ckpt_VAE = Path("./models/encoder/VAE_loss/VAE_" + str(hparams.model_ID) + ".ckpt")
 
 if os.path.exists(path_ckpt_VAE)==False:
     print("[ERROR] Model does not exist. Please check the /models folder for existing models.")
@@ -54,10 +52,7 @@ for architecture in architectures_VAE:
 
 ## Classifier ##
 
-path_ckpt_cla = Path(os.getcwd(),
-                    "models/classifier/",
-                    ("cla_" + str(hparams.model_ID) + ".ckpt")
-                    )
+path_ckpt_cla = Path("./models/encoder/classifier/cla_" + str(hparams.model_ID) + ".ckpt")
 
 if os.path.exists(path_ckpt_cla) == False:
     print("[ERROR] Model does not exist. Please check the /models folder for existing models.")
@@ -68,9 +63,12 @@ architectures_cla = [
     LogisticRegression
 ]
 
+temp = pathlib.PosixPath
+pathlib.PosixPath = pathlib.WindowsPath
+
 for architecture in architectures_cla:
     try:
-        cla = architecture.load_from_checkpoint(path_ckpt_cla)
+        cla = MLP.load_from_checkpoint(path_ckpt_cla)
         cla_type = architecture.__name__
         break
     except RuntimeError:
