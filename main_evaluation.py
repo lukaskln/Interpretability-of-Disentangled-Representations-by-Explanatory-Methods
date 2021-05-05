@@ -141,8 +141,3 @@ scores, test_images = scores_AM_Original(encoder,
                                         ).expgrad_shap()
 
 vis_AM_Original(scores, test_images).visualise()
-
-
-
-
-

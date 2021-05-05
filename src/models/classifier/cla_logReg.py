@@ -35,8 +35,20 @@ class LogisticRegression(pl.LightningModule):
         self.optimizer = optimizer
         self.VAE_type = VAE_type
 
-        self.encoder = torch.load(path_ckpt)
-        self.encoder.freeze()
+        if VAE_type == "betaVAE_MLP":
+            self.encoder = betaVAE.load_from_checkpoint(path_ckpt)
+        elif VAE_type == "betaVAE_VGG":
+            self.encoder = betaVAE_VGG.load_from_checkpoint(path_ckpt)
+        elif VAE_type == "betaVAE_ResNet":
+            self.encoder = betaVAE_ResNet.load_from_checkpoint(path_ckpt)
+        elif VAE_type == "betaTCVAE_MLP":
+            self.encoder = betaTCVAE.load_from_checkpoint(path_ckpt)
+        elif VAE_type == "betaTCVAE_VGG":
+            self.encoder = betaTCVAE_VGG.load_from_checkpoint(path_ckpt)
+        elif VAE_type == "betaTCVAE_ResNet":
+            self.encoder = betaTCVAE_ResNet.load_from_checkpoint(path_ckpt)
+
+        self.encoder.eval()
             
         self.linear = nn.Linear(in_features=self.hparams.input_dim, out_features=self.hparams.num_classes, bias=bias)
 

@@ -121,20 +121,18 @@ def run():
         max_epochs=hparams.max_epochs,
         gradient_clip_val=hparams.grad_clipping,
         progress_bar_refresh_rate=25,
-        callbacks=False,
+        callbacks=[checkpoint_callback_VAE],
         gpus=-1 if torch.cuda.device_count() > 1 else 0,
         distributed_backend="dp" if torch.cuda.device_count() > 1 else False,
         sync_batchnorm=True if torch.cuda.device_count() > 1 else False,
         logger=logger
     )
 
-
     trainer.fit(model_enc,
         datamodule.train_dataloader(), 
         datamodule.val_dataloader(),
         )
 
-    torch.save(model_enc, path_ckpt)
     #### Select Classifier ####    
 
     if hparams.model_cla == "MLP":
