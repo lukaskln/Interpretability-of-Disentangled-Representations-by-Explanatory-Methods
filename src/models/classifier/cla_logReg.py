@@ -48,7 +48,7 @@ class LogisticRegression(pl.LightningModule):
         elif VAE_type == "betaTCVAE_ResNet":
             self.encoder = betaTCVAE_ResNet.load_from_checkpoint(path_ckpt)
 
-        self.encoder.eval()
+        self.encoder.freeze()
             
         self.linear = nn.Linear(in_features=self.hparams.input_dim, out_features=self.hparams.num_classes, bias=bias)
 

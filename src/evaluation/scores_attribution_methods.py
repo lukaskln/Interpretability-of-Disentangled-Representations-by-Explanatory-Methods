@@ -106,7 +106,7 @@ class scores_AM_Latent:
 
             encoding_train, _ = encoder.encode(images_train)
             encoding_test, _ = encoder.encode(images_test)
-
+            
         exp = shap.GradientExplainer(self.model, 
                                     data = encoding_train)
         

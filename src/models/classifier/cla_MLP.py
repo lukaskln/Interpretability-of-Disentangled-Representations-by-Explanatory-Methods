@@ -46,7 +46,7 @@ class MLP(pl.LightningModule):
         elif VAE_type == "betaTCVAE_ResNet":
             self.encoder = betaTCVAE_ResNet.load_from_checkpoint(path_ckpt)
 
-        self.encoder.eval()
+        self.encoder.freeze()
 
         self.fc1 = nn.Linear(self.hparams.input_dim, 256, bias=bias)
         self.fc2 = nn.Linear(256, self.hparams.num_classes, bias=bias)

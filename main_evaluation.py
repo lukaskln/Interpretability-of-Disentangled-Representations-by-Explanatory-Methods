@@ -52,7 +52,7 @@ for architecture in architectures_VAE:
 
 ## Classifier ##
 
-path_ckpt_cla = Path("./models/encoder/classifier/cla_" + str(hparams.model_ID) + ".ckpt")
+path_ckpt_cla = Path("./models/classifier/cla_" + str(hparams.model_ID) + ".ckpt")
 
 if os.path.exists(path_ckpt_cla) == False:
     print("[ERROR] Model does not exist. Please check the /models folder for existing models.")
@@ -68,7 +68,7 @@ pathlib.PosixPath = pathlib.WindowsPath
 
 for architecture in architectures_cla:
     try:
-        cla = MLP.load_from_checkpoint(path_ckpt_cla)
+        cla = architecture.load_from_checkpoint(path_ckpt_cla)
         cla_type = architecture.__name__
         break
     except RuntimeError:
