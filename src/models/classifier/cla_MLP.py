@@ -3,11 +3,11 @@ import os
 
 import pytorch_lightning as pl
 import torch
-from pytorch_lightning.metrics.functional import accuracy
 from torch import nn
 from torch.nn import functional as F
 from torch.optim import Adam
 from torch.optim.optimizer import Optimizer
+from torchmetrics.functional import confusion_matrix, accuracy
 
 from src.models.encoder.VAE_loss.betaVAE import *
 from src.models.encoder.VAE_loss.betaVAE_VGG import *
@@ -92,14 +92,15 @@ class MLP(pl.LightningModule):
 
         y_hat = self(x)
 
-        acc = accuracy(y_hat, y)
         val_loss = F.cross_entropy(y_hat, y)
-
-        return {'val_loss': val_loss, 'acc': acc}
+        return {'val_loss': val_loss, 'val_y': y, 'val_y_hat': y_hat}
 
     def validation_epoch_end(self, outputs):
-        acc = torch.stack([x['acc'] for x in outputs]).mean()
+        val_y = torch.cat(tuple([x['val_y'] for x in outputs]))
+        val_y_hat = torch.cat(tuple([x['val_y_hat'] for x in outputs]))
+
         val_loss = torch.stack([x['val_loss'] for x in outputs]).mean()
+        acc = accuracy(val_y_hat, val_y, num_classes=self.hparams.num_classes)
 
         self.log('val_loss', val_loss, on_epoch=True, prog_bar=True,
                  sync_dist=True if torch.cuda.device_count() > 1 else False)
@@ -114,19 +115,25 @@ class MLP(pl.LightningModule):
         
         y_hat = self(x)
 
-        acc = accuracy(y_hat, y)
         test_loss = F.cross_entropy(y_hat, y)
 
-        return {'test_loss': test_loss, 'acc': acc}
+        return {'test_loss': test_loss, 'test_y': y, 'test_y_hat': y_hat}
 
     def test_epoch_end(self, outputs):
-        acc = torch.stack([x['acc'] for x in outputs]).mean()
+        test_y = torch.cat(tuple([x['test_y'] for x in outputs]))
+        test_y_hat = torch.cat(tuple([x['test_y_hat'] for x in outputs]))
+
         test_loss = torch.stack([x['test_loss'] for x in outputs]).mean()
+
+        acc = accuracy(test_y_hat, test_y)
+        confmat = confusion_matrix(test_y_hat, test_y, num_classes=self.hparams.num_classes)
 
         self.log('test_loss', test_loss, on_epoch=True, prog_bar=True,
                  sync_dist=True if torch.cuda.device_count() > 1 else False)
         self.log('test_acc', acc, on_epoch=True, prog_bar=True,
                  sync_dist=True if torch.cuda.device_count() > 1 else False)
+
+        print("\n Confusion Matrix: \n", torch.round(confmat).type(torch.IntTensor))
 
     def configure_optimizers(self):
         return self.optimizer(self.parameters(), lr=self.hparams.learning_rate)
