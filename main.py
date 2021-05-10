@@ -126,7 +126,7 @@ def run():
         distributed_backend="dp" if torch.cuda.device_count() > 1 else False,
         sync_batchnorm=True if torch.cuda.device_count() > 1 else False,
         logger=logger,
-        replace_sampler_ddp=False
+        replace_sampler_ddp=True if torch.cuda.device_count() > 1 else False
     )
 
     trainer.fit(model_enc,
@@ -158,8 +158,7 @@ def run():
         callbacks=[early_stop_callback_cla, checkpoint_callback_cla],
         gpus=-1 if torch.cuda.device_count() > 1 else 0,
         distributed_backend="dp" if torch.cuda.device_count() > 1 else False,
-        sync_batchnorm=True if torch.cuda.device_count() > 1 else False,
-        replace_sampler_ddp=False
+        sync_batchnorm=True if torch.cuda.device_count() > 1 else False
     )
 
     trainer.fit(model_reg, 

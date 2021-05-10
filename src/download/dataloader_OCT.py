@@ -54,21 +54,20 @@ class OCT_DataModule(pl.LightningDataModule):
         self.train_enc, self.val_enc = random_split(data_enc, [85600, 21400],  
                                     generator=torch.Generator().manual_seed(self.seed))
 
+        weights = make_weights_for_balanced_classes(train.imgs, len(train.classes))
+
+        weights = torch.DoubleTensor(weights)
+        weights_enc, weights_cla = random_split(weights, [107000, 1309],  # 108309
+                                                generator=torch.Generator().manual_seed(self.seed))
+        weights_enc, _ = random_split(weights_enc, [85600, 21400],
+                                      generator=torch.Generator().manual_seed(self.seed))
+
+        self.sampler_cla = torch.utils.data.sampler.WeightedRandomSampler(weights_cla, len(weights_cla))
+
         if torch.cuda.device_count() > 1:
-            self.sampler_enc = DistributedSampler(self.train_enc)
-            self.sampler_cla = DistributedSampler(self.train_cla)
-
+            self.sampler_enc = False
         else:
-            weights = make_weights_for_balanced_classes(train.imgs, len(train.classes))
-            weights = torch.DoubleTensor(weights)
-            weights_enc, weights_cla = random_split(weights, [107000, 1309],  # 108309
-                                generator=torch.Generator().manual_seed(self.seed))
-            weights_enc, _ = random_split(weights_enc, [85600, 21400],
-                                        generator=torch.Generator().manual_seed(self.seed))
-
             self.sampler_enc = torch.utils.data.sampler.WeightedRandomSampler(weights_enc, len(weights_enc))
-
-            self.sampler_cla = torch.utils.data.sampler.WeightedRandomSampler(weights_cla, len(weights_cla))
 
         self.test = torchvision.datasets.ImageFolder(self.data_dir + "/test", transform=transform_img)
 
