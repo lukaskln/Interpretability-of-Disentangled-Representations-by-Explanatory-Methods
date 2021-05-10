@@ -63,16 +63,16 @@ class OCT_DataModule(pl.LightningDataModule):
                                       generator=torch.Generator().manual_seed(self.seed))
 
         self.sampler_cla = torch.utils.data.sampler.WeightedRandomSampler(weights_cla, len(weights_cla))
-
-        if torch.cuda.device_count() > 1:
-            self.sampler_enc = False
-        else:
-            self.sampler_enc = torch.utils.data.sampler.WeightedRandomSampler(weights_enc, len(weights_enc))
+        self.sampler_enc = torch.utils.data.sampler.WeightedRandomSampler(weights_enc, len(weights_enc))
 
         self.test = torchvision.datasets.ImageFolder(self.data_dir + "/test", transform=transform_img)
 
     def train_dataloader(self):
-        return DataLoader(self.train_enc, batch_size=self.batch_size, num_workers=self.num_workers, sampler=self.sampler_enc)
+        if torch.cuda.device_count() > 1:
+            DL = DataLoader(self.train_enc, batch_size=self.batch_size, num_workers=self.num_workers)
+        else:
+            DL = DataLoader(self.train_enc, batch_size=self.batch_size, num_workers=self.num_workers, sampler=self.sampler_enc)
+        return DL
 
     def train_dataloader_cla(self):
         return DataLoader(self.train_cla, batch_size=32, num_workers=self.num_workers, sampler=self.sampler_cla)
