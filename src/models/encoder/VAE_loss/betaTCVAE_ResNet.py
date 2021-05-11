@@ -38,7 +38,7 @@ class betaTCVAE_ResNet(pl.LightningModule):
             self.trainset_size = 107000
 
         # Encoder
-        self.resnet = torchvision.models.resnet18(pretrained=True)
+        self.resnet = torchvision.models.resnet18(pretrained=pretrained)
 
         if pretrained == True:
 

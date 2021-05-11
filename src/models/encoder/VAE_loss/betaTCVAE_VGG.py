@@ -120,7 +120,7 @@ class betaTCVAE_VGG(pl.LightningModule):
 
     def loss(self, recons, x, mu, log_var, z):
         recons_loss = F.binary_cross_entropy(
-            recons.view(-1, self.hparams.input_height),
+            recons.view(-1, self.hparams.input_height).clamp(0, 1),
             x.view(-1, self.hparams.input_height),
             reduction='sum')
 
