@@ -100,7 +100,7 @@ class MLP(pl.LightningModule):
         val_y_hat = torch.cat(tuple([x['val_y_hat'] for x in outputs]))
 
         val_loss = torch.stack([x['val_loss'] for x in outputs]).mean()
-        acc = accuracy(val_y_hat, val_y, num_classes=self.hparams.num_classes)
+        acc = accuracy(val_y_hat, val_y)
 
         self.log('val_loss', val_loss, on_epoch=True, prog_bar=True,
                  sync_dist=True if torch.cuda.device_count() > 1 else False)

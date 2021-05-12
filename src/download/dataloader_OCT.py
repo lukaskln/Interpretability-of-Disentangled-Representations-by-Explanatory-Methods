@@ -14,6 +14,7 @@ import torch
 import torchvision
 from torchvision import transforms
 
+# From: https://discuss.pytorch.org/t/balanced-sampling-between-classes-with-torchvision-dataloader/2703/3
 def make_weights_for_balanced_classes(images, nclasses):
     count = [0] * nclasses
     for item in images:
@@ -62,8 +63,14 @@ class OCT_DataModule(pl.LightningDataModule):
         weights_enc, _ = random_split(weights_enc, [85600, 21400],
                                       generator=torch.Generator().manual_seed(self.seed))
 
-        self.sampler_cla = torch.utils.data.sampler.WeightedRandomSampler(weights_cla, len(weights_cla))
-        self.sampler_enc = torch.utils.data.sampler.WeightedRandomSampler(weights_enc, len(weights_enc))
+        self.sampler_cla = torch.utils.data.sampler.WeightedRandomSampler(weights_cla, 
+                                len(weights_cla), 
+                                generator=torch.Generator().manual_seed(self.seed)
+                            )
+        self.sampler_enc = torch.utils.data.sampler.WeightedRandomSampler(weights_enc, 
+                                len(weights_enc), 
+                                generator=torch.Generator().manual_seed(self.seed)
+                            )
 
         self.test = torchvision.datasets.ImageFolder(self.data_dir + "/test", transform=transform_img)
 
