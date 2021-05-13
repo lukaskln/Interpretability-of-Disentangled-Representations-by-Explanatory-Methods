@@ -34,12 +34,12 @@ class betaTCVAE_VGG(pl.LightningModule):
             self.trainset_size = 600000
         elif dataset == "OCT":
             self.scale = 50
-            self.trainset_size = 107000
+            self.trainset_size = 85600
 
         # Encoder
-        model = torchvision.models.vgg16_bn()
+        model = torchvision.models.vgg19_bn()
 
-        model = list(model.features.children())[1:40]
+        model = list(model.features.children())[1:53]
 
         self.enc_conv1 = nn.Conv2d(1, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
         self.vgg = nn.Sequential(*model)
@@ -52,19 +52,19 @@ class betaTCVAE_VGG(pl.LightningModule):
 
         if dataset == "OCT":
             self.decoder = nn.Sequential(
-                nn.ConvTranspose2d(in_channels=latent_dim, out_channels=self.scale * 8, kernel_size=8, stride=1, padding=0, bias=False),
+                nn.ConvTranspose2d(in_channels=latent_dim, out_channels=self.scale * 8, kernel_size=12, stride=1, padding=0, bias=False),
                 nn.BatchNorm2d(self.scale * 8),
                 nn.ReLU(True),
-                nn.ConvTranspose2d(in_channels=self.scale * 8, out_channels=self.scale * 4, kernel_size=8, stride=2, padding=1, bias=False),
+                nn.ConvTranspose2d(in_channels=self.scale * 8, out_channels=self.scale * 4, kernel_size=12, stride=2, padding=1, bias=False),
                 nn.BatchNorm2d(self.scale * 4),
                 nn.ReLU(True),
-                nn.ConvTranspose2d(in_channels=self.scale * 4, out_channels=self.scale * 2, kernel_size=10, stride=2, padding=1, bias=False),
+                nn.ConvTranspose2d(in_channels=self.scale * 4, out_channels=self.scale * 2, kernel_size=14, stride=2, padding=1, bias=False),
                 nn.BatchNorm2d(self.scale * 2),
                 nn.ReLU(True),
-                nn.ConvTranspose2d(in_channels=self.scale * 2, out_channels=self.scale, kernel_size=10, stride=2, padding=1, bias=False),
+                nn.ConvTranspose2d(in_channels=self.scale * 2, out_channels=self.scale, kernel_size=14, stride=2, padding=1, bias=False),
                 nn.BatchNorm2d(self.scale),
                 nn.ReLU(True),
-                nn.ConvTranspose2d(in_channels=self.scale, out_channels=1, kernel_size=10, stride=2, padding=1, bias=False),
+                nn.ConvTranspose2d(in_channels=self.scale, out_channels=1, kernel_size=14, stride=2, padding=1, bias=False),
                 nn.Sigmoid()
             )
         else:

@@ -52,7 +52,7 @@ def run():
         num_classes = 3
     elif hparams.dataset == "OCT":
         datamodule = datamodule_OCT
-        input_height = 40804
+        input_height = int(326 ** 2)
         num_classes = 4
     #### Select Encoder ####
 

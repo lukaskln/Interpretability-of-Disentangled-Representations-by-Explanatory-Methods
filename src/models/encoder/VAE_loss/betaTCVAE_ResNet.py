@@ -26,6 +26,7 @@ class betaTCVAE_ResNet(pl.LightningModule):
         self.save_hyperparameters()
         self.c = c
         self.num_iter = 0
+        self.dataset= dataset
 
         if dataset == "mnist":
             self.scale = 7
@@ -35,10 +36,11 @@ class betaTCVAE_ResNet(pl.LightningModule):
             self.trainset_size = 600000
         elif dataset == "OCT":
             self.scale = 50
-            self.trainset_size = 107000
+            self.trainset_size = 85600
 
         # Encoder
-        self.resnet = torchvision.models.resnet18(pretrained=pretrained)
+        self.resnet = torchvision.models.resnet50(pretrained=pretrained)
+        #self.resnet = torchvision.models.wide_resnet50_2(pretrained=pretrained)
 
         if pretrained == True:
 
@@ -60,19 +62,45 @@ class betaTCVAE_ResNet(pl.LightningModule):
         self.fc_logvar = nn.Linear(in_features=5*c, out_features=latent_dim)
 
         # Decoder
-        self.dec_bn1 = nn.BatchNorm1d(latent_dim)
-        self.fc = nn.Linear(in_features=latent_dim,
-                            out_features=c*2*self.scale*self.scale)
-        self.dec_bn2 = nn.BatchNorm1d(c*2*self.scale*self.scale)
-        self.dec_conv2 = nn.ConvTranspose2d(
-            in_channels=c*2, out_channels=c, kernel_size=4, stride=2, padding=1)
-        self.dec_bn3 = nn.BatchNorm2d(c)
-        self.dec_conv1 = nn.ConvTranspose2d(
-            in_channels=c, out_channels=1, kernel_size=4, stride=2, padding=1)
+        if dataset == "OCT":
+            self.decoder = nn.Sequential(
+                nn.ConvTranspose2d(in_channels=latent_dim, out_channels=self.scale * 8, kernel_size=12, stride=1, padding=0, bias=False),
+                nn.BatchNorm2d(self.scale * 8),
+                nn.ReLU(True),
+                nn.ConvTranspose2d(in_channels=self.scale * 8, out_channels=self.scale * 4, kernel_size=12, stride=2, padding=1, bias=False),
+                nn.BatchNorm2d(self.scale * 4),
+                nn.ReLU(True),
+                nn.ConvTranspose2d(in_channels=self.scale * 4, out_channels=self.scale * 2, kernel_size=14, stride=2, padding=1, bias=False),
+                nn.BatchNorm2d(self.scale * 2),
+                nn.ReLU(True),
+                nn.ConvTranspose2d(in_channels=self.scale * 2, out_channels=self.scale, kernel_size=14, stride=2, padding=1, bias=False),
+                nn.BatchNorm2d(self.scale),
+                nn.ReLU(True),
+                nn.ConvTranspose2d(in_channels=self.scale, out_channels=1, kernel_size=14, stride=2, padding=1, bias=False),
+                nn.Sigmoid()
+            )
+        else:
+            self.decoder = nn.Sequential(
+                nn.BatchNorm1d(latent_dim),
+                nn.Linear(in_features=latent_dim, out_features=c*2*self.scale*self.scale),
+                nn.BatchNorm1d(c*2*self.scale*self.scale),
+                nn.Unflatten(1, (self.c*2, self.scale, self.scale)),
+                nn.ConvTranspose2d(in_channels=c*2, out_channels=c, kernel_size=4, stride=2, padding=1),
+                nn.ReLU(), nn.BatchNorm2d(c),
+                nn.ConvTranspose2d(in_channels=c, out_channels=1, kernel_size=4, stride=2, padding=1),
+                nn.Sigmoid()
+            )
 
 
     def encode(self, x):
         x = self.resnet(x)
+
+        try:
+            x = torch.squeeze(x, dim=3)
+            x = torch.squeeze(x, dim=2)
+        except IndexError:
+            pass
+
         x = F.relu(self.enc_fc(x))
         mu = self.fc_mu(x)
         log_var = self.fc_logvar(x)
@@ -86,14 +114,12 @@ class betaTCVAE_ResNet(pl.LightningModule):
         return z
 
     def decode(self, z):
-        x = self.dec_bn1(z)
-        x = self.fc(x)
-        x = self.dec_bn2(x)
-        x = x.view(x.size(0), self.c*2, self.scale, self.scale)
-        x = F.relu(self.dec_conv2(x))
-        x = self.dec_bn3(x)
-        x = self.dec_conv1(x)
-        return torch.sigmoid(x)
+        if self.dataset == "OCT":
+            z = torch.unsqueeze(z,2)
+            z = torch.unsqueeze(z,3)
+
+        x = self.decoder(z)
+        return x
 
     def forward(self, x):
         mu, log_var = self.encode(x)
