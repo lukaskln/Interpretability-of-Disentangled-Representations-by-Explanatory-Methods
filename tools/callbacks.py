@@ -34,11 +34,11 @@ checkpoint_callback_VAE = ModelCheckpoint(
 #### Classifier Callbacks ####
 
 early_stop_callback_cla = EarlyStopping(
-    monitor='val_loss',
-    min_delta=0.001,
+    monitor='val_acc',
+    min_delta=0.005,
     patience=10,
     verbose=False,
-    mode='min'
+    mode='max'
 )
 
 checkpoint_callback_cla = ModelCheckpoint(

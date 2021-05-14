@@ -119,6 +119,10 @@ class betaTCVAE_VGG(pl.LightningModule):
         return log_density
 
     def loss(self, recons, x, mu, log_var, z):
+
+        recons = torch.where(torch.isnan(recons), torch.zeros_like(recons), recons)
+        recons = torch.where(torch.isinf(recons), torch.zeros_like(recons), recons)
+
         recons_loss = F.binary_cross_entropy(
             recons.view(-1, self.hparams.input_height).clamp(0, 1),
             x.view(-1, self.hparams.input_height),

@@ -72,9 +72,7 @@ class MLP(pl.LightningModule):
 
         y_hat = self(x)
 
-        loss = F.cross_entropy(y_hat, y, reduction='sum')
-
-        loss /= x.size(0)
+        loss = F.cross_entropy(y_hat, y, reduction='mean')
 
         acc = accuracy(y_hat, y)
 
@@ -92,14 +90,15 @@ class MLP(pl.LightningModule):
 
         y_hat = self(x)
 
-        val_loss = F.cross_entropy(y_hat, y)
+        val_loss = F.cross_entropy(y_hat, y, reduction='mean')
+
         return {'val_loss': val_loss, 'val_y': y, 'val_y_hat': y_hat}
 
     def validation_epoch_end(self, outputs):
         val_y = torch.cat(tuple([x['val_y'] for x in outputs]))
         val_y_hat = torch.cat(tuple([x['val_y_hat'] for x in outputs]))
 
-        val_loss = torch.stack([x['val_loss'] for x in outputs]).mean()
+        val_loss = F.cross_entropy(val_y_hat, val_y, reduction='mean')
         acc = accuracy(val_y_hat, val_y)
 
         self.log('val_loss', val_loss, on_epoch=True, prog_bar=True,
@@ -115,7 +114,7 @@ class MLP(pl.LightningModule):
         
         y_hat = self(x)
 
-        test_loss = F.cross_entropy(y_hat, y)
+        test_loss = F.cross_entropy(y_hat, y, reduction='mean')
 
         return {'test_loss': test_loss, 'test_y': y, 'test_y_hat': y_hat}
 
@@ -123,7 +122,7 @@ class MLP(pl.LightningModule):
         test_y = torch.cat(tuple([x['test_y'] for x in outputs]))
         test_y_hat = torch.cat(tuple([x['test_y_hat'] for x in outputs]))
 
-        test_loss = torch.stack([x['test_loss'] for x in outputs]).mean()
+        test_loss = F.cross_entropy(test_y_hat, test_y, reduction='mean')
 
         acc = accuracy(test_y_hat, test_y)
         confmat = confusion_matrix(test_y_hat, test_y, num_classes=self.hparams.num_classes)

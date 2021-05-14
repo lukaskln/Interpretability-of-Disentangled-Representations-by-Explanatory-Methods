@@ -31,8 +31,8 @@ class vis_LatentSpace:
                                        2.2066e+00, -1.7470e+00, -9.8487e-04,  2.1421e-02, -2.4422e+00])
                 latent = torch.transpose(latent.repeat(20, 1), 0, 1)
             elif self.input_dim > 200:
-                latent = torch.Tensor([4.4006e-01,  1.4105e+00,  2.7381e+00, -3.1938e-01, -6.5295e+00,
-                                       -1.7721e+00, -5.5428e+00,  2.4716e+00, -6.5041e-01, -6.7776e+00])
+                latent = torch.Tensor([7.4399e-02,  2.9964e-01, -5.9140e+00, -3.9806e+00, -3.6684e-02,
+                                       2.7512e-01, -8.1353e+00, -4.7633e-01,  7.2584e-01, -1.9241e+00])
                 latent = torch.transpose(latent.repeat(20, 1), 0, 1)
             else:
                 latent = torch.ones(self.latent_dim, 20)
