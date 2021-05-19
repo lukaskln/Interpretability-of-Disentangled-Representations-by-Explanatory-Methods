@@ -111,12 +111,13 @@ class betaVAE_VGG(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         x, _ = batch
+
         mu, log_var = self.encode(x)
         z = self.sampling(mu, log_var)
 
         recons = self.decode(z)
 
-        vae_loss = self.loss(recons, x, mu, log_var, z)
+        vae_loss = self.loss(recons, x, mu, log_var)
 
         self.log('loss', vae_loss, on_epoch=False, prog_bar=True, on_step=True,
                  sync_dist=True if torch.cuda.device_count() > 1 else False)
@@ -124,12 +125,13 @@ class betaVAE_VGG(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         x, _ = batch
+
         mu, log_var = self.encode(x)
         z = self.sampling(mu, log_var)
 
         recons = self.decode(z)
 
-        vae_loss = self.loss(recons, x, mu, log_var, z)
+        vae_loss = self.loss(recons, x, mu, log_var)
 
         self.log('val_loss', vae_loss, on_epoch=True, prog_bar=True,
                  sync_dist=True if torch.cuda.device_count() > 1 else False)
