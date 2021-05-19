@@ -6,7 +6,6 @@ import os
 import shutil
 import zipfile
 import numpy as np
-import urllib.request as request
 
 from torch.utils.data import DataLoader, random_split, TensorDataset, DistributedSampler
 from torch import Tensor

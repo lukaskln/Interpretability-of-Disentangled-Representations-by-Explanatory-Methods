@@ -1,7 +1,7 @@
 import argparse
 from argparse import ArgumentParser
 import os
-from random import randint
+
 """
 This file contains the declaration of our argument parser
 """
