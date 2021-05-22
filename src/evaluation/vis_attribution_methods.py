@@ -39,7 +39,7 @@ class vis_AM_Latent:
             self.labels = ["square", "ellipse", "heart"]
 
     def visualise(self):
-        print("\n Total Latent Feature Attribution:")
+        print("Visualizing Total Latent Feature Attribution...")
 
         shap.summary_plot(self.shap_values, 
                           self.encoding_test, 
@@ -49,7 +49,7 @@ class vis_AM_Latent:
                           show=False
                         )
         plt.savefig('./images/total attribution latent features.png')
-        print("\n Attribution of Latent Features:")
+        print("Visualizing Attribution of Latent Features...")
 
         fig, axes = plt.subplots(nrows=1, ncols=4)
         plt.figure(figsize=(15, 8), dpi=200)
@@ -115,7 +115,7 @@ class vis_AM_Latent_on_Rec:
         return shap_numpy, test_numpy
 
     def visualise(self):
-        print("\n Attribution of Latent Features on Reconstructions:")
+        print("Visualizing Attribution of Latent Features on Reconstructions...")
 
         test_images_rec = self.rec_image()
         shap_values_rec = self.rec_shap()

@@ -55,11 +55,11 @@ class vis_Reconstructions:
 
         images, labels = iter(self.datamodule).next()
 
-        print('\n Original images...')
+        print('Visualizing Original images...')
         self.show_image(torchvision.utils.make_grid(images[0:50], 10, 5))
         plt.savefig('./images/original.png')
 
-        print('\n VAE reconstructions...')
+        print('Visualizing VAE reconstructions...')
         self.visualise_output(images)
         plt.savefig('./images/reconstructions.png')
 

@@ -64,6 +64,6 @@ class vis_LatentSpace:
         for i in range(0, self.latent_dim, 1):
             plt.text(3, (self.input_dim/2.1) + (i*step_size), str(i), color="red")
 
-        print("\n Latent Space Features:")
+        print("Visualizing Latent Space Features...")
         plt.savefig('./images/latent space features.png')
 
