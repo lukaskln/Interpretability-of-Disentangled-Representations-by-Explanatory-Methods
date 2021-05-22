@@ -2,7 +2,6 @@ import torchvision.utils
 import numpy as np
 import matplotlib.pyplot as plt
 import torch
-plt.ion()
 
 class vis_Reconstructions:
     def __init__(self, model, datamodule, type):
@@ -19,7 +18,9 @@ class vis_Reconstructions:
     def show_image(self, img):
         img = self.to_img(img)
         npimg = img.numpy()
+        plt.figure(figsize=(12, 6), dpi=200)
         plt.imshow(np.transpose(npimg, (1, 2, 0)))
+        plt.axis('off')
 
     def visualise_output(self, images):
 
@@ -34,7 +35,7 @@ class vis_Reconstructions:
                 mu, log_var = model.encode(images.view(-1, height * width))
             else:
                 mu, log_var = model.encode(images)
-            #print(mu)
+            #print(mu[21])
             z = model.sampling(mu, log_var)
             images = model.decode(z)
             images = images.cpu()
@@ -45,19 +46,20 @@ class vis_Reconstructions:
                 images = self.to_img(images)
             
             np_imagegrid = torchvision.utils.make_grid(images[0:50], 10, 5).numpy()
+            plt.figure(figsize=(12, 6), dpi=200)
             plt.imshow(np.transpose(np_imagegrid, (1, 2, 0)))
             plt.axis('off')
-        return plt.show()
+
 
     def visualise(self):
 
         images, labels = iter(self.datamodule).next()
 
-        print('\n Original images:')
+        print('\n Original images...')
         self.show_image(torchvision.utils.make_grid(images[0:50], 10, 5))
-        plt.axis('off')
-        plt.show()
+        plt.savefig('./images/original.png')
 
-        print('\n VAE reconstructions:')
+        print('\n VAE reconstructions...')
         self.visualise_output(images)
+        plt.savefig('./images/reconstructions.png')
 

@@ -19,7 +19,9 @@ class vis_AM_Original:
     def visualise(self):
         shap_values, test_values = self.prep(self.shap_values, self.test_images)
 
-        shap.image_plot(shap_values, test_values)
+        plt.figure(figsize=(15, 10), dpi=200)
+        shap.image_plot(shap_values, test_values, show=False)
+        plt.savefig('./images/attribution original.png')
 
 class vis_AM_Latent:
     def __init__(self, shap_values, explainer, encoding_test, labels_test):
@@ -43,12 +45,14 @@ class vis_AM_Latent:
                           self.encoding_test, 
                           plot_type="bar",
                           color= plt.cm.tab10,
-                          class_names=self.labels
+                          class_names=self.labels,
+                          show=False
                         )
-
+        plt.savefig('./images/total attribution latent features.png')
         print("\n Attribution of Latent Features:")
 
-        fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(15, 15))
+        fig, axes = plt.subplots(nrows=1, ncols=4)
+        plt.figure(figsize=(15, 8), dpi=200)
         axes = axes.ravel()
 
         for i in range(0, 4, 1):
@@ -63,7 +67,7 @@ class vis_AM_Latent:
                 auto_size_plot=False,
                 row_index=i)
 
-        plt.show()
+        plt.savefig('./images/attribution latent features.png')
 
 
 class vis_AM_Latent_on_Rec:
@@ -117,5 +121,8 @@ class vis_AM_Latent_on_Rec:
         shap_values_rec = self.rec_shap()
 
         shap_values, test_values = self.prep(shap_values_rec, test_images_rec)
+        
+        plt.figure(figsize=(15, 10), dpi=200)
+        shap.image_plot(shap_values, test_values, show = False)
+        plt.savefig('./images/attribution original into LSF.png')
 
-        shap.image_plot(shap_values, test_values)
