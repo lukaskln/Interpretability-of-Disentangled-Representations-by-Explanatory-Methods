@@ -63,8 +63,6 @@ architectures_cla = [
     LogisticRegression
 ]
 
-temp = pathlib.PosixPath
-pathlib.PosixPath = pathlib.WindowsPath
 
 for architecture in architectures_cla:
     try:
