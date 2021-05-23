@@ -106,7 +106,7 @@ vis_LatentSpace(encoder,
 
 #### Attribution Methods ####
 
-print('\n Attribution of Original Images into Predictions:')
+print('Visualizing Attribution of Original Images into Predictions...')
 scores, test_images = scores_AM_Original(cla, 
                                         datamodule.train_dataloader(),
                                         type=encoder_type,
@@ -115,6 +115,7 @@ scores, test_images = scores_AM_Original(cla,
 
 
 vis_AM_Original(scores, test_images).visualise()
+plt.savefig('./images/attribution original.png')
 
 exp, scores, encoding_test, labels_test = scores_AM_Latent(model = cla,
                                         encoder = encoder,
@@ -129,7 +130,7 @@ vis_AM_Latent(shap_values=scores,
             labels_test=labels_test
             ).visualise()
 
-print('\n Attribution of Original Images into Latent Space Representations:')
+print('Visualizing Attribution of Original Images into Latent Space Representations...')
 scores, test_images = scores_AM_Original(encoder,
                                         datamodule.train_dataloader(),
                                         type=encoder_type,
@@ -137,3 +138,4 @@ scores, test_images = scores_AM_Original(encoder,
                                         ).expgrad_shap()
 
 vis_AM_Original(scores, test_images).visualise()
+plt.savefig('./images/attribution original into LSF.png')

@@ -88,7 +88,7 @@ class scores_AM_Latent:
         self.type = type
 
     def expgrad_shap(self):
-        print("\n Attribution of Latent Space Representations: ")
+        print("Visualizing Attribution of Latent Space Representations... ")
 
         with torch.no_grad():
             iter_obj = iter(self.datamodule)
@@ -114,7 +114,7 @@ class scores_AM_Latent:
         return exp, expgrad_shap_values, encoding_test.numpy().astype('float32'), labels_test
 
     def deep_shap(self):
-        print("\n Attribution of Latent Space Representations: ")
+        print("Visualizing Attribution of Latent Space Representations... ")
 
         with torch.no_grad():
             iter_obj = iter(self.datamodule)
