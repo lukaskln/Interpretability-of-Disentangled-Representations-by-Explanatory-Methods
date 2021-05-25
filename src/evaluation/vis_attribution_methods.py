@@ -40,7 +40,7 @@ class vis_AM_Latent:
     def visualise(self):
         print("Visualizing Total Latent Feature Attribution...")
 
-        plt.figure(figsize=(20, 20), dpi=200)
+        plt.figure(figsize=(24, 20), dpi=200)
         shap.summary_plot(self.shap_values, 
                           self.encoding_test, 
                           plot_type="bar",
