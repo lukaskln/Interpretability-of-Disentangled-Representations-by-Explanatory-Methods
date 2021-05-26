@@ -35,7 +35,7 @@ class vis_Reconstructions:
                 mu, log_var = model.encode(images.view(-1, height * width))
             else:
                 mu, log_var = model.encode(images)
-            #print(mu[21])
+            self.mu = mu[21]
             z = model.sampling(mu, log_var)
             images = model.decode(z)
             images = images.cpu()
@@ -62,4 +62,5 @@ class vis_Reconstructions:
         print('Visualizing VAE reconstructions...')
         self.visualise_output(images)
         plt.savefig('./images/reconstructions.png')
+        return self.mu
 

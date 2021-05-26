@@ -5,6 +5,7 @@ import os
 import glob
 from pathlib import Path
 import pathlib
+import platform
 
 import pytorch_lightning as pl
 import torch
@@ -63,6 +64,10 @@ architectures_cla = [
     LogisticRegression
 ]
 
+system = platform.system()
+if system == "Windows":
+    temp = pathlib.PosixPath
+    pathlib.PosixPath = pathlib.WindowsPath
 
 for architecture in architectures_cla:
     try:
@@ -92,7 +97,7 @@ elif hparams.dataset == "OCT":
 #### Visualizations ####
 
 try:
-    vis_Reconstructions(encoder, datamodule.train_dataloader(), type=encoder_type).visualise()
+    mu = vis_Reconstructions(encoder, datamodule.train_dataloader(), type=encoder_type).visualise()
 except RuntimeError:
     print("[ERROR] Wrong dataset selected? Check --dataset=...")
     raise SystemExit(0)
@@ -102,6 +107,7 @@ vis_LatentSpace(encoder,
                 latent_dim=encoder.state_dict()['fc_mu.weight'].shape[0],
                 latent_range=hparams.eval_latent_range,
                 input_dim=np.sqrt(input_height).astype(int),
+                mu = mu
                 ).visualise()
 
 #### Attribution Methods ####
