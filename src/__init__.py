@@ -9,3 +9,4 @@ from src.models.encoder.VAE_loss.betaTCVAE_VGG import *
 from src.models.encoder.VAE_loss.betaTCVAE_ResNet import *
 from src.models.classifier.cla_logReg import *
 from src.models.classifier.cla_MLP import *
+from src.models.classifier.cla_CNN import *

@@ -7,16 +7,11 @@ from torch import nn
 from torch.nn import functional as F
 from torch.optim import Adam
 from torch.optim.optimizer import Optimizer
+
 from torchmetrics.functional import confusion_matrix, accuracy
+import torchvision
 
-from src.models.encoder.VAE_loss.betaVAE import *
-from src.models.encoder.VAE_loss.betaVAE_VGG import *
-from src.models.encoder.VAE_loss.betaTCVAE import *
-from src.models.encoder.VAE_loss.betaTCVAE_VGG import *
-from src.models.encoder.VAE_loss.betaVAE_ResNet import *
-from src.models.encoder.VAE_loss.betaTCVAE_ResNet import *
-
-class MLP(pl.LightningModule):
+class CNN(pl.LightningModule):
     def __init__(
         self,
         path_ckpt,
@@ -25,75 +20,41 @@ class MLP(pl.LightningModule):
         bias: bool = True,
         learning_rate: float = 1e-4,
         optimizer: Optimizer = Adam,
-        VAE_type = "betaVAE_MLP",
-        fix_weights = False,
-        TL = False,
         **kwargs
     ):
         super().__init__()
         self.save_hyperparameters()
         self.optimizer = optimizer
-        self.VAE_type = VAE_type
 
-        if TL == False:
-            if VAE_type == "betaVAE_MLP":
-                self.encoder = betaVAE.load_from_checkpoint(path_ckpt)
-            elif VAE_type == "betaVAE_VGG":
-                self.encoder = betaVAE_VGG.load_from_checkpoint(path_ckpt)
-            elif VAE_type == "betaVAE_ResNet":
-                self.encoder = betaVAE_ResNet.load_from_checkpoint(path_ckpt)
-            elif VAE_type == "betaTCVAE_MLP":
-                self.encoder = betaTCVAE.load_from_checkpoint(path_ckpt)
-            elif VAE_type == "betaTCVAE_VGG":
-                self.encoder = betaTCVAE_VGG.load_from_checkpoint(path_ckpt)
-            elif VAE_type == "betaTCVAE_ResNet":
-                self.encoder = betaTCVAE_ResNet.load_from_checkpoint(path_ckpt)
+        model = torchvision.models.vgg16_bn()
+        model = list(model.features.children())[1:36]
 
-            if fix_weights == True:
-                self.encoder.freeze()
-            else:
-                self.encoder.eval()
-
-            self.fc1 = nn.Linear(self.hparams.input_dim, 256, bias=bias)
-            self.fc2 = nn.Linear(256, self.hparams.num_classes, bias=bias)
-
-        else:
-            self.VAE_type = "betaTCVAE_ResNet"
-            import torchvision
-            self.encoder = torchvision.models.resnet50(pretrained=True)
-
-            with torch.no_grad():
-                weight = self.encoder.conv1.weight.clone()
-
-            self.encoder.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=1, padding=3, bias=False)
-
-            for param in self.encoder.parameters():
-                param.requires_grad = False
-
-            self.encoder.conv1.weight[:, 0] = weight[:, 0]
-
-            self.fc1 = nn.Linear(1000, 256, bias=bias)
-            self.fc2 = nn.Linear(256, self.hparams.num_classes, bias=bias)
-
+        self.enc_conv1 = nn.Conv2d(1, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+        self.vgg = nn.Sequential(*model)
+        self.enc_avgpool = nn.AdaptiveAvgPool2d(output_size=(1,1))
+        self.fc_1 = nn.Linear(in_features=512, out_features=256)
+        self.fc_2 = nn.Linear(in_features=256, out_features=self.hparams.num_classes)
 
     def forward(self, x):
 
-        if x.shape[1] != self.hparams.input_dim:
-            x = self.encoder(x)
+        x = self.enc_conv1(x)
+        x = self.vgg(x)
+        x = self.enc_avgpool(x)
 
-        x = F.relu(self.fc1(x))
-        x = self.fc2(x)
-        
+        try:
+            x = torch.squeeze(x, dim=3)
+            x = torch.squeeze(x, dim=2)
+        except IndexError:
+            pass
+
+        x = F.relu(self.fc_1(x))
+        x = self.fc_2(x)
         y_hat = F.softmax(x, dim=1)
 
         return y_hat
 
     def training_step(self, batch, batch_idx):
         x, y = batch
-
-        if self.VAE_type == "betaVAE_MLP" or self.VAE_type == "betaTCVAE_MLP":
-            # flatten any input
-            x = x.view(x.size(0), -1)
 
         y_hat = self(x)
 
@@ -109,9 +70,6 @@ class MLP(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         x, y = batch
-
-        if self.VAE_type == "betaVAE_MLP" or self.VAE_type == "betaTCVAE_MLP":
-            x = x.view(x.size(0), -1)
 
         y_hat = self(x)
 
@@ -133,9 +91,6 @@ class MLP(pl.LightningModule):
 
     def test_step(self, batch, batch_idx):
         x, y = batch
-
-        if self.VAE_type == "betaVAE_MLP" or self.VAE_type == "betaTCVAE_MLP":
-            x = x.view(x.size(0), -1)
         
         y_hat = self(x)
 

@@ -110,63 +110,73 @@ def run():
             dataset=hparams.dataset,
             pretrained = hparams.pretrained
         )
+    elif hparams.model == "None":
+        pass
     else:
         raise Exception('Unknown Encoder type: ' + hparams.model)
 
     ## Training Encoder ##
 
-    print("GPUs used:", torch.cuda.device_count())
+    if hparams.model != "None" and hparams.TL == False:
 
-    trainer = pl.Trainer(
-        max_epochs=hparams.max_epochs,
-        gradient_clip_val=hparams.grad_clipping,
-        progress_bar_refresh_rate=25,
-        callbacks=[checkpoint_callback_VAE],
-        gpus=-1 if torch.cuda.device_count() > 1 else 0,
-        distributed_backend="dp" if torch.cuda.device_count() > 1 else False,
-        sync_batchnorm=True if torch.cuda.device_count() > 1 else False,
-        logger=logger,
-        replace_sampler_ddp=True if torch.cuda.device_count() > 1 else False
-    )
-
-    trainer.fit(model_enc,
-        datamodule.train_dataloader(), 
-        datamodule.val_dataloader(),
+        trainer = pl.Trainer(
+            max_epochs=hparams.max_epochs,
+            gradient_clip_val=hparams.grad_clipping,
+            progress_bar_refresh_rate=25,
+            callbacks=[checkpoint_callback_VAE],
+            gpus=-1 if torch.cuda.device_count() > 1 else 0,
+            distributed_backend="dp" if torch.cuda.device_count() > 1 else False,
+            sync_batchnorm=True if torch.cuda.device_count() > 1 else False,
+            logger=logger,
+            replace_sampler_ddp=True if torch.cuda.device_count() > 1 else False
         )
+
+        trainer.fit(model_enc,
+            datamodule.train_dataloader(), 
+            datamodule.val_dataloader(),
+            )
 
     #### Select Classifier ####    
 
     if hparams.model_cla == "MLP":
-        model_reg = MLP(input_dim=hparams.latent_dim,
+        model_cla = MLP(input_dim=hparams.latent_dim,
                         num_classes=num_classes,
-                        VAE_type= hparams.model,
+                        VAE_type=hparams.model,
+                        fix_weights=hparams.fix_weights,
+                        TL=hparams.TL,
                         path_ckpt=path_ckpt)
+
+    elif hparams.model_cla == "CNN" and hparams.model == "None":
+        model_cla = CNN(input_dim=hparams.latent_dim,
+                        num_classes=num_classes,
+                        path_ckpt=path_ckpt)
+
     elif hparams.model_cla == "reg":
-        model_reg = LogisticRegression(
+        model_cla = LogisticRegression(
             input_dim=hparams.latent_dim,
             num_classes=num_classes,
             VAE_type=hparams.model,
             path_ckpt=path_ckpt)
     else:
-        raise Exception('Unknown Classifer type: ' + hparams.cla_type)
+        raise Exception('Unknown Classifer type: ' + hparams.cla_type +'. CNN works only without encoder')
 
 
     ## Training Classifier ##
     trainer = pl.Trainer(
         logger= logger,
-        progress_bar_refresh_rate=25,
+        progress_bar_refresh_rate=32,
         callbacks=[early_stop_callback_cla, checkpoint_callback_cla],
         gpus=-1 if torch.cuda.device_count() > 1 else 0,
         distributed_backend="dp" if torch.cuda.device_count() > 1 else False,
         sync_batchnorm=True if torch.cuda.device_count() > 1 else False
     )
 
-    trainer.fit(model_reg, 
+    trainer.fit(model_cla,
         datamodule.train_dataloader_cla(), 
         datamodule.val_dataloader_cla()
         )
                 
-    trainer.test(model_reg, datamodule.test_dataloader())
+    trainer.test(model_cla, datamodule.test_dataloader())
 
 
     if hparams.logger == "wandb":
@@ -179,8 +189,11 @@ def run():
     path_ckpt_cla = Path(os.getcwd(), "models/classifier/",("cla_" + str(hparams.model_ID) + ".ckpt"))
 
     if hparams.save_model == False:
-        os.remove(str(path_ckpt_VAE))
-        os.remove(str(path_ckpt_cla))
+        try:
+            os.remove(str(path_ckpt_cla))
+            os.remove(str(path_ckpt_VAE))
+        except FileNotFoundError:
+            pass
 
 
 if __name__ == '__main__':

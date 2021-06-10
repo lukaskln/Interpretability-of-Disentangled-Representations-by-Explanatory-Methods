@@ -27,9 +27,9 @@ def get_parser():
     
     # Training Parameters
     parser.add_argument("--model", choices=["betaVAE_MLP", "betaVAE_VGG", "betaVAE_ResNet",
-                                            "betaTCVAE_MLP", "betaTCVAE_VGG", "betaTCVAE_ResNet"], 
+                                            "betaTCVAE_MLP", "betaTCVAE_VGG", "betaTCVAE_ResNet", "None"], 
                                             default="betaVAE_MLP", type=str)
-    parser.add_argument("--model_cla", choices=["MLP", "reg"], default="MLP", type=str)
+    parser.add_argument("--model_cla", choices=["MLP", "reg", "CNN"], default="MLP", type=str)
     parser.add_argument("--learning_rate", default=0.001, type=float)
     parser.add_argument("--grad_clipping", default=0.0, type=float)
     parser.add_argument("--max_epochs", default=70, type=int)
@@ -43,7 +43,8 @@ def get_parser():
     parser.add_argument("--seed", default=42, type=int)
     parser.add_argument("--logger", choices=["_", "wandb", "tensorboard"], default="_", type=str)
     parser.add_argument("--save_model", default=False, type=str2bool)
-    parser.add_argument("--pretrained", default=False, type=str2bool)
+    parser.add_argument("--fix_weights", default=True, type=str2bool)
+    parser.add_argument("--TL", default=False, type=str2bool)
     
     # Evaluation
     parser.add_argument("--eval_latent_range", default=3.0, type=float)

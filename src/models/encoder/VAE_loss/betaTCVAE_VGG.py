@@ -37,9 +37,13 @@ class betaTCVAE_VGG(pl.LightningModule):
             self.trainset_size = 85600
 
         # Encoder
-        model = torchvision.models.vgg19_bn()
 
-        model = list(model.features.children())[1:53]
+        if dataset == "OCT":
+            model = torchvision.models.vgg19_bn()
+            model = list(model.features.children())[1:53]
+        else:
+            model = torchvision.models.vgg16_bn()
+            model = list(model.features.children())[1:36]
 
         self.enc_conv1 = nn.Conv2d(1, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
         self.vgg = nn.Sequential(*model)
