@@ -28,7 +28,7 @@ def get_parser():
     # Training Parameters
     parser.add_argument("--model", choices=["betaVAE_MLP", "betaVAE_VGG", "betaVAE_ResNet",
                                             "betaTCVAE_MLP", "betaTCVAE_VGG", "betaTCVAE_ResNet", "None"], 
-                                            default="betaVAE_MLP", type=str)
+                                            default="None", type=str)
     parser.add_argument("--model_cla", choices=["MLP", "reg", "CNN"], default="MLP", type=str)
     parser.add_argument("--learning_rate", default=0.001, type=float)
     parser.add_argument("--grad_clipping", default=0.0, type=float)
