@@ -23,7 +23,7 @@ class MLP(pl.LightningModule):
         input_dim: int,
         num_classes: int,
         bias: bool = True,
-        learning_rate: float = 0.001,
+        learning_rate: float = 0.0001,
         optimizer: Optimizer = Adam,
         VAE_type = "betaVAE_MLP",
         fix_weights = False,
