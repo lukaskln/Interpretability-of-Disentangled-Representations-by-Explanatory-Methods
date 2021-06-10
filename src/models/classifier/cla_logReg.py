@@ -23,7 +23,7 @@ class LogisticRegression(pl.LightningModule):
         input_dim: int,
         num_classes: int,
         bias: bool = True,
-        learning_rate: float = 1e-4,
+        learning_rate: float = 0.001,
         optimizer: Optimizer = Adam,
         l1_strength: float = 0.0,
         l2_strength: float = 0.0,

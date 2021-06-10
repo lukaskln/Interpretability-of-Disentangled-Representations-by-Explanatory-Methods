@@ -18,7 +18,7 @@ class CNN(pl.LightningModule):
         input_dim: int,
         num_classes: int,
         bias: bool = True,
-        learning_rate: float = 1e-4,
+        learning_rate: float = 0.001,
         optimizer: Optimizer = Adam,
         **kwargs
     ):
