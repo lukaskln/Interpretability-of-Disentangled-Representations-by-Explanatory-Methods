@@ -51,7 +51,7 @@ class OCT_DataModule(pl.LightningDataModule):
         data_enc, self.train_cla, self.val_cla = random_split(train, [106000, 1700, 609],  # 108309
                                     generator=torch.Generator().manual_seed(self.seed))
 
-        self.train_enc, self.val_enc = random_split(data_enc, [85600, 21400],  
+        self.train_enc, self.val_enc = random_split(data_enc, [84600, 21400],  
                                     generator=torch.Generator().manual_seed(self.seed))
 
         weights = make_weights_for_balanced_classes(train.imgs, len(train.classes))
