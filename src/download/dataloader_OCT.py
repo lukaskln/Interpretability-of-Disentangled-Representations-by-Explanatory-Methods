@@ -48,7 +48,7 @@ class OCT_DataModule(pl.LightningDataModule):
         train = torchvision.datasets.ImageFolder(self.data_dir + "/train",
                                                  transform=transform_img)
 
-        data_enc, self.train_cla = random_split(train, [107000, 1309],  # 108309
+        data_enc, self.train_cla, self.val_cla = random_split(train, [106000, 1700, 609],  # 108309
                                     generator=torch.Generator().manual_seed(self.seed))
 
         self.train_enc, self.val_enc = random_split(data_enc, [85600, 21400],  
@@ -57,7 +57,7 @@ class OCT_DataModule(pl.LightningDataModule):
         weights = make_weights_for_balanced_classes(train.imgs, len(train.classes))
 
         weights = torch.DoubleTensor(weights)
-        weights_enc, weights_cla = random_split(weights, [107000, 1309],  # 108309
+        weights_enc, weights_cla, _ = random_split(weights, [106000, 1700, 609],  # 108309
                                                 generator=torch.Generator().manual_seed(self.seed))
         weights_enc, _ = random_split(weights_enc, [85600, 21400],
                                       generator=torch.Generator().manual_seed(self.seed))
@@ -87,7 +87,7 @@ class OCT_DataModule(pl.LightningDataModule):
         return DataLoader(self.val_enc, batch_size=self.batch_size, num_workers=self.num_workers)
 
     def val_dataloader_cla(self):
-        return DataLoader(self.test, batch_size=32, num_workers=self.num_workers)
+        return DataLoader(self.val_cla, batch_size=64, num_workers=self.num_workers)
 
     def test_dataloader(self):
         return DataLoader(self.test, batch_size=self.batch_size, num_workers=self.num_workers)

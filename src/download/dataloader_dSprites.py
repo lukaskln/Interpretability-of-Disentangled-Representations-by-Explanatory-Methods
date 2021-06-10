@@ -52,7 +52,7 @@ class dSprites_DataModule(pl.LightningDataModule):
 
         dSprites_full = TensorDataset(torch.from_numpy(X), torch.from_numpy(y))
 
-        self.train_cla, data_enc = random_split(dSprites_full, [7280, 730000],  # 737280
+        self.val_cla, self.train_cla, data_enc = random_split(dSprites_full, [1280, 6000, 730000],  # 737280
                                generator=torch.Generator().manual_seed(self.seed))
 
         self.train_enc, self.val_enc, self.test = random_split(data_enc, [600000, 65000, 65000],
@@ -69,7 +69,7 @@ class dSprites_DataModule(pl.LightningDataModule):
                           collate_fn=collate_fn, num_workers=self.num_workers)
 
     def val_dataloader_cla(self):
-        return DataLoader(self.test, batch_size=32,
+        return DataLoader(self.val_cla, batch_size=64,
                           collate_fn=collate_fn, num_workers=self.num_workers)
 
     def test_dataloader(self):
