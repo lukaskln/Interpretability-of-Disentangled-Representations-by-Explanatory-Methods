@@ -64,14 +64,14 @@ class scores_AM_Original:
                                      data=images_train
                                     )
 
-        expgrad_shap_values = exp.shap_values(images_test)
+        expgrad_shap_values = exp.shap_values(images_test[:self.n])
 
         if self.type == 'betaVAE' or self.type == 'betaTCVAE':
             expgrad_shap_values = np.asarray(expgrad_shap_values).reshape(
                 self.out_dim, self.n, height, width)
             images_test = images_test.view(-1, 1, height, width)
 
-        return expgrad_shap_values, images_test
+        return expgrad_shap_values, images_test[:self.n]
 
 
 class scores_AM_Latent:
