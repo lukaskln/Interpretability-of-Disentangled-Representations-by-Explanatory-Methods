@@ -97,7 +97,7 @@ elif hparams.dataset == "OCT":
 #### Visualizations ####
 
 try:
-    mu = vis_Reconstructions(encoder, datamodule.test_dataloader(), type=encoder_type).visualise()
+    mu = vis_Reconstructions(encoder, datamodule.train_dataloader(), type=encoder_type).visualise()
 except RuntimeError:
     print("[ERROR] Wrong dataset selected? Check --dataset=...")
     raise SystemExit(0)
@@ -114,7 +114,7 @@ vis_LatentSpace(encoder,
 
 print('Visualizing Attribution of Original Images into Predictions...')
 scores, test_images = scores_AM_Original(cla, 
-                                        datamodule.test_dataloader(),
+                                        datamodule.train_dataloader(),
                                         type=encoder_type,
                                         out_dim = cla.state_dict()['fc2.weight'].shape[0]
                                         ).expgrad_shap()
@@ -125,7 +125,7 @@ plt.savefig('./images/attribution original.png')
 
 exp, scores, encoding_test, labels_test = scores_AM_Latent(model = cla,
                                         encoder = encoder,
-                                        datamodule=datamodule.test_dataloader(),
+                                        datamodule=datamodule.train_dataloader(),
                                         type = encoder_type,
                                         ).expgrad_shap()
 
@@ -138,7 +138,7 @@ vis_AM_Latent(shap_values=scores,
 
 print('Visualizing Attribution of Original Images into Latent Space Representations...')
 scores, test_images = scores_AM_Original(encoder,
-                                        datamodule.test_dataloader(),
+                                        datamodule.train_dataloader(),
                                         type=encoder_type,
                                         out_dim = encoder.state_dict()['fc_mu.weight'].shape[0]
                                         ).expgrad_shap()

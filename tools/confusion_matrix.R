@@ -48,9 +48,9 @@ heatmaply(
 
 cm_dSprites = 
 as.integer(c(
-141,  96,   7,   
-19, 220,   4,  
-68,  51,  47))
+14674,  1070,  5988,
+4020, 12368,  5098,
+5231,  2156, 14395))
 
 
 cm_dSprites = as.data.frame(matrix(cm_dSprites, ncol=3, byrow=TRUE))
@@ -67,7 +67,7 @@ heatmaply(
   dendrogram = "none",
   grid_color = "white",
   plot_method = "plotly",
-  cellnote = cm_OCT,
+  cellnote = cm_dSprites,
   xlab = "Predicted",
   ylab = "True",
   Colv = TRUE,
