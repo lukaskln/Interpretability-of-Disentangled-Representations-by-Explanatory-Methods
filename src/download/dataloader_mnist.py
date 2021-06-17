@@ -36,7 +36,7 @@ class MNIST_DataModule(pl.LightningDataModule):
         self.train_enc, self.val_enc = random_split(data_enc, [50000, 9000],
                                 generator=torch.Generator().manual_seed(self.seed))
 
-        self.train_cla, self.val_cla = random_split(data_cla, [800, 200],
+        self.train_cla, self.val_cla, _ = random_split(data_cla, [400, 100, 500], # 800 ,200
                                 generator=torch.Generator().manual_seed(self.seed))
 
         self.test = MNIST(self.data_dir, train=False, transform=self.transform)

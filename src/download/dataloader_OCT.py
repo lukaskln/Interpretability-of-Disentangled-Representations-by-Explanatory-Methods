@@ -48,7 +48,7 @@ class OCT_DataModule(pl.LightningDataModule):
         train = torchvision.datasets.ImageFolder(self.data_dir + "/train",
                                                  transform=transform_img)
 
-        data_enc, self.train_cla, self.val_cla = random_split(train, [106000, 1700, 609],  # 108309
+        data_enc, self.train_cla, self.val_cla, _ = random_split(train, [106000, 800, 609, 900],  # 800 = 1700
                                     generator=torch.Generator().manual_seed(self.seed))
 
         self.train_enc, self.val_enc = random_split(data_enc, [84600, 21400],  

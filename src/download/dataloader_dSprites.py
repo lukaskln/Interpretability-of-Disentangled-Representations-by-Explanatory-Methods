@@ -52,7 +52,7 @@ class dSprites_DataModule(pl.LightningDataModule):
 
         dSprites_full = TensorDataset(torch.from_numpy(X), torch.from_numpy(y))
 
-        self.val_cla, self.train_cla, data_enc = random_split(dSprites_full, [1280, 6000, 730000],  # 737280
+        self.val_cla, self.train_cla, data_enc, _ = random_split(dSprites_full, [1280, 3000, 730000, 3000],  # 3000 to 6000
                                generator=torch.Generator().manual_seed(self.seed))
 
         self.train_enc, self.val_enc, self.test = random_split(data_enc, [600000, 65000, 65000],
