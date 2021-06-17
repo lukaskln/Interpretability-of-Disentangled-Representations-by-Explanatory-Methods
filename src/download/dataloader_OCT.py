@@ -57,7 +57,7 @@ class OCT_DataModule(pl.LightningDataModule):
         weights = make_weights_for_balanced_classes(train.imgs, len(train.classes))
 
         weights = torch.DoubleTensor(weights)
-        weights_enc, weights_cla, _ = random_split(weights, [106000, 1700, 609],  # 108309
+        weights_enc, weights_cla, _ = random_split(weights, [106000, 800, 609, 900],  # 108309
                                                 generator=torch.Generator().manual_seed(self.seed))
         weights_enc, _ = random_split(weights_enc, [84600, 21400],
                                       generator=torch.Generator().manual_seed(self.seed))
