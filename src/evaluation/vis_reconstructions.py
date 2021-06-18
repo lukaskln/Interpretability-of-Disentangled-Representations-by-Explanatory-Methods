@@ -55,7 +55,7 @@ class vis_Reconstructions:
     def visualise(self):
 
         images, labels = iter(self.datamodule).next()
-        print(labels)
+
         print('Visualizing Original images...')
         self.show_image(torchvision.utils.make_grid(images[0:50], 10, 5))
         plt.savefig('./images/original.png')
