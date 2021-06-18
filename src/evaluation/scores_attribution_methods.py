@@ -50,8 +50,8 @@ class scores_AM_Original:
 
         with torch.no_grad():
             iter_obj = iter(self.datamodule)
-            images_train, labels_train = iter_obj.next()
             images_test, labels_test = iter_obj.next()
+            images_train, labels_train = iter_obj.next()
 
             height = images_train[0].shape[1]
             width = images_train[0].shape[2]
@@ -60,8 +60,8 @@ class scores_AM_Original:
                 images_train = images_train.view(-1, height * width)
                 images_test = images_test.view(-1, height * width)
 
-        exp = shap.GradientExplainer(self.model,
-                                     data=images_train
+        exp = shap.GradientExplainer(self.model,  # torch.zeros((1, 1, height, width)
+                                     data = images_train
                                     )
 
         expgrad_shap_values = exp.shap_values(images_test[:self.n])
@@ -90,8 +90,8 @@ class scores_AM_Latent:
 
         with torch.no_grad():
             iter_obj = iter(self.datamodule)
-            images_train, labels_train = iter_obj.next()
             images_test, labels_test = iter_obj.next()
+            images_train, labels_train = iter_obj.next()
 
             height = images_train[0].shape[1]
             width = images_train[0].shape[2]

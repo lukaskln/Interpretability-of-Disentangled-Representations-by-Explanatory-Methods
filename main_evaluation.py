@@ -97,7 +97,7 @@ elif hparams.dataset == "OCT":
 #### Visualizations ####
 
 try:
-    mu = vis_Reconstructions(encoder, datamodule.train_dataloader(), type=encoder_type).visualise()
+    mu, sd = vis_Reconstructions(encoder, datamodule.train_dataloader(), type=encoder_type).visualise()
 except RuntimeError:
     print("[ERROR] Wrong dataset selected? Check --dataset=...")
     raise SystemExit(0)
@@ -107,7 +107,8 @@ vis_LatentSpace(encoder,
                 latent_dim=encoder.state_dict()['fc_mu.weight'].shape[0],
                 latent_range=hparams.eval_latent_range,
                 input_dim=np.sqrt(input_height).astype(int),
-                mu = mu
+                mu = mu,
+                sd = sd
                 ).visualise()
 
 #### Attribution Methods ####

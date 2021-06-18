@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 plt.ioff()
 
 class vis_LatentSpace:
-    def __init__(self, model, mu, latent_dim=10, latent_range=3, input_dim=28):
+    def __init__(self, model, mu, sd, latent_dim=10, latent_range=3, input_dim=28):
         self.model = model
         self.model.eval()
 
@@ -13,6 +13,7 @@ class vis_LatentSpace:
         self.latent_range = latent_range
         self.input_dim = input_dim
         self.mu = mu
+        self.sd = sd
 
     def to_img(self, x):
         x = x.clamp(0, 1)
@@ -32,7 +33,10 @@ class vis_LatentSpace:
             #latent = torch.zeros(self.latent_dim, 20)
             latent = torch.transpose(latent.repeat(20, 1), 0, 1)
 
-            latent[i, :] = torch.linspace(-self.latent_range, self.latent_range, 20)
+            latent[i, :] = torch.linspace(
+                self.latent_range*-self.sd[i], 
+                self.latent_range*self.sd[i], 20) + self.mu[i]
+
             latent = torch.transpose(latent, 0, 1)
             img_recon = self.model.decode(latent)
             recon.append(img_recon.view(-1, 1, self.input_dim, self.input_dim))
@@ -52,7 +56,7 @@ class vis_LatentSpace:
             step_size = 340
 
         for i in range(0, self.latent_dim, 1):
-            plt.text(5, (self.input_dim/2.1) + (i*step_size), str(i), color="red")
+            plt.text(5, (self.input_dim/2.1) + (i*step_size), str(i), color="red", fontsize = 14)
 
         print("Visualizing Latent Space Features...")
         plt.savefig('./images/latent space features.png')

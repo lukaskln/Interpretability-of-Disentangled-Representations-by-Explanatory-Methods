@@ -47,5 +47,5 @@ def get_parser():
     parser.add_argument("--TL", default=False, type=str2bool)
     
     # Evaluation
-    parser.add_argument("--eval_latent_range", default=3.0, type=float)
+    parser.add_argument("--eval_latent_range", default=15.0, type=float)
     return parser
