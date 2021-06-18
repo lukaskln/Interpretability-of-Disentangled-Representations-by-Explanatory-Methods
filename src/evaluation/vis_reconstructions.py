@@ -35,8 +35,8 @@ class vis_Reconstructions:
                 mu, log_var = model.encode(images.view(-1, height * width))
             else:
                 mu, log_var = model.encode(images)
-            self.mu = mu[0]
-            self.sd = torch.exp(log_var[0] * 0.5)
+            self.mu = mu[21]
+            self.sd = torch.exp(log_var[21] * 0.5)
             z = model.sampling(mu, log_var)
             images = model.decode(z)
             images = images.cpu()
