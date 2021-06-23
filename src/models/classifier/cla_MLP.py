@@ -39,6 +39,7 @@ class MLP(pl.LightningModule):
         self.optimizer = optimizer
         self.VAE_type = VAE_type
         self.TL = TL
+        self.model_TL = model_TL
 
         if self.TL == False:
             if VAE_type == "betaVAE_MLP":
