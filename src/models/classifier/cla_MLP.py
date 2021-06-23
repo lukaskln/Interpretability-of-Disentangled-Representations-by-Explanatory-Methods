@@ -2,6 +2,9 @@ from pathlib import Path
 import os
 
 import pytorch_lightning as pl
+
+import torchvision
+
 import torch
 from torch import nn
 from torch.nn import functional as F
@@ -34,8 +37,9 @@ class MLP(pl.LightningModule):
         self.save_hyperparameters()
         self.optimizer = optimizer
         self.VAE_type = VAE_type
+        self.TL = TL
 
-        if TL == False:
+        if self.TL == False:
             if VAE_type == "betaVAE_MLP":
                 self.encoder = betaVAE.load_from_checkpoint(path_ckpt)
             elif VAE_type == "betaVAE_VGG":
@@ -59,24 +63,27 @@ class MLP(pl.LightningModule):
 
         else:
             self.VAE_type = "betaTCVAE_ResNet"
-            import torchvision
-            self.encoder = torchvision.models.resnet50(pretrained=True)
 
-            with torch.no_grad():
-                weight = self.encoder.conv1.weight.clone()
+            self.encoder = torchvision.models.inception_v3(pretrained=True)
 
-            self.encoder.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=1, padding=3, bias=False)
+            # with torch.no_grad():
+            #     weight = self.encoder.Conv2d_1a_3x3.conv.weight.clone()
+
+            # self.encoder.Conv2d_1a_3x3.conv = nn.Conv2d(1, 32, kernel_size=(3, 3), stride=(2, 2), bias=False)
 
             for param in self.encoder.parameters():
                 param.requires_grad = False
 
-            self.encoder.conv1.weight[:, 0] = weight[:, 0]
+            #self.encoder.Conv2d_1a_3x3.conv.weight[:, 0] = weight[:, 0]
 
             self.fc1 = nn.Linear(1000, 256, bias=bias)
             self.fc2 = nn.Linear(256, self.hparams.num_classes, bias=bias)
 
 
     def forward(self, x):
+        
+        if self.TL==True:
+            x = torch.cat([x, x, x], 1)
 
         if x.shape[1] != self.hparams.input_dim:
             x = self.encoder(x)
