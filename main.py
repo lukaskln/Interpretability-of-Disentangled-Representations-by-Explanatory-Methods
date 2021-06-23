@@ -144,6 +144,7 @@ def run():
                         VAE_type=hparams.model,
                         fix_weights=hparams.fix_weights,
                         TL=hparams.TL,
+                        model_TL=hparams.model_TL,
                         path_ckpt=path_ckpt)
 
     elif hparams.model_cla == "CNN" and hparams.model == "None":

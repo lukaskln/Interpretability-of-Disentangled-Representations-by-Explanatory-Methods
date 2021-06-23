@@ -31,6 +31,7 @@ class MLP(pl.LightningModule):
         VAE_type = "betaVAE_MLP",
         fix_weights = False,
         TL = False,
+        model_TL = "ResNet"
         **kwargs
     ):
         super().__init__()
@@ -64,17 +65,13 @@ class MLP(pl.LightningModule):
         else:
             self.VAE_type = "betaTCVAE_ResNet"
 
-            self.encoder = torchvision.models.inception_v3(pretrained=True, aux_logits=False)
-
-            # with torch.no_grad():
-            #     weight = self.encoder.Conv2d_1a_3x3.conv.weight.clone()
-
-            # self.encoder.Conv2d_1a_3x3.conv = nn.Conv2d(1, 32, kernel_size=(3, 3), stride=(2, 2), bias=False)
+            if self.model_TL == "Inception":
+                self.encoder = torchvision.models.inception_v3(pretrained=True, aux_logits=False)
+            else:
+                self.encoder = torchvision.models.resnet50(pretrained=True)
 
             for param in self.encoder.parameters():
                 param.requires_grad = False
-
-            #self.encoder.Conv2d_1a_3x3.conv.weight[:, 0] = weight[:, 0]
 
             self.fc1 = nn.Linear(1000, 256, bias=bias)
             self.fc2 = nn.Linear(256, self.hparams.num_classes, bias=bias)
