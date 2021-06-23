@@ -87,7 +87,7 @@ class MLP(pl.LightningModule):
 
         if x.shape[1] != self.hparams.input_dim:
             x = self.encoder(x)
-        print(x.shape)
+
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
         
