@@ -64,7 +64,7 @@ class MLP(pl.LightningModule):
         else:
             self.VAE_type = "betaTCVAE_ResNet"
 
-            self.encoder = torchvision.models.inception_v3(pretrained=True)
+            self.encoder = torchvision.models.inception_v3(pretrained=True, aux_logits=False)
 
             # with torch.no_grad():
             #     weight = self.encoder.Conv2d_1a_3x3.conv.weight.clone()
@@ -87,7 +87,7 @@ class MLP(pl.LightningModule):
 
         if x.shape[1] != self.hparams.input_dim:
             x = self.encoder(x)
-
+        print(x.shape)
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
         
