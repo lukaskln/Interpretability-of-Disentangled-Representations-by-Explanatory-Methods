@@ -74,8 +74,7 @@ class MLP(pl.LightningModule):
             for param in self.encoder.parameters():
                 param.requires_grad = False
 
-            self.fc0 = nn.Linear(1000, 2000, bias=bias)
-            self.fc1 = nn.Linear(2000, 256, bias=bias)
+            self.fc1 = nn.Linear(1000, 256, bias=bias)
             self.fc2 = nn.Linear(256, self.hparams.num_classes, bias=bias)
 
 
@@ -87,12 +86,7 @@ class MLP(pl.LightningModule):
         if x.shape[1] != self.hparams.input_dim:
             x = self.encoder(x)
 
-        if self.TL == True:
-            x = F.relu(self.fc0(x))
-            x = F.relu(self.fc1(x))
-        else:
-            x = F.relu(self.fc1(x))
-
+        x = F.relu(self.fc1(x))
         x = self.fc2(x)
         
         y_hat = F.softmax(x, dim=1)
