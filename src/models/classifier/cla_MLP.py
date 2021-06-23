@@ -75,7 +75,7 @@ class MLP(pl.LightningModule):
                 param.requires_grad = False
 
             self.fc0 = nn.Linear(1000, 2000, bias=bias)
-            self.fc1 = nn.Linear(2000, 512, bias=bias)
+            self.fc1 = nn.Linear(2000, 256, bias=bias)
             self.fc2 = nn.Linear(256, self.hparams.num_classes, bias=bias)
 
 
