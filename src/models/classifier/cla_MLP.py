@@ -31,7 +31,7 @@ class MLP(pl.LightningModule):
         VAE_type = "betaVAE_MLP",
         fix_weights = False,
         TL = False,
-        model_TL = "ResNet"
+        model_TL = "ResNet",
         **kwargs
     ):
         super().__init__()
