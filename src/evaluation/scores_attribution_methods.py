@@ -61,7 +61,7 @@ class scores_AM_Original:
                 images_test = images_test.view(-1, height * width)
 
         exp = shap.GradientExplainer(self.model,  # torch.zeros((1, 1, height, width)
-                                     data = images_train
+                                     data=images_train[labels_train == 3]
                                     )
 
         expgrad_shap_values = exp.shap_values(images_test[:self.n])

@@ -80,7 +80,7 @@ class MLP(pl.LightningModule):
 
     def forward(self, x):
         
-        if self.TL==True:
+        if self.TL == True:
             x = torch.cat([x, x, x], 1)
 
         if x.shape[1] != self.hparams.input_dim:
