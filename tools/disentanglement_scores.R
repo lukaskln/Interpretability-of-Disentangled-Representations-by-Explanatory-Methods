@@ -1,11 +1,12 @@
 #### Setup ####
 library(xgboost)
 library(nnet)
-#library(stargazer)
+library(stargazer)
 library(ggplot2)
 library(readr)
 library(gtable)
 library(grid)
+library(BBmisc)
 
 vColors = c("#1269B0","#72791C","#91056A")
 
@@ -14,15 +15,16 @@ dSprites_LSF$Label = factor(as.character(dSprites_LSF$Label), labels = c("square
 
 dSprites_LSF$Label = relevel(dSprites_LSF$Label, ref = "ellipse")
 
-dSprites_LSF[,2:11] = scale(dSprites_LSF[,2:11])
+dSprites_LSF[,2:11] = normalize(dSprites_LSF[,2:11])
+
 #### Multinominal regression for disnt. metric ####
 
-model <- multinom(Label ~., data=dSprites_LSF) # cbind(dSprites_LSF[,-c(3,6)], dSprites_LSF$LSF.0^2)
+model <- multinom(Label ~., data=dSprites_LSF[,-c(3,6)]) # cbind(dSprites_LSF[,-c(3,6)], dSprites_LSF$LSF.0^2)
 
 print("Multinominal model with square as baseline")
 summary(model)
 
-#stargazer(model)
+stargazer(model)
 
 z <- summary(model)$coefficients/summary(model)$standard.errors
 print("Standardized coefficients")
@@ -32,8 +34,17 @@ print("2-tailed z test")
 p <- (1 - pnorm(abs(z), 0, 1)) * 2
 p
 
-head(dSprites_LSF$Label)
-head(pp <- fitted(model))
+pp <- fitted(model)
+data.frame(pp[5:10,], True = dSprites_LSF$Label[5:10])
+
+# Logistic Regression
+
+model <- glm(Label ~.,family=binomial(link='logit'),data=dSprites_LSF[dSprites_LSF$Label != "heart",-c(3,6)])
+model <- glm(Label ~.,family=binomial(link='logit'),data=dSprites_LSF[dSprites_LSF$Label != "square",-c(3,6)])
+
+stargazer(model)
+
+summary(model)
 
 #### Feature Importance ####
 
