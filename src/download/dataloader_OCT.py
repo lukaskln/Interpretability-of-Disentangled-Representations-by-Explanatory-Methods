@@ -6,6 +6,7 @@ import os
 import shutil
 import zipfile
 import numpy as np
+import requests
 
 from torch.utils.data import DataLoader, random_split, TensorDataset, DistributedSampler
 from torch import Tensor
@@ -27,6 +28,14 @@ def make_weights_for_balanced_classes(images, nclasses):
         weight[idx] = weight_per_class[val[1]]
     return weight
 
+def download_url(url, save_path, chunk_size=128):
+    r = requests.get(url, stream=True, allow_redirects=True)
+    with open(save_path, 'wb') as f:
+        for chunk in r.iter_content(chunk_size=1024): 
+            if chunk:
+                f.write(chunk)
+                f.flush()
+
 
 class OCT_DataModule(pl.LightningDataModule):
     def __init__(self, batch_size, data_dir, seed, num_workers):
@@ -36,16 +45,30 @@ class OCT_DataModule(pl.LightningDataModule):
         self.seed = seed
         self.num_workers = num_workers
 
+    def prepare_data(self):
+        if not os.path.exists(os.path.join(self.data_dir, "test/")):
+            data_url = "https://polybox.ethz.ch/index.php/s/kcRvwssD2yWGfsN/download"
+            save_path = os.path.join(self.data_dir, "download_file.zip")
+
+            print("Downloading and extracting OCT retina data...")
+
+            download_url(data_url, save_path, chunk_size=512)
+
+            zip_ref = zipfile.ZipFile(save_path, 'r')
+            zip_ref.extractall(self.data_dir)
+            zip_ref.close()
+
+            os.remove(save_path)
+
     def setup(self):
 
         transform_img = transforms.Compose([
-            torchvision.transforms.Resize((326, 326)),  # 202
+            torchvision.transforms.Resize((326, 326)),
             transforms.Grayscale(num_output_channels=1),
-            #transforms.CenterCrop((496,750)),
             transforms.ToTensor(),
         ])
 
-        train = torchvision.datasets.ImageFolder(self.data_dir + "/train",
+        train = torchvision.datasets.ImageFolder(self.data_dir / "train",
                                                  transform=transform_img)
 
         data_enc, self.train_cla, self.val_cla = random_split(train, [106000, 1700, 609],  # 800 = 1700
@@ -71,7 +94,7 @@ class OCT_DataModule(pl.LightningDataModule):
                                 generator=torch.Generator().manual_seed(self.seed)
                             )
 
-        self.test = torchvision.datasets.ImageFolder(self.data_dir + "/test", transform=transform_img)
+        self.test = torchvision.datasets.ImageFolder(self.data_dir / "test", transform=transform_img)
 
     def train_dataloader(self):
         if torch.cuda.device_count() > 1:

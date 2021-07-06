@@ -11,7 +11,7 @@ import pytorch_lightning as pl
 class betaTCVAE_ResNet(pl.LightningModule):
     def __init__(self,
                  latent_dim=10,
-                 input_height=784,
+                 input_dim=784,
                  lr=0.001,
                  anneal_steps: int = 200,
                  alpha: float = 1.,
@@ -122,8 +122,8 @@ class betaTCVAE_ResNet(pl.LightningModule):
         recons = torch.where(torch.isinf(recons), torch.zeros_like(recons), recons)
 
         recons_loss = F.binary_cross_entropy(
-            recons.view(-1, self.hparams.input_height).clamp(0, 1),
-            x.view(-1, self.hparams.input_height),
+            recons.view(-1, self.hparams.input_dim).clamp(0, 1),
+            x.view(-1, self.hparams.input_dim),
             reduction='sum')
 
         log_q_zx = self.log_density_gaussian(z, mu, log_var).sum(dim=1)

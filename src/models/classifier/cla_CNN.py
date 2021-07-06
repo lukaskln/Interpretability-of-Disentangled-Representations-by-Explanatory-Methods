@@ -15,7 +15,6 @@ class CNN(pl.LightningModule):
     def __init__(
         self,
         path_ckpt,
-        input_dim: int,
         num_classes: int,
         bias: bool = True,
         learning_rate: float = 0.00001,

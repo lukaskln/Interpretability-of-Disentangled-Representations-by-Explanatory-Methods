@@ -44,15 +44,15 @@ def run():
 
     if hparams.dataset=="mnist":
         datamodule = datamodule_mnist
-        input_height = 784
+        input_dim = 784
         num_classes = 10
     elif hparams.dataset == "dSprites":
         datamodule = datamodule_dSprites
-        input_height = 4096
+        input_dim = 4096
         num_classes = 3
     elif hparams.dataset == "OCT":
         datamodule = datamodule_OCT
-        input_height = int(326 ** 2)  # 40804
+        input_dim = int(326 ** 2) 
         num_classes = 4
     #### Select Encoder ####
 
@@ -61,14 +61,14 @@ def run():
             beta=hparams.VAE_beta,
             lr=hparams.learning_rate,
             latent_dim=hparams.latent_dim,
-            input_height=input_height
+            input_dim=input_dim
         )
     elif hparams.model == "betaVAE_VGG":
         model_enc = betaVAE_VGG(
             beta=hparams.VAE_beta,
             lr=hparams.learning_rate,
             latent_dim=hparams.latent_dim,
-            input_height=input_height,
+            input_dim=input_dim,
             dataset=hparams.dataset
         )
     elif hparams.model == "betaVAE_ResNet":
@@ -76,7 +76,7 @@ def run():
             beta=hparams.VAE_beta,
             lr=hparams.learning_rate,
             latent_dim=hparams.latent_dim,
-            input_height=input_height,
+            input_dim=input_dim,
             dataset=hparams.dataset
         )
     elif hparams.model == "betaTCVAE_MLP":
@@ -86,7 +86,7 @@ def run():
             gamma=hparams.VAE_gamma,
             lr=hparams.learning_rate,
             latent_dim=hparams.latent_dim,
-            input_height=input_height,
+            input_dim=input_dim,
             dataset=hparams.dataset
         )
     elif hparams.model == "betaTCVAE_VGG":
@@ -96,7 +96,7 @@ def run():
             gamma=hparams.VAE_gamma,
             lr=hparams.learning_rate,
             latent_dim=hparams.latent_dim,
-            input_height=input_height,
+            input_dim=input_dim,
             dataset=hparams.dataset
         )
     elif hparams.model == "betaTCVAE_ResNet":
@@ -106,7 +106,7 @@ def run():
             gamma=hparams.VAE_gamma,
             lr=hparams.learning_rate,
             latent_dim=hparams.latent_dim,
-            input_height=input_height,
+            input_dim=input_dim,
             dataset=hparams.dataset,
             pretrained = hparams.pretrained
         )
@@ -139,7 +139,8 @@ def run():
     #### Select Classifier ####    
 
     if hparams.model_cla == "MLP":
-        model_cla = MLP(input_dim=hparams.latent_dim,
+        model_cla = MLP(latent_dim=hparams.latent_dim,
+                        input_dim=input_dim,
                         num_classes=num_classes,
                         VAE_type=hparams.model,
                         fix_weights=hparams.fix_weights,
@@ -148,13 +149,12 @@ def run():
                         path_ckpt=path_ckpt)
 
     elif hparams.model_cla == "CNN" and hparams.model == "None":
-        model_cla = CNN(input_dim=hparams.latent_dim,
-                        num_classes=num_classes,
+        model_cla = CNN(num_classes=num_classes,
                         path_ckpt=path_ckpt)
 
     elif hparams.model_cla == "reg":
         model_cla = LogisticRegression(
-            input_dim=hparams.latent_dim,
+            latent_dim=hparams.latent_dim,
             num_classes=num_classes,
             VAE_type=hparams.model,
             path_ckpt=path_ckpt)

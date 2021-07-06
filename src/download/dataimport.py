@@ -19,6 +19,9 @@ hparams = parser.parse_args()
 base_path = Path(__file__).resolve().parents[2]
 data_path = base_path / "data"
 
+# Set browser to Mozilla 5.0 in user agent, 
+# since chromium does not always work for mnist download:
+
 opener = urllib.request.build_opener()
 opener.addheaders = [('User-agent', 'Mozilla/5.0')]
 urllib.request.install_opener(opener)
@@ -34,7 +37,6 @@ if hparams.dataset=="mnist":
     datamodule_mnist.setup()
 
 # dSprites
-
 if hparams.dataset == "dSprites":
     datamodule_dSprites = dSprites_DataModule(data_dir=data_path / "dSprites/",
                                                         batch_size=hparams.batch_size,
@@ -44,17 +46,13 @@ if hparams.dataset == "dSprites":
     datamodule_dSprites.prepare_data()
     datamodule_dSprites.setup()
 
+# OCT
 if hparams.dataset == "OCT":
-    
-    system = platform.system()
-    if system == "Windows":
-        data_path = "C:/Users/Lukas/Documents/GitHub/Semi-supervised-methods/data/OCT"
-    else:
-        data_path = "/cluster/scratch/luklein/CellData/OCT"
 
-    datamodule_OCT = OCT_DataModule(data_dir=data_path,
+    datamodule_OCT = OCT_DataModule(data_dir=data_path / "OCT/",
                                     batch_size=hparams.batch_size,
                                     seed=hparams.seed,
                                     num_workers=hparams.num_workers)
 
+    datamodule_OCT.prepare_data()
     datamodule_OCT.setup()

@@ -11,7 +11,7 @@ class betaTCVAE(pl.LightningModule):
     def __init__(self, 
         enc_out_dim=256, 
         latent_dim=10, 
-        input_height=784,
+        input_dim=784,
         lr=0.001,
         anneal_steps: int = 200,
         alpha: float = 1.,
@@ -32,7 +32,7 @@ class betaTCVAE(pl.LightningModule):
             self.trainset_size = 85600
 
         self.encoder = nn.Sequential(
-            nn.Linear(input_height, 500), nn.ReLU(),
+            nn.Linear(input_dim, 500), nn.ReLU(),
             nn.BatchNorm1d(num_features=500),
             nn.Linear(500, 250), nn.ReLU(),
             nn.BatchNorm1d(num_features=250),
@@ -43,7 +43,7 @@ class betaTCVAE(pl.LightningModule):
             nn.Linear(latent_dim, 250), nn.ReLU(),
             nn.BatchNorm1d(num_features=250),
             nn.Linear(250, 500), nn.ReLU(),
-            nn.Linear(500, input_height)
+            nn.Linear(500, input_dim)
         )
 
         self.fc_mu = nn.Linear(enc_out_dim, latent_dim)
@@ -77,8 +77,8 @@ class betaTCVAE(pl.LightningModule):
     def loss(self, recons, x, mu, log_var, z, M_N):
 
         recons_loss = F.binary_cross_entropy(
-            recons.view(-1, self.hparams.input_height),
-            x.view(-1, self.hparams.input_height),
+            recons.view(-1, self.hparams.input_dim),
+            x.view(-1, self.hparams.input_dim),
             reduction='sum')
 
         log_q_zx = self.log_density_gaussian(z, mu, log_var).sum(dim=1)
@@ -131,7 +131,7 @@ class betaTCVAE(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         x, _ = batch
-        x = x.view(-1, self.hparams.input_height)
+        x = x.view(-1, self.hparams.input_dim)
         mu, log_var = self.encode(x)
         z = self.sampling(mu, log_var)
 
@@ -147,7 +147,7 @@ class betaTCVAE(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         x, _ = batch
-        x = x.view(-1, self.hparams.input_height)
+        x = x.view(-1, self.hparams.input_dim)
         mu, log_var = self.encode(x)
         z = self.sampling(mu, log_var)
 

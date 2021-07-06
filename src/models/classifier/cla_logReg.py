@@ -20,7 +20,7 @@ class LogisticRegression(pl.LightningModule):
     def __init__(
         self,
         path_ckpt,
-        input_dim: int,
+        latent_dim: int,
         num_classes: int,
         bias: bool = True,
         learning_rate: float = 0.0001,
@@ -50,11 +50,11 @@ class LogisticRegression(pl.LightningModule):
 
         self.encoder.freeze()
             
-        self.linear = nn.Linear(in_features=self.hparams.input_dim, out_features=self.hparams.num_classes, bias=bias)
+        self.linear = nn.Linear(in_features=self.hparams.latent_dim, out_features=self.hparams.num_classes, bias=bias)
 
     def forward(self, x):
 
-        if x.shape[1] != self.hparams.input_dim:
+        if x.shape[1] != self.hparams.latent_dim:
             x = self.encoder(x)
             
         x = self.linear(x)

@@ -23,6 +23,7 @@ class MLP(pl.LightningModule):
     def __init__(
         self,
         path_ckpt,
+        latent_dim: int,
         input_dim: int,
         num_classes: int,
         bias: bool = True,
@@ -41,7 +42,7 @@ class MLP(pl.LightningModule):
         self.TL = TL
         self.model_TL = model_TL
 
-        if self.TL == False:
+        if self.TL == False and self.VAE_type != "None":
             if VAE_type == "betaVAE_MLP":
                 self.encoder = betaVAE.load_from_checkpoint(path_ckpt)
             elif VAE_type == "betaVAE_VGG":
@@ -60,10 +61,10 @@ class MLP(pl.LightningModule):
             else:
                 self.encoder.eval()
 
-            self.fc1 = nn.Linear(self.hparams.input_dim, 256, bias=bias)
+            self.fc1 = nn.Linear(self.hparams.latent_dim, 256, bias=bias)
             self.fc2 = nn.Linear(256, self.hparams.num_classes, bias=bias)
 
-        else:
+        elif self.TL == True:
             self.VAE_type = "betaTCVAE_ResNet"
 
             if self.model_TL == "Inception":
@@ -76,6 +77,9 @@ class MLP(pl.LightningModule):
 
             self.fc1 = nn.Linear(1000, 256, bias=bias)
             self.fc2 = nn.Linear(256, self.hparams.num_classes, bias=bias)
+        else:
+            self.fc1 = nn.Linear(self.hparams.input_dim, 256, bias=bias)
+            self.fc2 = nn.Linear(256, self.hparams.num_classes, bias=bias)
 
 
     def forward(self, x):
@@ -83,7 +87,7 @@ class MLP(pl.LightningModule):
         if self.TL == True:
             x = torch.cat([x, x, x], 1)
 
-        if x.shape[1] != self.hparams.input_dim:
+        if x.shape[1] != self.hparams.latent_dim and self.VAE_type != "None":
             x = self.encoder(x)
 
         x = F.relu(self.fc1(x))
@@ -96,7 +100,7 @@ class MLP(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         x, y = batch
 
-        if self.VAE_type == "betaVAE_MLP" or self.VAE_type == "betaTCVAE_MLP":
+        if self.VAE_type == "betaVAE_MLP" or self.VAE_type == "betaTCVAE_MLP" or self.VAE_type == "None":
             # flatten any input
             x = x.view(x.size(0), -1)
 
@@ -115,7 +119,7 @@ class MLP(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         x, y = batch
 
-        if self.VAE_type == "betaVAE_MLP" or self.VAE_type == "betaTCVAE_MLP":
+        if self.VAE_type == "betaVAE_MLP" or self.VAE_type == "betaTCVAE_MLP" or self.VAE_type == "None":
             x = x.view(x.size(0), -1)
 
         y_hat = self(x)
@@ -139,7 +143,7 @@ class MLP(pl.LightningModule):
     def test_step(self, batch, batch_idx):
         x, y = batch
 
-        if self.VAE_type == "betaVAE_MLP" or self.VAE_type == "betaTCVAE_MLP":
+        if self.VAE_type == "betaVAE_MLP" or self.VAE_type == "betaTCVAE_MLP" or self.VAE_type == "None":
             x = x.view(x.size(0), -1)
         
         y_hat = self(x)

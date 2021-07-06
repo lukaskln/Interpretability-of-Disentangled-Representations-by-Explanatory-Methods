@@ -6,13 +6,13 @@ from torch import optim, Tensor
 import pytorch_lightning as pl
 
 class betaVAE(pl.LightningModule):
-    def __init__(self, enc_out_dim=256, latent_dim=10, input_height=784, beta=1, lr=0.001):
+    def __init__(self, enc_out_dim=256, latent_dim=10, input_dim=784, beta=1, lr=0.001):
         super(betaVAE, self).__init__()
 
         self.save_hyperparameters()
         
         self.encoder = nn.Sequential(
-            nn.Linear(input_height, 500), nn.ReLU(),
+            nn.Linear(input_dim, 500), nn.ReLU(),
             nn.BatchNorm1d(num_features=500),
             nn.Linear(500, 250), nn.ReLU(),
             nn.BatchNorm1d(num_features=250),
@@ -23,7 +23,7 @@ class betaVAE(pl.LightningModule):
             nn.Linear(latent_dim, 250), nn.ReLU(),
             nn.BatchNorm1d(num_features=250),
             nn.Linear(250, 500), nn.ReLU(),
-            nn.Linear(500, input_height)
+            nn.Linear(500, input_dim)
             )
         
         self.fc_mu=nn.Linear(enc_out_dim, latent_dim)
@@ -55,8 +55,8 @@ class betaVAE(pl.LightningModule):
 
     def loss(self, recons, x, mu, logvar):
         bce = F.binary_cross_entropy(
-            recons.view(-1, self.hparams.input_height), 
-            x.view(-1, self.hparams.input_height),
+            recons.view(-1, self.hparams.input_dim), 
+            x.view(-1, self.hparams.input_dim),
             reduction='sum')
 
         batch_size = x.shape[0]
@@ -67,7 +67,7 @@ class betaVAE(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         x, _ = batch
-        x = x.view(-1, self.hparams.input_height)
+        x = x.view(-1, self.hparams.input_dim)
         mu, log_var = self.encode(x)
         z = self.sampling(mu, log_var)
 
@@ -82,7 +82,7 @@ class betaVAE(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         x, _ = batch
 
-        x = x.view(-1, self.hparams.input_height)
+        x = x.view(-1, self.hparams.input_dim)
         mu, log_var = self.encode(x)
         z = self.sampling(mu, log_var)
 
