@@ -7,11 +7,17 @@ import torchvision
 import pytorch_lightning as pl
 
 class betaVAE_VGG(pl.LightningModule):
-    def __init__(self, input_dim = 784, c=64, latent_dim=10, beta=1, lr=0.001, dataset = "mnist"):
+    def __init__(self,
+                 latent_dim=10,
+                 input_dim=784,
+                 lr=0.001,
+                 beta: float = 1.,
+                 dataset="mnist",
+                 c=64
+                 ):
         super(betaVAE_VGG, self).__init__()
         self.save_hyperparameters()
         self.c = c
-        self.num_iter = 0
         self.dataset = dataset
 
         if dataset == "mnist":
@@ -102,6 +108,7 @@ class betaVAE_VGG(pl.LightningModule):
         return mu
 
     def loss(self, recons, x, mu, logvar):
+        
         bce = F.binary_cross_entropy(
             recons.view(-1, self.hparams.input_dim),
             x.view(-1, self.hparams.input_dim),

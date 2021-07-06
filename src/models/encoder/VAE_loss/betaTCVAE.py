@@ -9,7 +9,6 @@ import pytorch_lightning as pl
 
 class betaTCVAE(pl.LightningModule):
     def __init__(self, 
-        enc_out_dim=256, 
         latent_dim=10, 
         input_dim=784,
         lr=0.001,
@@ -36,7 +35,7 @@ class betaTCVAE(pl.LightningModule):
             nn.BatchNorm1d(num_features=500),
             nn.Linear(500, 250), nn.ReLU(),
             nn.BatchNorm1d(num_features=250),
-            nn.Linear(250, enc_out_dim), nn.ReLU(),
+            nn.Linear(250, 50), nn.ReLU(),
         )
 
         self.decoder = nn.Sequential(
@@ -46,8 +45,8 @@ class betaTCVAE(pl.LightningModule):
             nn.Linear(500, input_dim)
         )
 
-        self.fc_mu = nn.Linear(enc_out_dim, latent_dim)
-        self.fc_log_var = nn.Linear(enc_out_dim, latent_dim)
+        self.fc_mu = nn.Linear(50, latent_dim)
+        self.fc_log_var = nn.Linear(50, latent_dim)
 
     def encode(self, x):
         z = self.encoder(x)

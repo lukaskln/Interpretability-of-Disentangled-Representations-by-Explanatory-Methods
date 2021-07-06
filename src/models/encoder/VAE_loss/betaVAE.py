@@ -6,7 +6,13 @@ from torch import optim, Tensor
 import pytorch_lightning as pl
 
 class betaVAE(pl.LightningModule):
-    def __init__(self, enc_out_dim=256, latent_dim=10, input_dim=784, beta=1, lr=0.001):
+    def __init__(self,
+                 latent_dim=10,
+                 input_dim=784,
+                 lr=0.001,
+                 beta: float = 4.,
+                 dataset="mnist"
+                 ):
         super(betaVAE, self).__init__()
 
         self.save_hyperparameters()
@@ -16,7 +22,7 @@ class betaVAE(pl.LightningModule):
             nn.BatchNorm1d(num_features=500),
             nn.Linear(500, 250), nn.ReLU(),
             nn.BatchNorm1d(num_features=250),
-            nn.Linear(250, enc_out_dim), nn.ReLU(),
+            nn.Linear(250, 50), nn.ReLU(),
             )
 
         self.decoder = nn.Sequential(
@@ -26,8 +32,8 @@ class betaVAE(pl.LightningModule):
             nn.Linear(500, input_dim)
             )
         
-        self.fc_mu=nn.Linear(enc_out_dim, latent_dim)
-        self.fc_log_var=nn.Linear(enc_out_dim, latent_dim)
+        self.fc_mu=nn.Linear(50, latent_dim)
+        self.fc_log_var=nn.Linear(50, latent_dim)
        
     def encode(self,x):
         z = self.encoder(x)
@@ -46,14 +52,11 @@ class betaVAE(pl.LightningModule):
         return reconst
 
     def forward(self,x):
-        # During inference, we simply spit out the mean of the
-        # learned distribution for the current input.  We could
-        # use a random sample from the distribution, but mu of
-        # course has the highest probability (MAP Estimator).
         mu, log_var = self.encode(x)
         return mu
 
     def loss(self, recons, x, mu, logvar):
+        
         bce = F.binary_cross_entropy(
             recons.view(-1, self.hparams.input_dim), 
             x.view(-1, self.hparams.input_dim),
