@@ -1,7 +1,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/lukaskln/Semi-supervised-methods">
-    <img src="https://glassboxmedicine.files.wordpress.com/2020/03/ct-gif.gif?w=371" alt="Logo" width="320"> 
+    <img src="https://github.com/lukaskln/Semi-supervised-methods/blob/master/images/OCT_LSF.gif" alt="Logo" width="150"> 
   </a>
 
   <h3 align="center">Semi-supervised Methods</h3>
