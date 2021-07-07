@@ -38,7 +38,7 @@ class vis_AM_Latent:
             self.labels = ["square", "ellipse", "heart"]
 
     def visualise(self):
-        print("Visualizing Total Latent Feature Attribution...")
+        print("-> Total Attribution...")
 
         plt.figure(figsize=(24, 20), dpi=200)
         shap.summary_plot(self.shap_values, 
@@ -49,7 +49,7 @@ class vis_AM_Latent:
                           show=False
                         )
         plt.savefig('./images/total attribution latent features.png')
-        print("Visualizing Attribution of Latent Features...")
+        print("-> Local Attribution...")
 
         fig, axes = plt.subplots(nrows=1, ncols=4)
         plt.figure(figsize=(30, 10), dpi=200)
@@ -68,60 +68,3 @@ class vis_AM_Latent:
                 row_index=i)
 
         plt.savefig('./images/attribution latent features.png')
-
-
-class vis_AM_Latent_on_Rec:
-    def __init__(self, shap_values, encoding_test, model, type):
-        self.shap_values = torch.from_numpy(np.stack(shap_values)[:, 0:5, :])
-        self.encoding_test = torch.from_numpy(encoding_test[0:5,:]).type(torch.DoubleTensor)
-        self.model = model
-        self.type = type
-
-    def to_img(self, x):
-        x = x.clamp(0, 1)
-        return x
-
-    def rec_image(self):
-        with torch.no_grad():
-            images = self.model.decode(self.encoding_test.float())
-            images = images.cpu()
-
-        if self.type == 'betaVAE' or self.type == 'betaTCVAE':
-            images = self.to_img(images.view(-1, 1, 28, 28))
-        else:
-            images = self.to_img(images)
-
-        return images
-
-    def rec_shap(self):
-        shap_list = []
-        for i in range(0,self.shap_values.shape[1]):
-            with torch.no_grad():
-                value = self.model.decode(self.shap_values[:, i, :].float())
-                value = value.cpu()
-
-            if self.type == 'betaVAE' or self.type == 'betaTCVAE':
-                shap_list.append(value.view(-1, 28, 28))
-            else:
-                shap_list.append(value)
-
-        shap_full = torch.stack((shap_list[0:self.shap_values.shape[1]]), dim=1)
-
-        return shap_full
-
-    def prep(self, shap_values, test_images):
-        shap_numpy = [np.swapaxes(np.swapaxes(s.numpy(), 1, -1), 1, 2) for s in shap_values]
-        test_numpy = np.swapaxes(np.swapaxes(test_images.numpy(), 1, -1), 1, 2)
-        return shap_numpy, test_numpy
-
-    def visualise(self):
-        print("Visualizing Attribution of Latent Features on Reconstructions...")
-
-        test_images_rec = self.rec_image()
-        shap_values_rec = self.rec_shap()
-
-        shap_values, test_values = self.prep(shap_values_rec, test_images_rec)
-        
-        plt.figure(figsize=(20, 14), dpi=200)
-        shap.image_plot(shap_values, test_values, show = False)
-

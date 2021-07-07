@@ -46,7 +46,8 @@ def get_parser():
     parser.add_argument("--fix_weights", default=True, type=str2bool)
     parser.add_argument("--TL", default=False, type=str2bool)
     parser.add_argument("--model_TL", choices=["ResNet", "Inception"], default="ResNet", type=str)
-    
+ 
     # Evaluation
+    parser.add_argument("--method", choices=["EG", "IG", "DeepSHAP", "KernelSHAP"], default="EG", type=str)
     parser.add_argument("--eval_latent_range", default=15.0, type=float)
     return parser
