@@ -1,9 +1,9 @@
 <br />
 <p align="center">
-  <a href="https://github.com/lukaskln/Semi-supervised-methods">
-    <img src="https://github.com/lukaskln/Semi-supervised-methods/blob/master/images/Attribution.gif" alt="Logo" width="120">
+  <a href="https://github.com/lukaskln/Interpretability-of-Disentangled-Representations-by-Explanatory-Methods">
+    <img src="https://github.com/lukaskln/Interpretability-of-Disentangled-Representations-by-Explanatory-Methods/blob/master/images/Attribution.gif" alt="Logo" width="120">
     &nbsp;&nbsp;&nbsp;&nbsp;
-    <img src="https://github.com/lukaskln/Semi-supervised-methods/blob/master/images/OCT_LSF.gif" alt="Logo" width="120">
+    <img src="https://github.com/lukaskln/Interpretability-of-Disentangled-Representations-by-Explanatory-Methods/blob/master/images/OCT_LSF.gif" alt="Logo" width="120">
   </a>
 
   <h3 align="center">Interpretability of Disentangled Representations by Explanatory Methods</h3>
@@ -11,10 +11,10 @@
   <p align="center">
     Master Thesis at the ETH Zürich & University of Geneva
     <br />
-    <a href="https://github.com/lukaskln/Semi-supervised-methods/tree/main/src"><strong>Explore the Project »</strong></a>
+    <a href="https://github.com/lukaskln/Interpretability-of-Disentangled-Representations-by-Explanatory-Methods/tree/master/src"><strong>Explore the Project »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/lukaskln/Semi-supervised-methods/issues">Report Bug</a>
+    <a href="https://github.com/lukaskln/Interpretability-of-Disentangled-Representations-by-Explanatory-Methods/issues">Report Bug</a>
   </p>
 </p>
 
@@ -24,7 +24,7 @@
 * [Datasets](#datasets)
 * [Usage](#usage)
   * [Run the code](#run-the-code)
-  * [Reproducing the results](#reproducing-our-results)
+  * [Reproducing the results](#reproducing-the-results)
 * [Contact](#contact)
 
 ## About the Thesis
