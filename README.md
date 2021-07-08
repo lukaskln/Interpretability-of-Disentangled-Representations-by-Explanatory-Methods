@@ -1,7 +1,9 @@
 <br />
 <p align="center">
   <a href="https://github.com/lukaskln/Semi-supervised-methods">
-    <img src="https://github.com/lukaskln/Semi-supervised-methods/blob/master/images/OCT_LSF.gif" alt="Logo" width="150"> 
+    <img src="https://github.com/lukaskln/Semi-supervised-methods/blob/master/images/Attribution.gif" alt="Logo" width="120">
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <img src="https://github.com/lukaskln/Semi-supervised-methods/blob/master/images/OCT_LSF.gif" alt="Logo" width="120">
   </a>
 
   <h3 align="center">Interpretability of Disentangled Representations by Explanatory Methods</h3>
