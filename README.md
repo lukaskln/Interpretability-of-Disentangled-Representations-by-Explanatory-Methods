@@ -54,7 +54,7 @@ AI engineers try to establish trust between humans and machines by building mach
 │    └─── encoder
 │         └─── VAE_loss                   - Encoder checkpoints
 ├─── src
-│    ├─── __init__.py                     - Imports for main* scripts
+│    │ __init__.py                        - Imports for main* scripts
 │    │
 │    ├─── download
 │    │      dataimport.py                 - Initializes all datamodules
