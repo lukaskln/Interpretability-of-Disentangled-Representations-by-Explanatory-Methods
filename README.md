@@ -40,41 +40,41 @@ AI engineers try to establish trust between humans and machines by building mach
 ```
 ├── README.md                                
 ├── LICENSE.txt                             
-├── environment.yml                    - YAML file with the conda env.
-├── main_evaluation.py                 - Main script to execute for evaluation
-├── main.py                            - Main script to execute for training
-├─── data                              - Data storage folder (filled after first run)
+├── environment.yml                       - YAML file with the conda env.
+├── main_evaluation.py                    - Main script to execute for evaluation
+├── main.py                               - Main script to execute for training
+├─── data                                 - Data storage folder (filled after first run)
 │    ├─── dSprites
 │    ├─── mnist
 │    └─── OCT
-├─── images                            - Image export folder 
+├─── images                               - Image export folder 
 │
-├─── models                            - Trained and saved models
-│    ├─── classifier                   - Classifier checkpoints
+├─── models                               - Trained and saved models
+│    ├─── classifier                      - Classifier checkpoints
 │    └─── encoder
-│         └─── VAE_loss                - Encoder checkpoints
+│         └─── VAE_loss                   - Encoder checkpoints
 ├─── src
-│    ├─── __init__.py                  - Imports for main* scripts
+│    ├─── __init__.py                     - Imports for main* scripts
 │    │
 │    ├─── download
-│    │      dataimport.py              - Initializes all datamodules
-│    │      dataloader_dSprites.py     - dSprites datamodule
-│    │      dataloader_mnist.py        - MNIST datamodule
-│    │      dataloader_OCT.py          - OCT retina datamodule
+│    │      dataimport.py                 - Initializes all datamodules
+│    │      dataloader_dSprites.py        - dSprites datamodule
+│    │      dataloader_mnist.py           - MNIST datamodule
+│    │      dataloader_OCT.py             - OCT retina datamodule
 │    │
 │    ├─── evaluation
 │    │      scores_attribution_methods.py - Attribution scores computation
-│    │      vis_attribution_methods.py - Attribution visualization
-│    │      vis_latentspace.py         - Latent space visualization
-│    │      vis_reconstructions.py     - Original & reconstruction images
+│    │      vis_attribution_methods.py    - Attribution visualization
+│    │      vis_latentspace.py            - Latent space visualization
+│    │      vis_reconstructions.py        - Original & reconstruction images
 │    │
 │    └─── models
-│         ├─── classifier              - Classifier modules
+│         ├─── classifier                 - Classifier modules
 │         │      cla_CNN.py
 │         │      cla_logReg.py
 │         │      cla_MLP.py
 │         └─── encoder
-│              └─── VAE_loss           - VAE-loss based encoder/decoder modules
+│              └─── VAE_loss              - VAE-loss based encoder/decoder modules
 │                     betaTCVAE.py
 │                     betaTCVAE_ResNet.py
 │                     betaTCVAE_VGG.py
@@ -83,11 +83,11 @@ AI engineers try to establish trust between humans and machines by building mach
 │                     betaVAE_VGG.py
 │
 └─── tools
-       argparser.py                    - Parser for command line arguments 
-       beta_effect.R                   - Beta effect plot
-       callbacks.py                    - Early stopping and checkpoints
-       confusion_matrix.R              - Confusion matrix plot
-       disentanglement_scores.R        - Importance plot and multinominal regression
+       argparser.py                       - Parser for command line arguments 
+       beta_effect.R                      - Beta effect plot
+       callbacks.py                       - Early stopping and checkpoints
+       confusion_matrix.R                 - Confusion matrix plot
+       disentanglement_scores.R           - Importance plot and multinominal regression
 ```
 ## Datasets
 
