@@ -19,7 +19,7 @@
 </p>
 
 ## Table of Contents
-* [About the Project](#about-the-project)
+* [About the Thesis](#about-the-thesis)
 * [Folder Structure](#folder-structure)
 * [Datasets](#datasets)
 * [Usage](#usage)
@@ -27,7 +27,7 @@
   * [Reproducing the results](#reproducing-our-results)
 * [Contact](#contact)
 
-## About the Project
+## About the Thesis
 
 AI engineers try to establish trust between humans and machines by building machine learning systems that are either an interpretable model or a black-box model, which upon an explanatory method is applied. This thesis combines interpretable models and explanatory methods to gain new insights on the synergies of both approaches in a semi-supervised setting and with a focus on medical application. In medicine, AI models show astonishing prediction accuracies. However, they lack two crucial attributes for daily use in cooperation with a physician: The ability to be trained on small-sized labeled data and interpret the reasoning behind a prediction transparently. The thesis demonstrates that both obstacles can be solved jointly based on two proof-of-concept datasets and a medical dataset containing OCT images of the retina:
 
