@@ -43,7 +43,7 @@ AI engineers try to establish trust between humans and machines by building mach
 ├── environment.yml                       - YAML file with the conda env.
 ├── main_evaluation.py                    - Main script to execute for evaluation
 ├── main.py                               - Main script to execute for training
-├─── data                                 - Data storage folder (filled after first run)
+├─── data                                 - Data storage folders (each filled after first run)
 │    ├─── dSprites
 │    ├─── mnist
 │    └─── OCT
