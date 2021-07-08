@@ -1,7 +1,3 @@
-from pathlib import Path
-import os
-
-import pytorch_lightning as pl
 import torch
 from torchmetrics.functional import confusion_matrix, accuracy
 from torch import nn
@@ -9,12 +5,19 @@ from torch.nn import functional as F
 from torch.optim import Adam
 from torch.optim.optimizer import Optimizer
 
+import pytorch_lightning as pl
+
 from src.models.encoder.VAE_loss.betaVAE import *
+from src.models.encoder.VAE_loss.betaVAE_ResNet import *
 from src.models.encoder.VAE_loss.betaVAE_VGG import *
 from src.models.encoder.VAE_loss.betaTCVAE import *
-from src.models.encoder.VAE_loss.betaTCVAE_VGG import *
-from src.models.encoder.VAE_loss.betaVAE_ResNet import *
 from src.models.encoder.VAE_loss.betaTCVAE_ResNet import *
+from src.models.encoder.VAE_loss.betaTCVAE_VGG import *
+
+"""
+Defines the Logistic Regression classifier module. 
+Has also l1 and l2 penalty terms for Lasso and Ridge-Regression.
+"""
 
 class LogisticRegression(pl.LightningModule):
     def __init__(
@@ -50,10 +53,12 @@ class LogisticRegression(pl.LightningModule):
 
         self.encoder.freeze()
             
-        self.linear = nn.Linear(in_features=self.hparams.latent_dim, out_features=self.hparams.num_classes, bias=bias)
+        self.linear = nn.Linear(in_features=self.hparams.latent_dim, 
+                                out_features=self.hparams.num_classes, 
+                                bias=bias
+                            )
 
     def forward(self, x):
-
         if x.shape[1] != self.hparams.latent_dim:
             x = self.encoder(x)
             
@@ -65,7 +70,6 @@ class LogisticRegression(pl.LightningModule):
         x, y = batch
 
         if self.VAE_type == "betaVAE_MLP" or self.VAE_type == "betaTCVAE_MLP":
-            # flatten any input
             x = x.view(x.size(0), -1)
 
         y_hat = self(x)
@@ -86,6 +90,7 @@ class LogisticRegression(pl.LightningModule):
 
         self.log('loss', loss, on_epoch=True,
                  sync_dist=True if torch.cuda.device_count() > 1 else False)
+
         self.log('acc', acc, on_epoch=False,  prog_bar=True,
                  sync_dist=True if torch.cuda.device_count() > 1 else False)
         return loss
@@ -111,6 +116,7 @@ class LogisticRegression(pl.LightningModule):
 
         self.log('val_loss', val_loss, on_epoch=True, prog_bar=True,
                  sync_dist=True if torch.cuda.device_count() > 1 else False)
+
         self.log('val_acc', acc, on_epoch=True, prog_bar=True,
                  sync_dist=True if torch.cuda.device_count() > 1 else False)
 
@@ -128,6 +134,7 @@ class LogisticRegression(pl.LightningModule):
 
     def test_epoch_end(self, outputs):
         test_y = torch.cat(tuple([x['test_y'] for x in outputs]))
+
         test_y_hat = torch.cat(tuple([x['test_y_hat'] for x in outputs]))
 
         test_loss = F.cross_entropy(test_y_hat, test_y, reduction='mean')
@@ -137,6 +144,7 @@ class LogisticRegression(pl.LightningModule):
 
         self.log('test_loss', test_loss, on_epoch=True, prog_bar=True,
                  sync_dist=True if torch.cuda.device_count() > 1 else False)
+
         self.log('test_acc', acc, on_epoch=True, prog_bar=True,
                  sync_dist=True if torch.cuda.device_count() > 1 else False)
 

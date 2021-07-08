@@ -1,12 +1,18 @@
+import math
+
 import torch
-from torch import nn
 import torch.nn.functional as F
 from torch import optim, Tensor
-import math
-import torchvision
+from torch import nn
 
+import torchvision
 import pytorch_lightning as pl
 
+"""
+Defines the VGG encoder with beta-TCVAE loss module. As the decoder for the
+MNIST and dSprites data, an InfoGAN, and for the OCT data, a DCGAN architecture is
+automatically selected. Also the VGG size depends on the data.
+"""
 
 class betaTCVAE_VGG(pl.LightningModule):
     def __init__(self,
@@ -48,6 +54,7 @@ class betaTCVAE_VGG(pl.LightningModule):
         self.enc_conv1 = nn.Conv2d(1, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
         self.vgg = nn.Sequential(*model)
         self.enc_avgpool = nn.AdaptiveAvgPool2d(output_size=(1,1))
+
         self.enc_fc = nn.Linear(in_features=512, out_features=10*c)
         self.fc_mu = nn.Linear(in_features=10*c, out_features=latent_dim)
         self.fc_logvar = nn.Linear(in_features=10*c, out_features=latent_dim) 
@@ -123,7 +130,7 @@ class betaTCVAE_VGG(pl.LightningModule):
         return log_density
 
     def loss(self, recons, x, mu, log_var, z):
-
+        # Inspired by: https://github.com/YannDubs/disentangling-vae/blob/7b8285baa19d591cf34c652049884aca5d8acbca/disvae/models/losses.py#L316
         recons_loss = F.binary_cross_entropy(
             recons.view(-1, self.hparams.input_dim).clamp(0, 1),
             x.view(-1, self.hparams.input_dim),
@@ -189,6 +196,7 @@ class betaTCVAE_VGG(pl.LightningModule):
 
         self.log('loss', vae_loss, on_epoch=False, prog_bar=True, on_step=True,
                  sync_dist=True if torch.cuda.device_count() > 1 else False)
+
         return vae_loss
 
     def validation_step(self, batch, batch_idx):
@@ -202,6 +210,7 @@ class betaTCVAE_VGG(pl.LightningModule):
 
         self.log('val_loss', vae_loss, on_epoch=True, prog_bar=True,
                  sync_dist=True if torch.cuda.device_count() > 1 else False)
+                 
         return vae_loss
 
     def configure_optimizers(self):

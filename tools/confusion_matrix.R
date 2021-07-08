@@ -1,7 +1,10 @@
 library(heatmaply)
 library(RColorBrewer)
 
+# Run script to produce confusion matrix plots. Data is already in the script.
+# Images are saved in /image folder
 
+# MNIST
 cm_mnist = 
 as.integer(c(
 910,    0,   15,    8,    0,   30,   13,    2,    2,    0,
@@ -45,7 +48,7 @@ heatmaply(
   cellnote_textposition = "middle center"
 )
 
-
+# dSprites
 cm_dSprites = 
 as.integer(c(
 14674,  1070,  5988,
@@ -82,7 +85,7 @@ heatmaply(
   cellnote_textposition = "middle center"
 )
 
-
+# OCT retina
 cm_OCT = 
 as.integer(c(
 141,  96,   7,   6,

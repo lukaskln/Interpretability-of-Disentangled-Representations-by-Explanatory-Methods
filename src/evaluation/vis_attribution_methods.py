@@ -1,10 +1,12 @@
-import torchvision.utils
 import numpy as np
 import matplotlib.pyplot as plt
-import torch
 import shap
-from scipy.special import softmax, logit, expit
-import colorcet as cc
+
+"""
+Creates two objects visualizing the attribution from the original input images
+and the LSFs. Attribution based on the LSFs is visualized locally and globally (total).
+All visualizations are saved into the /images folder.
+"""
 
 class vis_AM_Original:
     def __init__(self, shap_values, test_images):
@@ -18,7 +20,6 @@ class vis_AM_Original:
 
     def visualise(self):
         shap_values, test_values = self.prep(self.shap_values, self.test_images)
-
         plt.figure(figsize=(20, 14), dpi=200)
         shap.image_plot(shap_values, test_values, show=False)
 
@@ -49,6 +50,7 @@ class vis_AM_Latent:
                           show=False
                         )
         plt.savefig('./images/total attribution latent features.png')
+
         print("-> Local Attribution...")
 
         fig, axes = plt.subplots(nrows=1, ncols=4)
@@ -58,7 +60,7 @@ class vis_AM_Latent:
         for i in range(0, 4, 1):
             plt.subplot(1, 4, i+1)
             shap.multioutput_decision_plot(
-                np.zeros((1,self.n)).tolist()[0], #[i for i in softmax(self.exp.expected_value)]
+                np.zeros((1,self.n)).tolist()[0],
                 self.shap_values,
                 highlight=self.labels_test[i],
                 legend_labels=self.labels,

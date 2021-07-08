@@ -1,13 +1,18 @@
-import torch
 from pathlib import Path
-from tools.argparser import *
-import pytorch_lightning as pl
 import os
 
+import torch
 from torch.utils.data import DataLoader, random_split
 from torchvision.datasets import MNIST
 from torchvision import transforms
+import pytorch_lightning as pl
 
+from tools.argparser import *
+
+"""
+Creating Pytorch Lightning datamodule for automatic download, preparation 
+and setting up of the dataloaders for the MNIST dataset.
+"""
 
 class MNIST_DataModule(pl.LightningDataModule):
     def __init__(self, batch_size, data_dir, seed, num_workers):
@@ -22,12 +27,11 @@ class MNIST_DataModule(pl.LightningDataModule):
         ])
 
     def prepare_data(self):
-        # download
+        print("Downloading and extracting MNIST data...")
         MNIST(self.data_dir, train=True, download=True)
         MNIST(self.data_dir, train=False, download=True)
 
     def setup(self, stage=None):
-
         mnist_full = MNIST(self.data_dir, train=True, transform=self.transform)
 
         data_cla, data_enc = random_split(mnist_full, [1000, 59000],

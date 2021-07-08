@@ -6,6 +6,12 @@ from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from pytorch_lightning.callbacks import ModelCheckpoint
 
 from tools.argparser import *
+
+"""
+This file contains the declaration of all callbacks such as
+early stopping and checkpoint saving.
+"""
+
 parser = get_parser()
 hparams = parser.parse_args()
 

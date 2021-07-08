@@ -1,5 +1,4 @@
 #### Setup ####
-from pytorch_lightning.loggers import WandbLogger
 import warnings
 import datetime
 import os
@@ -7,16 +6,22 @@ import glob
 from pathlib import Path
 
 import pytorch_lightning as pl
+from pytorch_lightning.loggers import WandbLogger
 
 warnings.filterwarnings('ignore')
 
 print("Loading Modules...")
 from src.__init__ import *
 
+"""
+Calls all scripts from __init__ and runs the full training, validation and testing loops for the VAE-based model and the classifier. 
+Further, the logging, all callbacks and the distributed GPU backend is configured.  
+"""
+
+
 def run():
 
-    ## Parser and Seeding ##
-
+    #### Parser and Seeding ####
     parser = get_parser()
     hparams = parser.parse_args()
 
@@ -30,8 +35,7 @@ def run():
         print("[ERROR] Model ID does already exist")
         raise SystemExit(0)
 
-    #### Logging ####
-
+    #### Set Logging ####
     if hparams.logger == "wandb":
         import wandb
         #wandb.init(project="VAE-mnist")
@@ -39,7 +43,7 @@ def run():
     else:
         logger = False
 
-    #### Dataset selection ####
+    #### Selecting Dataset ####
     print("Loading Datasets...")
 
     if hparams.dataset=="mnist":
@@ -54,8 +58,8 @@ def run():
         datamodule = datamodule_OCT
         input_dim = int(326 ** 2) 
         num_classes = 4
-    #### Select Encoder ####
 
+    #### Selecting Encoder ####
     if hparams.model=="betaVAE_MLP":
             model_enc = betaVAE(
             beta=hparams.VAE_beta,
@@ -115,8 +119,7 @@ def run():
     else:
         raise Exception('Unknown Encoder type: ' + hparams.model)
 
-    ## Training Encoder ##
-
+    #### Training Encoder ####
     if hparams.model != "None" and hparams.TL == False:
 
         trainer = pl.Trainer(
@@ -136,8 +139,7 @@ def run():
             datamodule.val_dataloader(),
             )
 
-    #### Select Classifier ####    
-
+    #### Selecting Classifier ####    
     if hparams.model_cla == "MLP":
         model_cla = MLP(latent_dim=hparams.latent_dim,
                         input_dim=input_dim,
@@ -162,7 +164,7 @@ def run():
         raise Exception('Unknown Classifer type: ' + hparams.cla_type +'. CNN works only without encoder')
 
 
-    ## Training Classifier ##
+    #### Training Classifier ####
     trainer = pl.Trainer(
         logger= logger,
         progress_bar_refresh_rate=32,
@@ -184,8 +186,7 @@ def run():
         wandb.finish()
 
 
-    ## Remove interim models ##
-
+    #### Remove models ####
     path_ckpt_VAE = Path(os.getcwd(), "models/encoder/VAE_loss/",("VAE_" + str(hparams.model_ID) + ".ckpt"))
     path_ckpt_cla = Path(os.getcwd(), "models/classifier/",("cla_" + str(hparams.model_ID) + ".ckpt"))
 

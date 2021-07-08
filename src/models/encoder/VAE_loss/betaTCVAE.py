@@ -1,11 +1,17 @@
-import torch
-from torch import nn
-import torch.nn.functional as F
-from torch import optim, Tensor
 import math
 
+import torch
+import torch.nn.functional as F
+from torch import optim, Tensor
+from torch import nn
+
+import torchvision
 import pytorch_lightning as pl
 
+"""
+Defines the MLP encoder with beta-TCVAE loss module. Also for the decoder
+an MLP architecture is selected.
+"""
 
 class betaTCVAE(pl.LightningModule):
     def __init__(self, 
@@ -19,7 +25,6 @@ class betaTCVAE(pl.LightningModule):
         dataset="mnist"
         ):
         super(betaTCVAE, self).__init__()
-
         self.save_hyperparameters()
         self.num_iter = 0
 
@@ -73,8 +78,8 @@ class betaTCVAE(pl.LightningModule):
         log_density = norm - 0.5 * ((x - mu) ** 2 * torch.exp(-logvar))
         return log_density
 
-    def loss(self, recons, x, mu, log_var, z, M_N):
-
+    def loss(self, recons, x, mu, log_var, z):
+        # Inspired by: https://github.com/YannDubs/disentangling-vae/blob/7b8285baa19d591cf34c652049884aca5d8acbca/disvae/models/losses.py#L316
         recons_loss = F.binary_cross_entropy(
             recons.view(-1, self.hparams.input_dim),
             x.view(-1, self.hparams.input_dim),
@@ -136,12 +141,11 @@ class betaTCVAE(pl.LightningModule):
 
         recons = self.decode(z)
 
-        M_N = x.shape[0] / 50000
-
-        vae_loss = self.loss(recons, x, mu, log_var, z, M_N)
+        vae_loss = self.loss(recons, x, mu, log_var, z)
 
         self.log('loss', vae_loss, on_epoch=False, prog_bar=True, on_step=True,
                  sync_dist=True if torch.cuda.device_count() > 1 else False)
+                 
         return vae_loss
 
     def validation_step(self, batch, batch_idx):
@@ -152,12 +156,11 @@ class betaTCVAE(pl.LightningModule):
 
         recons = self.decode(z)
 
-        M_N = x.shape[0] / 10000
-
-        vae_loss = self.loss(recons, x, mu, log_var, z, M_N)
+        vae_loss = self.loss(recons, x, mu, log_var, z)
 
         self.log('val_loss', vae_loss, on_epoch=True, prog_bar=True,
                  sync_dist=True if torch.cuda.device_count() > 1 else False)
+
         return vae_loss
 
     def configure_optimizers(self):

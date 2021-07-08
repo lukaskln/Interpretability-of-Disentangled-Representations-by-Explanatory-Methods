@@ -1,10 +1,3 @@
-from pathlib import Path
-import os
-
-import pytorch_lightning as pl
-
-import torchvision
-
 import torch
 from torch import nn
 from torch.nn import functional as F
@@ -12,12 +5,20 @@ from torch.optim import Adam
 from torch.optim.optimizer import Optimizer
 from torchmetrics.functional import confusion_matrix, accuracy
 
+import pytorch_lightning as pl
+import torchvision
+
 from src.models.encoder.VAE_loss.betaVAE import *
 from src.models.encoder.VAE_loss.betaVAE_VGG import *
 from src.models.encoder.VAE_loss.betaTCVAE import *
 from src.models.encoder.VAE_loss.betaTCVAE_VGG import *
 from src.models.encoder.VAE_loss.betaVAE_ResNet import *
 from src.models.encoder.VAE_loss.betaTCVAE_ResNet import *
+
+"""
+Defines the MLP classifier module. Also includes the loading 
+and training of the transfer-learned and pre-trained encoders.
+"""
 
 class MLP(pl.LightningModule):
     def __init__(
@@ -77,14 +78,14 @@ class MLP(pl.LightningModule):
 
             self.fc1 = nn.Linear(1000, 256, bias=bias)
             self.fc2 = nn.Linear(256, self.hparams.num_classes, bias=bias)
+
         else:
             self.fc1 = nn.Linear(self.hparams.input_dim, 256, bias=bias)
             self.fc2 = nn.Linear(256, self.hparams.num_classes, bias=bias)
 
 
     def forward(self, x):
-        
-        if self.TL == True:
+        if self.TL == True: # Since TL encoder has three input channels
             x = torch.cat([x, x, x], 1)
 
         if x.shape[1] != self.hparams.latent_dim and self.VAE_type != "None":
@@ -101,7 +102,6 @@ class MLP(pl.LightningModule):
         x, y = batch
 
         if self.VAE_type == "betaVAE_MLP" or self.VAE_type == "betaTCVAE_MLP" or self.VAE_type == "None":
-            # flatten any input
             x = x.view(x.size(0), -1)
 
         y_hat = self(x)
@@ -112,6 +112,7 @@ class MLP(pl.LightningModule):
 
         self.log('loss', loss, on_epoch=True,
                  sync_dist=True if torch.cuda.device_count() > 1 else False)
+
         self.log('acc', acc, on_epoch=False,  prog_bar=True,
                  sync_dist=True if torch.cuda.device_count() > 1 else False)
         return loss
@@ -137,6 +138,7 @@ class MLP(pl.LightningModule):
 
         self.log('val_loss', val_loss, on_epoch=True, prog_bar=True,
                  sync_dist=True if torch.cuda.device_count() > 1 else False)
+
         self.log('val_acc', acc, on_epoch=True, prog_bar=True,
                  sync_dist=True if torch.cuda.device_count() > 1 else False)
 
@@ -163,6 +165,7 @@ class MLP(pl.LightningModule):
 
         self.log('test_loss', test_loss, on_epoch=True, prog_bar=True,
                  sync_dist=True if torch.cuda.device_count() > 1 else False)
+                 
         self.log('test_acc', acc, on_epoch=True, prog_bar=True,
                  sync_dist=True if torch.cuda.device_count() > 1 else False)
 

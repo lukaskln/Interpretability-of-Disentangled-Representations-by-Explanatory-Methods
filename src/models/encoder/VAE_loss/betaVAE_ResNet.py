@@ -1,11 +1,16 @@
 import torch
-from torch import nn
 import torch.nn.functional as F
+from torch import nn
 from torch import optim, Tensor
-import torchvision
 
+import torchvision
 import pytorch_lightning as pl
 
+"""
+Defines the ResNet encoder with beta-VAE loss module. As the decoder for the
+MNIST and dSprites data, an InfoGAN, and for the OCT data, a DCGAN architecture is
+automatically selected.
+"""
 
 class betaVAE_ResNet(pl.LightningModule):
     def __init__(self,
@@ -29,10 +34,9 @@ class betaVAE_ResNet(pl.LightningModule):
         
         # Encoder
         self.resnet = torchvision.models.resnet50()
-
         self.resnet.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=1, padding=3, bias=False)
-            
         self.resnet.avgpool = nn.AdaptiveAvgPool2d(output_size=(1, 1))
+        
         self.enc_fc = nn.Linear(in_features=1000, out_features=5*c)
         self.fc_mu = nn.Linear(in_features=5*c, out_features=latent_dim)
         self.fc_logvar = nn.Linear(in_features=5*c, out_features=latent_dim)
@@ -122,6 +126,7 @@ class betaVAE_ResNet(pl.LightningModule):
 
         self.log('loss', vae_loss, on_epoch=False, prog_bar=True, on_step=True,
                  sync_dist=True if torch.cuda.device_count() > 1 else False)
+
         return vae_loss
 
     def validation_step(self, batch, batch_idx):
@@ -136,6 +141,7 @@ class betaVAE_ResNet(pl.LightningModule):
 
         self.log('val_loss', vae_loss, on_epoch=True, prog_bar=True,
                  sync_dist=True if torch.cuda.device_count() > 1 else False)
+
         return vae_loss
 
     def configure_optimizers(self):

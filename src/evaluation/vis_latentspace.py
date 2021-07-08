@@ -1,8 +1,13 @@
-from torchvision.utils import make_grid
-import torch
 import numpy as np
 import matplotlib.pyplot as plt
-plt.ioff()
+
+import torch
+from torchvision.utils import make_grid
+
+"""
+Creates an object to sample and visualize the effect of the LSFs
+by sampling from the conditional latent distributions. 
+"""
 
 class vis_LatentSpace:
     def __init__(self, model, mu, sd, latent_dim=10, latent_range=3, input_dim=28):
@@ -25,12 +30,11 @@ class vis_LatentSpace:
         plt.imshow(np.transpose(npimg, (1, 2, 0)))
 
     def visualise(self):
+        print("Visualizing LSFs...")
         recon = []
 
         for i in range(0,self.latent_dim,1):
-
             latent = self.mu
-            #latent = torch.zeros(self.latent_dim, 20)
             latent = torch.transpose(latent.repeat(20, 1), 0, 1)
 
             latent[i, :] = torch.linspace(
@@ -58,6 +62,5 @@ class vis_LatentSpace:
         for i in range(0, self.latent_dim, 1):
             plt.text(5, (self.input_dim/2.1) + (i*step_size), str(i), color="red", fontsize = 14)
 
-        print("Visualizing LSFs...")
         plt.savefig('./images/latent space features.png')
 

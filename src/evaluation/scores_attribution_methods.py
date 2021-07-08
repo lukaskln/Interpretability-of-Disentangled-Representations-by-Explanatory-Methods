@@ -2,6 +2,12 @@ import torch
 import numpy as np
 import shap
 
+"""
+Creates the attribution scores computing objects based on the original images
+and the latent representations as inputs. Every object has attached methods for 
+IG, EG, Kernel SHAP and Deep SHAP based attribution computation.
+"""
+
 class scores_AM_Original:
     def __init__(self, model, datamodule, type, method, out_dim=10, n=5):
         self.model = model
@@ -15,7 +21,6 @@ class scores_AM_Original:
         self.type = type
 
     def deep_shap(self):
-
         with torch.no_grad():
             iter_obj = iter(self.datamodule)
             images_test, labels_test = iter_obj.next()
@@ -36,13 +41,12 @@ class scores_AM_Original:
 
         if self.type == 'betaVAE' or self.type == 'betaTCVAE':
             deep_shap_values = np.asarray(deep_shap_values).reshape(
-                self.out_dim, self.n, height, width)
+                                    self.out_dim, self.n, height, width)
             images_test = images_test.view(-1, 1, height, width)
 
         return deep_shap_values, images_test[:self.n]
 
     def expgrad_shap(self):
-
         with torch.no_grad():
             iter_obj = iter(self.datamodule)
             images_test, labels_test = iter_obj.next()
@@ -59,20 +63,19 @@ class scores_AM_Original:
                 images_test = images_test.view(-1, height * width)
 
         exp = shap.GradientExplainer(self.model,
-                                     data=images_train #[labels_train == 3]
+                                     data=images_train 
                                     )
 
         expgrad_shap_values = exp.shap_values(images_test[:self.n])
 
         if self.type == 'betaVAE' or self.type == 'betaTCVAE':
             expgrad_shap_values = np.asarray(expgrad_shap_values).reshape(
-                self.out_dim, self.n, height, width)
+                                        self.out_dim, self.n, height, width)
             images_test = images_test.view(-1, 1, height, width)
 
         return expgrad_shap_values, images_test[:self.n]
 
     def kernel_shap(self):
-
         with torch.no_grad():
             iter_obj = iter(self.datamodule)
             images_test, labels_test = iter_obj.next()
@@ -89,11 +92,12 @@ class scores_AM_Original:
                                    data=images_train.detach().numpy()
                                 )
 
-        kernel_shap_values = exp.shap_values(images_test[:self.n].detach().numpy(), check_additivity=True)
+        kernel_shap_values = exp.shap_values(images_test[:self.n].detach().numpy(), 
+                                            check_additivity=True)
 
         if self.type == 'betaVAE' or self.type == 'betaTCVAE':
             kernel_shap_values = np.asarray(kernel_shap_values).reshape(
-                self.out_dim, self.n, height, width)
+                                        self.out_dim, self.n, height, width)
             images_test = images_test.view(-1, 1, height, width)
 
         return kernel_shap_values, images_test[:self.n]
@@ -105,7 +109,6 @@ class scores_AM_Original:
         return x
 
     def compute(self):
-
         if self.method == "DeepSHAP":
             values, images_test = self.deep_shap()
         elif self.method == "KernelSHAP":
@@ -130,7 +133,6 @@ class scores_AM_Latent:
         self.type = type
 
     def expgrad_shap(self):
-
         with torch.no_grad():
             iter_obj = iter(self.datamodule)
             images_test, labels_test = iter_obj.next()
@@ -152,13 +154,13 @@ class scores_AM_Latent:
             encoding_test, _ = encoder.encode(images_test)
             
         exp = shap.GradientExplainer(self.model, 
-                                    data = encoding_train)
+                                     data = encoding_train
+                                    )
         
         expgrad_shap_values = exp.shap_values(encoding_test)
         return exp, expgrad_shap_values, encoding_test.numpy().astype('float32'), labels_test
 
     def deep_shap(self):
-
         with torch.no_grad():
             iter_obj = iter(self.datamodule)
             images_test, labels_test = iter_obj.next()
@@ -177,13 +179,13 @@ class scores_AM_Latent:
             encoding_test, _ = encoder.encode(images_test)
 
         exp = shap.DeepExplainer(self.model,
-                                     data=encoding_train)
+                                 data=encoding_train
+                                )
 
         deep_shap_values = exp.shap_values(encoding_test, check_additivity=True)
         return exp, deep_shap_values, encoding_test.numpy().astype('float32'), labels_test
 
     def kernel_shap(self):
-
         with torch.no_grad():
             iter_obj = iter(self.datamodule)
             images_test, labels_test = iter_obj.next()
@@ -201,10 +203,13 @@ class scores_AM_Latent:
             encoding_train, _ = encoder.encode(images_train)
             encoding_test, _ = encoder.encode(images_test)
 
-        exp = shap.KernelExplainer( self.kernel_model,
-                                    data=encoding_train.detach().numpy())
+        exp = shap.KernelExplainer(self.kernel_model,
+                                   data=encoding_train.detach().numpy()
+                                  )
 
-        kernel_shap_values = exp.shap_values(encoding_test.detach().numpy(), check_additivity=True)
+        kernel_shap_values = exp.shap_values(encoding_test.detach().numpy(), 
+                                            check_additivity=True)
+
         return exp, kernel_shap_values, encoding_test.numpy().astype('float32'), labels_test
 
     def kernel_model(self, x):
@@ -214,7 +219,6 @@ class scores_AM_Latent:
         return x
 
     def compute(self):
-
         print("\nVisualizing Attribution of LSF into Predictions... ")
 
         if self.method == "DeepSHAP":

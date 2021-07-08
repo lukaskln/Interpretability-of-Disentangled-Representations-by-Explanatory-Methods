@@ -5,14 +5,20 @@ from torch import optim, Tensor
 
 import pytorch_lightning as pl
 
+"""
+Defines the MLP encoder with beta-VAE loss module. Also for the decoder
+an MLP architecture is selected.
+"""
+
+
 class betaVAE(pl.LightningModule):
     def __init__(self,
-                 latent_dim=10,
-                 input_dim=784,
-                 lr=0.001,
-                 beta: float = 4.,
-                 dataset="mnist"
-                 ):
+        latent_dim=10,
+        input_dim=784,
+        lr=0.001,
+        beta: float = 4.,
+        dataset="mnist"
+        ):
         super(betaVAE, self).__init__()
 
         self.save_hyperparameters()
@@ -35,13 +41,13 @@ class betaVAE(pl.LightningModule):
         self.fc_mu=nn.Linear(50, latent_dim)
         self.fc_log_var=nn.Linear(50, latent_dim)
        
-    def encode(self,x):
+    def encode(self, x):
         z = self.encoder(x)
         mu = self.fc_mu(z)
         log_var = self.fc_log_var(z)
         return mu, log_var
     
-    def sampling(self,mu, log_var):
+    def sampling(self, mu, log_var):
         std = torch.exp(log_var * 0.5)
         q = torch.distributions.Normal(mu + 1e-05, std + 1e-05)
         z = q.rsample()
@@ -51,7 +57,7 @@ class betaVAE(pl.LightningModule):
         reconst = F.sigmoid(self.decoder(z))
         return reconst
 
-    def forward(self,x):
+    def forward(self, x):
         mu, log_var = self.encode(x)
         return mu
 
@@ -80,6 +86,7 @@ class betaVAE(pl.LightningModule):
 
         self.log('loss', vae_loss, on_epoch=False, prog_bar=True, on_step=True,
                  sync_dist=True if torch.cuda.device_count() > 1 else False)
+
         return vae_loss
 
     def validation_step(self, batch, batch_idx):
@@ -95,6 +102,7 @@ class betaVAE(pl.LightningModule):
 
         self.log('val_loss', vae_loss, on_epoch=True, prog_bar=True,
                  sync_dist=True if torch.cuda.device_count() > 1 else False)
+
         return vae_loss
 
     def configure_optimizers(self):

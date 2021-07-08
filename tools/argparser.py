@@ -3,7 +3,7 @@ from argparse import ArgumentParser
 import os
 
 """
-This file contains the declaration of our argument parser
+This file contains the declaration of the argument parser
 """
 
 # Needed to parse booleans from command line properly
@@ -19,6 +19,7 @@ def str2bool(v):
 
 def get_parser():
     parser = ArgumentParser(description='semi-supervised learning')
+
     # Data and Computation Parameters
     parser.add_argument("--batch_size", default=100, type=int)
     parser.add_argument("--dataset", choices=["mnist","dSprites","OCT"], default="mnist", type=str)
@@ -43,6 +44,8 @@ def get_parser():
     parser.add_argument("--seed", default=42, type=int)
     parser.add_argument("--logger", choices=["_", "wandb", "tensorboard"], default="_", type=str)
     parser.add_argument("--save_model", default=False, type=str2bool)
+
+    # TL and PT
     parser.add_argument("--fix_weights", default=True, type=str2bool)
     parser.add_argument("--TL", default=False, type=str2bool)
     parser.add_argument("--model_TL", choices=["ResNet", "Inception"], default="ResNet", type=str)
@@ -50,4 +53,5 @@ def get_parser():
     # Evaluation
     parser.add_argument("--method", choices=["EG", "IG", "DeepSHAP", "KernelSHAP"], default="EG", type=str)
     parser.add_argument("--eval_latent_range", default=15.0, type=float)
+    
     return parser

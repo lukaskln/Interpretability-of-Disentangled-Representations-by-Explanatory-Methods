@@ -1,4 +1,3 @@
-#### Setup ####
 library(xgboost)
 library(nnet)
 library(stargazer)
@@ -9,6 +8,11 @@ library(grid)
 library(BBmisc)
 
 vColors = c("#1269B0","#72791C","#91056A")
+
+# Run script to produce importance plot and multinominal regression output.
+# Images are saved in /image folder
+
+#### Data import and transformation ####
 
 dSprites_LSF = read.csv("./data/dSprites/dSprites_LSF_samples.csv")
 dSprites_LSF$Label = factor(as.character(dSprites_LSF$Label), labels = c("square","ellipse","heart"))
@@ -24,7 +28,7 @@ model <- multinom(Label ~., data=dSprites_LSF[,-c(3,6)]) # cbind(dSprites_LSF[,-
 print("Multinominal model with square as baseline")
 summary(model)
 
-stargazer(model)
+# stargazer(model) # for LaTeX output
 
 z <- summary(model)$coefficients/summary(model)$standard.errors
 print("Standardized coefficients")
@@ -42,7 +46,7 @@ data.frame(pp[5:10,], True = dSprites_LSF$Label[5:10])
 model <- glm(Label ~.,family=binomial(link='logit'),data=dSprites_LSF[dSprites_LSF$Label != "heart",-c(3,6)])
 model <- glm(Label ~.,family=binomial(link='logit'),data=dSprites_LSF[dSprites_LSF$Label != "square",-c(3,6)])
 
-stargazer(model)
+# stargazer(model) # for LaTeX output
 
 summary(model)
 
@@ -80,22 +84,22 @@ dfData <- data.frame(loss = c(67.8,36.9,12.8,-17.5,-48.7,-83.6,-121,-157,-191,-2
 
 plot1 =
 ggplot(data = dfData, aes(x=1:10, y=accuracy)) + 
-geom_line(cex = 1, color = vColors[1]) +
-geom_point(cex = 2, color = vColors[1]) +
-ylab("Test Accuracy") +
-coord_cartesian(ylim = c(0.4, 1)) +
-scale_x_continuous(expression(beta), labels = as.character(1:10), breaks = 1:10) +
-theme(panel.grid.minor.x = element_blank()) +
-theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank()) +
-scale_y_continuous(labels = scales::percent)
+  geom_line(cex = 1, color = vColors[1]) +
+  geom_point(cex = 2, color = vColors[1]) +
+  ylab("Test Accuracy") +
+  coord_cartesian(ylim = c(0.4, 1)) +
+  scale_x_continuous(expression(beta), labels = as.character(1:10), breaks = 1:10) +
+  theme(panel.grid.minor.x = element_blank()) +
+  theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank()) +
+  scale_y_continuous(labels = scales::percent)
 
 plot2 =
 ggplot(data = dfData, aes(x=1:10, y=loss)) + 
-geom_line(cex = 1, color = vColors[2]) +
-geom_point(cex = 2, color = vColors[2]) +
-ylab("\u03B2-TCVAE loss") +
-scale_x_continuous(expression(beta), labels = as.character(1:10), breaks = 1:10) +
-theme(panel.grid.minor.x = element_blank()) 
+  geom_line(cex = 1, color = vColors[2]) +
+  geom_point(cex = 2, color = vColors[2]) +
+  ylab("\u03B2-TCVAE loss") +
+  scale_x_continuous(expression(beta), labels = as.character(1:10), breaks = 1:10) +
+  theme(panel.grid.minor.x = element_blank()) 
 
 
 g1 <- ggplotGrob(plot0)

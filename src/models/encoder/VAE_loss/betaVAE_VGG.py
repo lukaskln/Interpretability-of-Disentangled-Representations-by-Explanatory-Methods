@@ -1,10 +1,16 @@
 import torch
-from torch import nn
 import torch.nn.functional as F
+from torch import nn
 from torch import optim, Tensor
-import torchvision
 
+import torchvision
 import pytorch_lightning as pl
+
+"""
+Defines the VGG encoder with beta-VAE loss module. As the decoder for the
+MNIST and dSprites data, an InfoGAN, and for the OCT data, a DCGAN architecture is
+automatically selected. Also the VGG size depends on the data.
+"""
 
 class betaVAE_VGG(pl.LightningModule):
     def __init__(self,
@@ -131,6 +137,7 @@ class betaVAE_VGG(pl.LightningModule):
 
         self.log('loss', vae_loss, on_epoch=False, prog_bar=True, on_step=True,
                  sync_dist=True if torch.cuda.device_count() > 1 else False)
+
         return vae_loss
 
     def validation_step(self, batch, batch_idx):
@@ -145,6 +152,7 @@ class betaVAE_VGG(pl.LightningModule):
 
         self.log('val_loss', vae_loss, on_epoch=True, prog_bar=True,
                  sync_dist=True if torch.cuda.device_count() > 1 else False)
+                 
         return vae_loss
 
     def configure_optimizers(self):

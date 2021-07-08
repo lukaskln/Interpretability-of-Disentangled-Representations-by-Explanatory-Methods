@@ -21,6 +21,12 @@ from src.evaluation.vis_reconstructions import *
 from src.evaluation.scores_attribution_methods import *
 from src.evaluation.vis_attribution_methods import *
 
+"""
+Calls all scripts from __init__ and the evaluation folder. The encoder and decoder are imported, 
+attribution is calculated for all three combinations, and all visualizations are saved
+into the /images folder.
+"""
+
 parser = get_parser()
 hparams = parser.parse_args()
 
@@ -52,7 +58,6 @@ for architecture in architectures_VAE:
         continue
 
 ## Classifier ##
-
 path_ckpt_cla = Path("./models/classifier/cla_" + str(hparams.model_ID) + ".ckpt")
 
 if os.path.exists(path_ckpt_cla) == False:
@@ -65,7 +70,7 @@ architectures_cla = [
 ]
 
 system = platform.system()
-if system == "Windows":
+if system == "Windows": # Change automatic path reading for windows systems
     temp = pathlib.PosixPath
     pathlib.PosixPath = pathlib.WindowsPath
 
@@ -78,7 +83,7 @@ for architecture in architectures_cla:
         # repeat the loop on failure
         continue
 
-## Dataset selection ##
+#### Dataset selection ####
 print("Loading Datasets...")
 
 if hparams.dataset == "mnist":
@@ -94,8 +99,7 @@ elif hparams.dataset == "OCT":
     input_height = int(326 ** 2)
     num_classes = 4
 
-#### Visualizations ####
-
+#### Visualization of Reconstructions and LSFs ####
 try:
     mu, sd = vis_Reconstructions(encoder, datamodule.train_dataloader(), type=encoder_type).visualise()
 except RuntimeError:
@@ -111,8 +115,7 @@ vis_LatentSpace(encoder,
                 sd = sd
                 ).visualise()
 
-#### Attribution Methods ####
-
+#### Attribution Computation and Visualization ####
 print('\nVisualizing Attribution of Original Images into Predictions...')
 scores, test_images = scores_AM_Original(cla, 
                                         datamodule.train_dataloader(),

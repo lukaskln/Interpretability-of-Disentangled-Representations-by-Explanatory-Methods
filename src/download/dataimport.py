@@ -1,21 +1,20 @@
 from six.moves import urllib
-import torch
+from pathlib import Path
+
 from src.download.dataloader_mnist import *
 from src.download.dataloader_dSprites import *
 from src.download.dataloader_OCT import *
-from pathlib import Path
 from tools.argparser import *
-import platform
 
 """
-Downloads training, validation and test data if not available locally and stores them into 
-the respective subdirectories.
+Calls the download of training, validation and test data if not available locally and stores them into 
+the respective subdirectories. Calls the selected dataloader.
 """
 
 parser = get_parser()
 hparams = parser.parse_args()
 
-### Define data path ###
+#### Define data path ####
 base_path = Path(__file__).resolve().parents[2]
 data_path = base_path / "data"
 
@@ -48,7 +47,6 @@ if hparams.dataset == "dSprites":
 
 # OCT
 if hparams.dataset == "OCT":
-
     datamodule_OCT = OCT_DataModule(data_dir=data_path / "OCT/",
                                     batch_size=hparams.batch_size,
                                     seed=hparams.seed,

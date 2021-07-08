@@ -1,7 +1,14 @@
-import torchvision.utils
 import numpy as np
 import matplotlib.pyplot as plt
+
 import torch
+import torchvision.utils
+
+"""
+Creates an object to visualize the original images and 
+reconstructions produced by the decoder. Also the encoding 
+of the image which is used to visualize the LSFs is selected.
+"""
 
 class vis_Reconstructions:
     def __init__(self, model, datamodule, type):
@@ -23,7 +30,6 @@ class vis_Reconstructions:
         plt.axis('off')
 
     def visualise_output(self, images):
-
         with torch.no_grad():
             
             height = images[0].shape[1]
@@ -35,8 +41,11 @@ class vis_Reconstructions:
                 mu, log_var = model.encode(images.view(-1, height * width))
             else:
                 mu, log_var = model.encode(images)
-            self.mu = mu[21]
+
+            # Select image for LSF visualization:
+            self.mu = mu[21] # Can be changed, 21 gives a nice result for the default seed
             self.sd = torch.exp(log_var[21] * 0.5)
+
             z = model.sampling(mu, log_var)
             images = model.decode(z)
             images = images.cpu()
@@ -53,7 +62,6 @@ class vis_Reconstructions:
 
 
     def visualise(self):
-
         images, labels = iter(self.datamodule).next()
 
         print('\nVisualizing Original Images...')

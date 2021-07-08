@@ -1,7 +1,3 @@
-from pathlib import Path
-import os
-
-import pytorch_lightning as pl
 import torch
 from torch import nn
 from torch.nn import functional as F
@@ -10,6 +6,12 @@ from torch.optim.optimizer import Optimizer
 
 from torchmetrics.functional import confusion_matrix, accuracy
 import torchvision
+import pytorch_lightning as pl
+
+"""
+Defines the CNN classifier module. Can not be used as a classification head 
+in the semi-supervised setting.
+"""
 
 class CNN(pl.LightningModule):
     def __init__(
@@ -35,7 +37,6 @@ class CNN(pl.LightningModule):
         self.fc_2 = nn.Linear(in_features=256, out_features=self.hparams.num_classes)
 
     def forward(self, x):
-
         x = self.enc_conv1(x)
         x = self.vgg(x)
         x = self.enc_avgpool(x)

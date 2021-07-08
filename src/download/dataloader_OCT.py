@@ -1,20 +1,27 @@
 import torch
 from pathlib import Path
-from tools.argparser import *
-import pytorch_lightning as pl
 import os
 import shutil
 import zipfile
 import numpy as np
 import requests
 
+import torch
 from torch.utils.data import DataLoader, random_split, TensorDataset, DistributedSampler
 from torch import Tensor
-import torch
 import torchvision
 from torchvision import transforms
+import pytorch_lightning as pl
+
+from tools.argparser import *
+
+"""
+Creating Pytorch Lightning datamodule for automatic download, preparation 
+and setting up of the dataloaders for the OCT retina dataset.
+"""
 
 # From: https://discuss.pytorch.org/t/balanced-sampling-between-classes-with-torchvision-dataloader/2703/3
+# Computing class weights for balanced sampling 
 def make_weights_for_balanced_classes(images, nclasses):
     count = [0] * nclasses
     for item in images:
@@ -28,7 +35,8 @@ def make_weights_for_balanced_classes(images, nclasses):
         weight[idx] = weight_per_class[val[1]]
     return weight
 
-def download_url(url, save_path, chunk_size=128):
+
+def download_url(url, save_path): # Chunk wise downloading to not overuse RAM
     r = requests.get(url, stream=True, allow_redirects=True)
     with open(save_path, 'wb') as f:
         for chunk in r.iter_content(chunk_size=1024): 
@@ -52,7 +60,7 @@ class OCT_DataModule(pl.LightningDataModule):
 
             print("Downloading and extracting OCT retina data...")
 
-            download_url(data_url, save_path, chunk_size=512)
+            download_url(data_url, save_path)
 
             zip_ref = zipfile.ZipFile(save_path, 'r')
             zip_ref.extractall(self.data_dir)
@@ -61,9 +69,8 @@ class OCT_DataModule(pl.LightningDataModule):
             os.remove(save_path)
 
     def setup(self):
-
-        transform_img = transforms.Compose([
-            torchvision.transforms.Resize((326, 326)),
+        transform_img = transforms.Compose([ 
+            torchvision.transforms.Resize((326, 326)), # Bilinear resizing
             transforms.Grayscale(num_output_channels=1),
             transforms.ToTensor(),
         ])
@@ -71,33 +78,34 @@ class OCT_DataModule(pl.LightningDataModule):
         train = torchvision.datasets.ImageFolder(self.data_dir / "train",
                                                  transform=transform_img)
 
-        data_enc, self.train_cla, self.val_cla = random_split(train, [106000, 1700, 609],  # 800 = 1700
-                                    generator=torch.Generator().manual_seed(self.seed))
+        data_enc, self.train_cla, self.val_cla = random_split(train, [106000, 1700, 609],
+                                                    generator=torch.Generator().manual_seed(self.seed))
 
         self.train_enc, self.val_enc = random_split(data_enc, [84600, 21400],  
-                                    generator=torch.Generator().manual_seed(self.seed))
-
-        weights = make_weights_for_balanced_classes(train.imgs, len(train.classes))
-
-        weights = torch.DoubleTensor(weights)
-        weights_enc, weights_cla, _ = random_split(weights, [106000, 1700, 609],  # 108309
-                                                generator=torch.Generator().manual_seed(self.seed))
-        weights_enc, _ = random_split(weights_enc, [84600, 21400],
-                                      generator=torch.Generator().manual_seed(self.seed))
-
-        self.sampler_cla = torch.utils.data.sampler.WeightedRandomSampler(weights_cla, 
-                                len(weights_cla), 
-                                generator=torch.Generator().manual_seed(self.seed)
-                            )
-        self.sampler_enc = torch.utils.data.sampler.WeightedRandomSampler(weights_enc, 
-                                len(weights_enc), 
-                                generator=torch.Generator().manual_seed(self.seed)
-                            )
+                                                    generator=torch.Generator().manual_seed(self.seed))
 
         self.test = torchvision.datasets.ImageFolder(self.data_dir / "test", transform=transform_img)
 
+        #### Computing and distributing weights for weighted sampling ####
+        weights = make_weights_for_balanced_classes(train.imgs, len(train.classes))
+        weights = torch.DoubleTensor(weights)
+
+        weights_enc, weights_cla, _ = random_split(weights, [106000, 1700, 609],
+                                                    generator=torch.Generator().manual_seed(self.seed))
+
+        weights_enc, _ = random_split(weights_enc, [84600, 21400],
+                                                    generator=torch.Generator().manual_seed(self.seed))
+
+        self.sampler_cla = torch.utils.data.sampler.WeightedRandomSampler(weights_cla, 
+                                                    len(weights_cla), 
+                                                    generator=torch.Generator().manual_seed(self.seed))
+
+        self.sampler_enc = torch.utils.data.sampler.WeightedRandomSampler(weights_enc, 
+                                                    len(weights_enc), 
+                                                    generator=torch.Generator().manual_seed(self.seed))
+
     def train_dataloader(self):
-        if torch.cuda.device_count() > 1:
+        if torch.cuda.device_count() > 1: # No weighted sampling in VAE training for distributed GPUs (#GPUs > 1)
             DL = DataLoader(self.train_enc, batch_size=self.batch_size, num_workers=self.num_workers)
         else:
             DL = DataLoader(self.train_enc, batch_size=self.batch_size, num_workers=self.num_workers, sampler=self.sampler_enc)
