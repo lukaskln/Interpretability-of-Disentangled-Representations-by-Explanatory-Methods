@@ -1,9 +1,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/lukaskln/Interpretability-of-Disentangled-Representations-by-Explanatory-Methods">
-    <img src="https://github.com/lukaskln/Interpretability-of-Disentangled-Representations-by-Explanatory-Methods/blob/master/images/OCT_LSF.gif" alt="Logo" width="220"> 
-    &nbsp;&nbsp;&nbsp;&nbsp;
-    <img src="https://github.com/lukaskln/Interpretability-of-Disentangled-Representations-by-Explanatory-Methods/blob/master/images/Example.jpg" alt="Logo" width="228">
+    <img src="https://github.com/lukaskln/Interpretability-of-Disentangled-Representations-by-Explanatory-Methods/blob/master/images/OCT_LSF.gif" alt="Logo" width="170"> 
   </a>
 
   <h3 align="center">Interpretability of Disentangled Representations by Explanatory Methods</h3>
@@ -29,14 +27,17 @@
 
 ## About the Thesis
 
-AI engineers try to establish trust between humans and machines by building machine learning systems that are either an interpretable model or a black-box model, which upon an explanatory method is applied. This thesis combines interpretable models and explanatory methods to gain new insights on the synergies of both approaches in a semi-supervised setting and with a focus on medical application. In medicine, AI models show astonishing prediction accuracies. However, they lack two crucial attributes for daily use in cooperation with a physician: The ability to be trained on small-sized labeled data and interpret the reasoning behind a prediction transparently. The thesis demonstrates that both obstacles can be solved jointly based on two proof-of-concept datasets and a medical dataset containing OCT images of the retina:
+<p align="center">
+  <img src="https://github.com/lukaskln/Interpretability-of-Disentangled-Representations-by-Explanatory-Methods/blob/master/images/Example_2.png" width="450"> 
+</p>
 
-> 1. An encoder is trained unsupervised on an augmented VAE-loss to capture the independent data generating factors in the images, producing disentangled, human interpretable, latent space representations.
->
-> 2. Based on these representations, a downstream classification task is solved by a neural network.
->
-> 3. The attribution is measured by an explanatory method from the input image and the disentangled representation into the predictions. Further, the attribution from the input image into the disentangled representation is measured to explain the encoder.
+AI engineers try to establish trust between humans and machines by either building interpretable models or applying explanatory methods upon black-box models. Both approaches form the basis for explainable AI (XAI). This thesis combines interpretable models and explanatory methods to gain new insights on their synergies in a semi-supervised setting and with a focus on medical application. In medicine, AI models show astonishing prediction accuracies. However, they lack two crucial attributes for daily use in cooperation with a physician: The ability to be trained on small-sized labeled datasets and to express the reasoning behind a prediction to challenge its diagnosis. The thesis demonstrates that both obstacles can be solved jointly through the semi-supervised setting, based on two proof-of-concept (POC) and one medical dataset containing OCT scans of the retina:
 
+1. An encoder is trained unsupervised on an augmented VAE-loss to capture the independent data generating factors in the images, producing disentangled, human interpretable, latent space representations.
+
+2. Based on these representations, a downstream classification task is solved by a neural network.
+
+3. The attribution is measured by an explanatory method from the input image and the disentangled representation into the predictions. Further, the attribution from the input image into the disentangled representation is measured to explain the encoder.
 
 ## Folder Structure
 ```
@@ -95,7 +96,11 @@ AI engineers try to establish trust between humans and machines by building mach
 
 To develop architectures, showcase theories, and test them on real-world medical data, three datasets can be selected in this library: two POC datasets and one medical. 
 
-The two POC datasets are MNIST by [LeCun et al.](http://yann.lecun.com/exdb/mnist/), a famous database of handwritten digits, and dSprites, an artificially generated dataset of sprites to measure disentanglement by [Matthey et al.](https://github.com/deepmind/dsprites-dataset/) at DeepMind. To test if the concepts also transfer to the medical domain and real world applications, the OCT retina dataset (V3) is selected, collected by [Kermany et al.](https://www.sciencedirect.com/science/article/pii/S0092867418301545) and consisting of 108,312 2D OCT images of the eye’s retina.
+The two POC datasets are MNIST by [LeCun et al.](http://yann.lecun.com/exdb/mnist/), a famous database of handwritten digits, and dSprites, an artificially generated dataset of sprites to measure disentanglement by [Matthey et al.](https://github.com/deepmind/dsprites-dataset/) at DeepMind. To test if the concepts also transfer to the medical domain and real world applications, the OCT retina dataset (V3) is selected, collected by [Kermany et al.](https://www.sciencedirect.com/science/article/pii/S0092867418301545) and consisting of 108,312 2D OCT images of the eye’s retina. Observe the three different disease and the normal state characterizing the retina OCT images:
+
+<p align="center">
+  <img src="https://github.com/lukaskln/Interpretability-of-Disentangled-Representations-by-Explanatory-Methods/blob/master/images/Example_1.jpg" width="600"> 
+</p>
 
 ## Usage
 
@@ -150,7 +155,13 @@ For the &#946;-TCVAE loss based model with &#946; = 4 and a VGG encoder architec
 
 #### **Evaluation**
 
-The models used for the visualizations in the thesis in sections 5.2 and 5.3 are already provided as pre-trained models with saved weights. They can be evaluated via the following model IDs: 1000, 2000, and 3000.
+<p align="center">
+  <img src="https://github.com/lukaskln/Interpretability-of-Disentangled-Representations-by-Explanatory-Methods/blob/master/images/Example_3.jpg" width="500">
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="https://github.com/lukaskln/Interpretability-of-Disentangled-Representations-by-Explanatory-Methods/blob/master/images/Example.jpg" width="350"> 
+</p>
+
+The models used for the visualizations in the thesis in sections 5.2 and 5.3 are already provided as pre-trained models with saved weights and can be downloaded here. Copy the respective .ckpt files into the `models/classifier` (cla_\*) and `models/encoder/VAE_loss` (VAE_\*) folder. They can be evaluated via the following model IDs: 1000, 2000, and 3000.
 
 - MNIST:
   ```sh
