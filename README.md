@@ -123,9 +123,9 @@ Once the virtual environment is activated, the code can be run as follows:
 
 - If you want to run the code on ETH's Leonhard cluster, submit the same job as above as follows:
   ```sh
-  bsub -W 24:00 -n 8 -R "rusage[ngpus_excl_p=2,mem=4500]" "--model_ID=1001 --dataset='mnist' --model='betaTCVAE_VGG' --VAE_beta=4 --save_model=True"
+  bsub -W 24:00 -n 8 -R "rusage[ngpus_excl_p=2,mem=4500]" "python main.py --model_ID=1001 --dataset='mnist' --model='betaTCVAE_VGG' --VAE_beta=4 --save_model=True"
   ```
-  The training code automatically supports data-parallel GPU training, with up to eight GPUs on one Leonhard node. The evaluation is computed exclusively on the CPU, supporting as many processors as possible. 
+  Load the proxy module on the Leonhard cluster via `module load eth_proxy` to download the data from external sources. The training code automatically supports data-parallel GPU training, with up to eight GPUs on one Leonhard node. The evaluation is computed exclusively on the CPU, supporting as many processors as possible. 
 
 ### Reproducing the results
 
