@@ -156,9 +156,9 @@ For the &#946;-TCVAE loss based model with &#946; = 4 and a VGG encoder architec
 #### **Evaluation**
 
 <p align="center">
-  <img src="https://github.com/lukaskln/Interpretability-of-Disentangled-Representations-by-Explanatory-Methods/blob/master/images/Example_3.jpg" width="500">
+  <img src="https://github.com/lukaskln/Interpretability-of-Disentangled-Representations-by-Explanatory-Methods/blob/master/images/Example_3.jpg" width="390">
   &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://github.com/lukaskln/Interpretability-of-Disentangled-Representations-by-Explanatory-Methods/blob/master/images/Example.jpg" width="350"> 
+  <img src="https://github.com/lukaskln/Interpretability-of-Disentangled-Representations-by-Explanatory-Methods/blob/master/images/Example.jpg" width="270"> 
 </p>
 
 The models used for the visualizations in the thesis in sections 5.2 and 5.3 are already provided as pre-trained models with saved weights and can be downloaded here. Copy the respective .ckpt files into the `models/classifier` (cla_\*) and `models/encoder/VAE_loss` (VAE_\*) folder. They can be evaluated via the following model IDs: 1000, 2000, and 3000.
