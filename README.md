@@ -1,7 +1,9 @@
 <br />
 <p align="center">
   <a href="https://github.com/lukaskln/Interpretability-of-Disentangled-Representations-by-Explanatory-Methods">
-    <img src="https://github.com/lukaskln/Interpretability-of-Disentangled-Representations-by-Explanatory-Methods/blob/master/images/OCT_LSF.gif" alt="Logo" width="140">
+    <img src="https://github.com/lukaskln/Interpretability-of-Disentangled-Representations-by-Explanatory-Methods/blob/master/images/OCT_LSF.gif" alt="Logo" width="180"> 
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <img src="https://github.com/lukaskln/Interpretability-of-Disentangled-Representations-by-Explanatory-Methods/blob/master/images/Example.jpg" alt="Logo" width="188">
   </a>
 
   <h3 align="center">Interpretability of Disentangled Representations by Explanatory Methods</h3>
