@@ -96,7 +96,7 @@ AI engineers try to establish trust between humans and machines by either buildi
 
 To develop architectures, showcase theories, and test them on real-world medical data, three datasets can be selected in this library: two POC datasets and one medical. 
 
-The two POC datasets are MNIST by [LeCun et al.](http://yann.lecun.com/exdb/mnist/), a famous database of handwritten digits, and dSprites, an artificially generated dataset of sprites to measure disentanglement by [Matthey et al.](https://github.com/deepmind/dsprites-dataset/) at DeepMind. To test if the concepts also transfer to the medical domain and real world applications, the OCT retina dataset (V3) is selected, collected by [Kermany et al.](https://www.sciencedirect.com/science/article/pii/S0092867418301545) and consisting of 108,312 2D OCT images of the eye’s retina. The three different diseases and the normal state characterizing the retina OCT scans, are observed below:
+MNIST by [LeCun et al.](http://yann.lecun.com/exdb/mnist/), a famous database of handwritten digits, and dSprites, an artificially generated dataset of sprites to measure disentanglement by [Matthey et al.](https://github.com/deepmind/dsprites-dataset/) at DeepMind, are the two POC datasets. To test if the concepts also transfer to the medical domain and real world applications, the OCT retina dataset (V3) is selected, collected by [Kermany et al.](https://www.sciencedirect.com/science/article/pii/S0092867418301545) and consisting of 108,312 2D OCT images of the eye’s retina. The three different diseases and the normal state characterizing the retina OCT scans, are observed below:
 
 <p align="center">
   <img src="https://github.com/lukaskln/Interpretability-of-Disentangled-Representations-by-Explanatory-Methods/blob/master/images/Example_1.jpg" width="600"> 
@@ -161,7 +161,7 @@ For the &#946;-TCVAE loss based model with &#946; = 4 and a VGG encoder architec
   <img src="https://github.com/lukaskln/Interpretability-of-Disentangled-Representations-by-Explanatory-Methods/blob/master/images/Example.jpg" width="270"> 
 </p>
 
-The models used for the visualizations in the thesis in sections 5.2 and 5.3 are already provided as pre-trained models with saved weights and can be downloaded here. Copy the respective .ckpt files into the `models/classifier` (cla_\*.ckpt) and `models/encoder/VAE_loss` (VAE_\*.ckpt) folder. They can be evaluated via the following model IDs: 1000, 2000, and 3000.
+The models used for the visualizations in the thesis in sections 5.2 and 5.3 are already provided as pre-trained models with saved weights and can be downloaded here. Copy the respective .ckpt files into the `models/classifier` (cla_\*.ckpt) and `models/encoder/VAE_loss` (VAE_\*.ckpt) folder. The models can be evaluated via the following IDs: 1000, 2000, and 3000.
 
 - MNIST:
   ```sh
@@ -175,24 +175,26 @@ The models used for the visualizations in the thesis in sections 5.2 and 5.3 are
   ```sh
   python main_evaluation.py --model_ID=3000 --dataset="OCT" --method="EG" --model="betaTCVAE_VGG" --eval_latent_range=15 --num_workers=40 --batch_size=200
   ```
-Set the `num_workers` argument to a suitable number for your computer, or remove it to choose half of your logical processors automatically. Modify the `eval_latent_range` argument to change the weighting of the standard deviation when sampling through the latent conditional densities to get more samples from the tails or around the center of the normal distributions.
+The `method` argument lets you choose betwen Integrated Gradients, Expected Gradients, Deep SHAP and Kernel SHAP as the explanatory method to compute the attributions. Set the `num_workers` argument to a suitable number for your computer, or remove it to choose half of your logical processors by default. Modify the `eval_latent_range` argument to change the weighting of the standard deviation when sampling through the latent conditional densities to get more samples from the tails or around the center of the normal distributions. 
 
 #### **Supervised-Training**
 
-Run the following code to train a VGG in a supervised setting on the small labeled dataset, to compare the results to the semi-supervised setting, as in section five of the thesis:
+A CNN with VGG16_bn architecture can be trained in a supervised setting on the small labeled dataset, for comparing the results to the semi-supervised setting:
 
   ```sh
   python main.py --model_ID=3002 --dataset="OCT" --model_cla="CNN" 
   ```
 
+This is also possible for all other classifiers, as presented in section five of the thesis.
+
 #### **Transfer-Learning and Pre-Training**
 
-Fine-tune the MLP on the supervised downstream task without training an unsupervised VAE-loss based model beforehand by using a transfer-learned encoder. The encoder is pre-trained on ImageNet and fixed in weights.
+The classifier can be fine-tune on the supervised downstream task without training an unsupervised VAE-loss based model beforehand by using a transfer-learned encoder. The encoder is pre-trained on ImageNet and fixed in weights:
 
   ```sh
   python main.py --model_ID=3003 --dataset="OCT" --TL=True --model_TL="Inception" 
   ```
-Pre-training is also possible on the orignal data and then fine-tuning the model to the downstream task:
+It is also possible to pre-train an encoder on the original data and then fine-tune it with the initialized weights to the downstream task:
 
   ```sh
   python main.py --model_ID=3004 --dataset="OCT" --model="betaVAE_VGG" --fix_weights=False  --latent_dim=20
