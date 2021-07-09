@@ -105,9 +105,9 @@ All essential libraries for the execution of the code are provided in the enviro
 
 Once the virtual environment is activated, the code can be run as follows:
 
-- Go into the `semi-supervised-methods` directory.
+- Go into the main directory.
   ```sh
-  cd semi-supervised-methods/
+  cd Interpretability-of-Disentangled-Representations-by-Explanatory-Methods/
   ```
 - Run the library with any number of custom arguments as defined in `tools/argparser.py`. 
 
@@ -158,11 +158,11 @@ The models used for the visualizations in the thesis in sections 5.2 and 5.3 are
   ```
 - dSprites:
   ```sh
-  python main_evaluation.py --model_ID=2000 --dataset="dSprites" --method="EG" --model="betaTCVAE_VGG" --eval_latent_range=15 --num_workers=30
+  python main_evaluation.py --model_ID=2000 --dataset="dSprites" --method="EG" --model="betaTCVAE_VGG" --eval_latent_range=15 --num_workers=30 --batch_size=200
   ```
 - OCT retina:
   ```sh
-  python main_evaluation.py --model_ID=3000 --dataset="OCT" --method="EG" --model="betaTCVAE_VGG" --eval_latent_range=15 --num_workers=40
+  python main_evaluation.py --model_ID=3000 --dataset="OCT" --method="EG" --model="betaTCVAE_VGG" --eval_latent_range=15 --num_workers=40 --batch_size=200
   ```
 Set the `num_workers` argument to a suitable number for your computer, or remove it to choose half of your logical processors automatically. Modify the `eval_latent_range` argument to change the weighting of the standard deviation when sampling through the latent conditional densities to get more samples from the tails or around the center of the normal distributions.
 
