@@ -104,7 +104,7 @@ MNIST by [LeCun et al.](http://yann.lecun.com/exdb/mnist/), a famous database of
 
 ## Usage
 
-All essential libraries for the execution of the code are provided in the environment.yml file from which a new conda environment can be created. For the R scripts, please install the corresponding libraries beforehand. 
+All essential libraries for the execution of the code are provided in the environment.yml file from which a new conda environment can be created (tested on Linux systems). For the R scripts, please install the corresponding libraries beforehand. 
 
 ### Run the code
 
@@ -161,7 +161,7 @@ For the &#946;-TCVAE loss based model with &#946; = 4 and a VGG encoder architec
   <img src="https://github.com/lukaskln/Interpretability-of-Disentangled-Representations-by-Explanatory-Methods/blob/master/images/Example.jpg" width="270"> 
 </p>
 
-The models used for the visualizations in the thesis in sections 5.2 and 5.3 are already provided as pre-trained models with saved weights and can be downloaded [here](https://www.google.de/). Copy the respective .ckpt files into the `models/classifier` (cla_\*.ckpt) and `models/encoder/VAE_loss` (VAE_\*.ckpt) folder. The models can be evaluated via the following IDs: 1000, 2000, and 3000.
+The models used for the visualizations in the thesis in sections 5.2 and 5.3 are already provided as pre-trained models with saved weights and can be downloaded [here](https://polybox.ethz.ch/index.php/s/5YN0ESOCWB81Gcg). Copy the respective .ckpt files into the `models/classifier` (cla_\*.ckpt) and `models/encoder/VAE_loss` (VAE_\*.ckpt) folder. The models can be evaluated via the following IDs: 1000, 2000, and 3000.
 
 - MNIST:
   ```sh
