@@ -104,7 +104,7 @@ MNIST by [LeCun et al.](http://yann.lecun.com/exdb/mnist/), a famous database of
 
 ## Usage
 
-All essential libraries for the execution of the code are provided in the environment.yml file from which a new conda environment can be created (tested on Linux systems). For the R scripts, please install the corresponding libraries beforehand. 
+All essential libraries for the execution of the code are provided in the environment.yml file from which a new conda environment can be created (Linux only). For the R scripts, please install the corresponding libraries beforehand. 
 
 ### Run the code
 
