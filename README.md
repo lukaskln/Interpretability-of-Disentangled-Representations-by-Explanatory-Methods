@@ -126,7 +126,7 @@ Once the virtual environment is activated, the code can be run as follows:
     ```
   Note that to save a model with a specific ID, the `save_model` argument must be set equal to True. Otherwise, the model will be deleted after the testing and can not be evaluated.
 
-- If you want to run the code on ETH's Leonhard cluster, submit the same job as above as follows:
+- If you want to run the code on ETH's Leonhard cluster, submit the same training job as above as follows:
   ```sh
   bsub -W 24:00 -n 8 -R "rusage[ngpus_excl_p=2,mem=4500]" "python main.py --model_ID=1001 --dataset='mnist' --model='betaTCVAE_VGG' --VAE_beta=4 --save_model=True"
   ```
